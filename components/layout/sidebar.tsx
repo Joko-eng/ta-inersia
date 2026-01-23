@@ -19,9 +19,6 @@ import {
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { sidebarMenu } from "@/config/menu";
 
-// ================================
-// Collapsible Menu Component
-// ================================
 function SidebarCollapsibleMenu({ menu }: { menu: any }) {
   const [open, setOpen] = useState(false);
 
@@ -54,9 +51,6 @@ function SidebarCollapsibleMenu({ menu }: { menu: any }) {
   );
 }
 
-// ================================
-// App Sidebar
-// ================================
 export function AppSidebar({
   role,
 }: {
@@ -67,7 +61,6 @@ export function AppSidebar({
   return (
     <Sidebar>
       <SidebarContent className="flex flex-col">
-        {/* Logo */}
         <div className="flex items-center gap-3 px-4 py-4">
           <Image
             src="/logo.png"
@@ -82,7 +75,6 @@ export function AppSidebar({
           </div>
         </div>
 
-        {/* Menu */}
         <SidebarGroup>
           <SidebarGroupLabel>MAIN</SidebarGroupLabel>
           <SidebarGroupContent>
@@ -105,7 +97,6 @@ export function AppSidebar({
           </SidebarGroupContent>
         </SidebarGroup>
 
-        {/* Theme Toggle - Bottom */}
         <div className="mt-auto px-4 pb-4 flex justify-center">
           <ThemeToggle />
         </div>
