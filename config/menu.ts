@@ -1,4 +1,4 @@
-import { Home, Layers, Settings, Users } from "lucide-react";
+import { Home, Layers, Settings, User, Users } from "lucide-react";
 
 export const sidebarMenu = {
   admin: [
@@ -33,11 +33,16 @@ export const sidebarMenu = {
     },
   ],
 
-  manager: [
+  projectmanager: [
     {
       label: "Dashboard",
       icon: Home,
       href: "/dashboard",
+    },
+    {
+      label: "Tim Pengembang",
+      icon: User,
+      href: "/tim pengembang",
     },
     {
       label: "Kelola Proyek",

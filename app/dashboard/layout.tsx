@@ -1,7 +1,6 @@
-// app/dashboard/layout.tsx
+import { AppNavbar } from "@/components/layout/navbar";
 import { AppSidebar } from "@/components/layout/sidebar";
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
-
+import { SidebarProvider } from "@/components/ui/sidebar";
 export default function DashboardLayout({
   children,
 }: {
@@ -9,12 +8,13 @@ export default function DashboardLayout({
 }) {
   return (
     <SidebarProvider>
-      <div className="flex min-h-screen">
-        <AppSidebar role={"member"} />
-        <main className="flex-1 p-4">
-          <SidebarTrigger className="mb-4" />
-          {children}
-        </main>
+      <div className="flex min-h-screen w-full">
+        <AppSidebar role="projectmanager" />
+
+        <div className="flex flex-1 flex-col w-full">
+          <AppNavbar name="Dimas Dani" role="projectmanager" />
+          <main className="flex-1 w-full p-6">{children}</main>
+        </div>
       </div>
     </SidebarProvider>
   );

@@ -13,8 +13,13 @@ import Image from "next/image";
 import { sidebarMenu } from "@/config/menu";
 import { ChevronDown } from "lucide-react";
 import Link from "next/link";
+import { ThemeToggle } from "../ui/theme-toggle";
 
-export function AppSidebar({ role }: { role: "admin" | "manager" | "member" }) {
+export function AppSidebar({
+  role,
+}: {
+  role: "admin" | "projectmanager" | "member";
+}) {
   const menus = sidebarMenu[role];
 
   return (
@@ -43,9 +48,9 @@ export function AppSidebar({ role }: { role: "admin" | "manager" | "member" }) {
                   {"children" in menu && menu.children ? (
                     <>
                       <SidebarMenuButton>
-                        <menu.icon />
+                        <menu.icon className="h-10 w-10" />
                         <span>{menu.label}</span>
-                        <ChevronDown className="ml-auto h-4 w-4" />
+                        <ChevronDown className="ml-auto h-6 w-6" />
                       </SidebarMenuButton>
 
                       <div className="ml-7 mt-1 space-y-1">
@@ -75,6 +80,9 @@ export function AppSidebar({ role }: { role: "admin" | "manager" | "member" }) {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
+      <div className="mt-auto px-4 pb-4">
+        <ThemeToggle />
+      </div>
     </Sidebar>
   );
 }
