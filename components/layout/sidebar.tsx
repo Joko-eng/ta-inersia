@@ -40,7 +40,7 @@ export function AppSidebar({ role }: { role: "admin" | "manager" | "member" }) {
             <SidebarMenu>
               {menus.map((menu) => (
                 <SidebarMenuItem key={menu.label}>
-                  {menu.children ? (
+                  {"children" in menu && menu.children ? (
                     <>
                       <SidebarMenuButton>
                         <menu.icon />
@@ -63,7 +63,7 @@ export function AppSidebar({ role }: { role: "admin" | "manager" | "member" }) {
                     </>
                   ) : (
                     <SidebarMenuButton asChild>
-                      <Link href={menu.href}>
+                      <Link href={"href" in menu ? menu.href : "#"}>
                         <menu.icon />
                         <span>{menu.label}</span>
                       </Link>
