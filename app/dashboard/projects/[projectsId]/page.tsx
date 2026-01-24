@@ -29,7 +29,6 @@ export default function ProjectPage() {
   const [tasks, setTasks] = useState<Task[]>([]);
 
   useEffect(() => {
-    // Fetch project data
     fetchProjectData(projectId);
   }, [projectId]);
 

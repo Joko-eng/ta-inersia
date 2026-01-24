@@ -26,21 +26,12 @@ import {
   sidebarMenu,
 } from "@/config/menu";
 
-/* =========================
-   ICON CONTROL (SATU TITIK)
-========================= */
-const ICON_SIZE = 24;
+const ICON_SIZE = 20;
 const ICON_STYLE = { width: ICON_SIZE, height: ICON_SIZE };
 
-/* =========================
-   HELPER
-========================= */
 const isActive = (pathname: string, href?: string) =>
   Boolean(href && pathname === href);
 
-/* =========================
-   LINK ITEM
-========================= */
 function SidebarLink({ item }: { item: MenuItem }) {
   const pathname = usePathname();
   if (!item.href) return null;
@@ -61,9 +52,6 @@ function SidebarLink({ item }: { item: MenuItem }) {
   );
 }
 
-/* =========================
-   NESTED MENU (PROJECT LIST)
-========================= */
 function SidebarNestedMenu({ menu }: { menu: MenuItem }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
@@ -96,9 +84,6 @@ function SidebarNestedMenu({ menu }: { menu: MenuItem }) {
   );
 }
 
-/* =========================
-   HEADER
-========================= */
 function SidebarHeader() {
   return (
     <div className="flex items-center gap-3 px-4 py-4">
@@ -117,9 +102,6 @@ function SidebarHeader() {
   );
 }
 
-/* =========================
-   APP SIDEBAR
-========================= */
 export function AppSidebar({
   role,
   projects,

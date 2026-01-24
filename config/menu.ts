@@ -1,8 +1,13 @@
-import { Folder, House, Settings, Users } from "lucide-react";
+import {
+  BarChart3,
+  Briefcase,
+  House,
+  Layers,
+  Settings,
+  UserCheck,
+  Users,
+} from "lucide-react";
 
-/* =========================
-   TYPES
-========================= */
 export type Role = "admin" | "projectmanager" | "member";
 
 export interface Project {
@@ -20,9 +25,6 @@ export interface MenuItem {
   children?: MenuItem[];
 }
 
-/* =========================
-   STATIC MENU (TANPA PROJECT)
-========================= */
 export const sidebarMenu: Record<Role, MenuItem[]> = {
   admin: [
     {
@@ -31,14 +33,33 @@ export const sidebarMenu: Record<Role, MenuItem[]> = {
       icon: House,
     },
     {
-      label: "Tim Pengembang",
-      href: "/team",
+      label: "Prospek Klien",
+      href: "/prospek-klien",
+      icon: Briefcase,
+    },
+    {
+      label: "Klien",
+      href: "/klien",
+      icon: UserCheck,
+    },
+    {
+      label: "Project Manager",
+      href: "/project-manager",
       icon: Users,
     },
     {
-      label: "Pengaturan",
-      href: "/settings",
-      icon: Settings,
+      label: "Income",
+      icon: BarChart3,
+      children: [
+        {
+          label: "Ringkasan",
+          href: "/income",
+        },
+        {
+          label: "Laporan",
+          href: "/income/laporan",
+        },
+      ],
     },
   ],
 
@@ -61,46 +82,47 @@ export const sidebarMenu: Record<Role, MenuItem[]> = {
       href: "/dashboard",
       icon: House,
     },
-    {
-      label: "Tim Pengembang",
-      href: "/team",
-      icon: Users,
-    },
   ],
 };
 
-/* =========================
-   DYNAMIC MENU (PROJECT)
-========================= */
 export function getSidebarMenu(projects: Project[]): Record<Role, MenuItem[]> {
   const projectItems: MenuItem[] = projects.map((project) => ({
     label: project.name,
-    href: `/dashboard/projects/${project.id}`, // langsung ke page.tsx yang SUDAH ADA
+    href: `/dashboard/projects/${project.id}`,
   }));
 
   const projectMenu: MenuItem = {
     label: "Projects",
-    icon: Folder,
+    icon: Layers,
     children: projectItems,
   };
 
   return {
     admin: [
       { label: "Dashboard", href: "/dashboard", icon: House },
-      { label: "Tim Pengembang", href: "/team", icon: Users },
+      { label: "Prospek Klien", href: "/prospek-klien", icon: Briefcase },
+      { label: "Klien", href: "/klien", icon: UserCheck },
+      { label: "Project Manager", href: "/project-manager", icon: Users },
+      {
+        label: "Income",
+        icon: BarChart3,
+        children: [
+          { label: "Ringkasan", href: "/income" },
+          { label: "Laporan", href: "/income/laporan" },
+        ],
+      },
       projectMenu,
       { label: "Pengaturan", href: "/settings", icon: Settings },
     ],
 
     projectmanager: [
       { label: "Dashboard", href: "/dashboard", icon: House },
-      { label: "Tim Pengembang", href: "/team", icon: Users },
+      { label: "Tim Pengembang", href: "/team", icon: Users }, // FIX
       projectMenu,
     ],
 
     member: [
       { label: "Dashboard", href: "/dashboard", icon: House },
-      { label: "Tim Pengembang", href: "/team", icon: Users },
       projectMenu,
     ],
   };
