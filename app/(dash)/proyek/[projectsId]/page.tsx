@@ -78,7 +78,7 @@ export default function ProjectPage() {
   return (
     <div className="flex-1 p-8">
       <div className="max-w-6xl mx-auto">
-        <h1 className="text-3xl font-bold mb-6">{projectName}</h1>
+        <h1 className="text-2xl font-bold mb-6">{projectName}</h1>
 
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-2">
@@ -87,7 +87,7 @@ export default function ProjectPage() {
               className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all ${
                 activeTab === "milestone"
                   ? "bg-primary text-primary-foreground border shadow-sm"
-                  : "text-muted-foreground hover:text-foreground"
+                  : "text-muted-foreground hover:text-foreground border shadow-sm"
               }`}
             >
               <svg
@@ -111,7 +111,7 @@ export default function ProjectPage() {
               className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all ${
                 activeTab === "kanban"
                   ? "bg-primary text-primary-foreground border shadow-sm"
-                  : "text-muted-foreground hover:text-foreground"
+                  : "text-muted-foreground hover:text-foreground border shadow-sm"
               }`}
             >
               <svg
