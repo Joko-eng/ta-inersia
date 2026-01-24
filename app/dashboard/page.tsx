@@ -1,3 +1,4 @@
 export default function page() {
-  return <div>bismillahd</div>;
+  return <div>bismillahd youp</div>;
+  
 }
