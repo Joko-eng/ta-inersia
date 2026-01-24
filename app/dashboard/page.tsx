@@ -1,3 +1,3 @@
 export default function page() {
-  return <div>ini halaman dashboard</div>;
+  return <div>bismillahd</div>;
 }
