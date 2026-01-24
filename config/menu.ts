@@ -71,7 +71,7 @@ export const sidebarMenu: Record<Role, MenuItem[]> = {
     },
     {
       label: "Tim Pengembang",
-      href: "/team",
+      href: "/dashboard/team",
       icon: Users,
     },
   ],
@@ -85,14 +85,14 @@ export const sidebarMenu: Record<Role, MenuItem[]> = {
   ],
 };
 
-export function getSidebarMenu(projects: Project[]): Record<Role, MenuItem[]> {
-  const projectItems: MenuItem[] = projects.map((project) => ({
+export function getSidebarMenu(proyek: Project[]): Record<Role, MenuItem[]> {
+  const projectItems: MenuItem[] = proyek.map((project) => ({
     label: project.name,
-    href: `/dashboard/projects/${project.id}`,
+    href: `/proyek/${project.id}`,
   }));
 
   const projectMenu: MenuItem = {
-    label: "Projects",
+    label: "Kelola Proyek",
     icon: Layers,
     children: projectItems,
   };
@@ -117,7 +117,7 @@ export function getSidebarMenu(projects: Project[]): Record<Role, MenuItem[]> {
 
     projectmanager: [
       { label: "Dashboard", href: "/dashboard", icon: House },
-      { label: "Tim Pengembang", href: "/team", icon: Users }, // FIX
+      { label: "Tim Pengembang", href: "/team", icon: Users },
       projectMenu,
     ],
 

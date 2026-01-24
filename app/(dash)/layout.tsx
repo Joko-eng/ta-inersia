@@ -38,7 +38,10 @@ export default function DashboardLayout({
   return (
     <SidebarProvider>
       <div className="flex min-h-screen w-full">
-        <AppSidebar role="admin" projects={loading ? undefined : projects} />
+        <AppSidebar
+          role="projectmanager"
+          projects={loading ? undefined : projects}
+        />
         <div className="flex-1 flex flex-col">
           <AppNavbar name="Dimas Dani" role="projectmanager" />
 
