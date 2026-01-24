@@ -1,71 +1,107 @@
-import { Home, Layers, Settings, User, Users } from "lucide-react";
+import { Folder, House, Settings, Users } from "lucide-react";
 
-export const sidebarMenu = {
+/* =========================
+   TYPES
+========================= */
+export type Role = "admin" | "projectmanager" | "member";
+
+export interface Project {
+  id: string;
+  name: string;
+}
+
+export interface MenuItem {
+  label: string;
+  href?: string;
+  icon?: React.ComponentType<{
+    className?: string;
+    style?: React.CSSProperties;
+  }>;
+  children?: MenuItem[];
+}
+
+/* =========================
+   STATIC MENU (TANPA PROJECT)
+========================= */
+export const sidebarMenu: Record<Role, MenuItem[]> = {
   admin: [
     {
       label: "Dashboard",
-      icon: Home,
       href: "/dashboard",
+      icon: House,
     },
     {
       label: "Tim Pengembang",
+      href: "/team",
       icon: Users,
-      href: "/dashboard/team",
-    },
-    {
-      label: "Kelola Proyek",
-      icon: Layers,
-      children: [
-        {
-          label: "Semua Proyek",
-          href: "/dashboard/projects",
-        },
-        {
-          label: "Manajemen User",
-          href: "/dashboard/users",
-        },
-      ],
     },
     {
       label: "Pengaturan",
+      href: "/settings",
       icon: Settings,
-      href: "/dashboard/settings",
     },
   ],
 
   projectmanager: [
     {
       label: "Dashboard",
-      icon: Home,
       href: "/dashboard",
+      icon: House,
     },
     {
       label: "Tim Pengembang",
-      icon: User,
-      href: "/tim pengembang",
-    },
-    {
-      label: "Kelola Proyek",
-      icon: Layers,
-      children: [
-        {
-          label: "Proyek Aktif",
-          href: "/dashboard/projects/active",
-        },
-      ],
+      href: "/team",
+      icon: Users,
     },
   ],
 
   member: [
     {
       label: "Dashboard",
-      icon: Home,
       href: "/dashboard",
+      icon: House,
     },
     {
-      label: "Tugas Saya",
-      icon: Layers,
-      href: "/dashboard/my-tasks",
+      label: "Tim Pengembang",
+      href: "/team",
+      icon: Users,
     },
   ],
-} as const;
+};
+
+/* =========================
+   DYNAMIC MENU (PROJECT)
+========================= */
+export function getSidebarMenu(projects: Project[]): Record<Role, MenuItem[]> {
+  const projectItems: MenuItem[] = projects.map((project) => ({
+    label: project.name,
+    href: `/dashboard/projects/${project.id}`, // langsung ke page.tsx yang SUDAH ADA
+  }));
+
+  const projectMenu: MenuItem = {
+    label: "Projects",
+    icon: Folder,
+    children: projectItems,
+  };
+
+  return {
+    admin: [
+      { label: "Dashboard", href: "/dashboard", icon: House },
+      { label: "Tim Pengembang", href: "/team", icon: Users },
+      projectMenu,
+      { label: "Pengaturan", href: "/settings", icon: Settings },
+    ],
+
+    projectmanager: [
+      { label: "Dashboard", href: "/dashboard", icon: House },
+      { label: "Tim Pengembang", href: "/team", icon: Users },
+      projectMenu,
+    ],
+
+    member: [
+      { label: "Dashboard", href: "/dashboard", icon: House },
+      { label: "Tim Pengembang", href: "/team", icon: Users },
+      projectMenu,
+    ],
+  };
+}

@@ -1,19 +1,52 @@
+"use client";
+
 import { AppNavbar } from "@/components/layout/navbar";
 import { AppSidebar } from "@/components/layout/sidebar";
 import { SidebarProvider } from "@/components/ui/sidebar";
+import { useEffect, useState } from "react";
+
+interface Project {
+  id: string;
+  name: string;
+}
+
 export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // Fetch projects dari API
+    async function fetchProjects() {
+      try {
+        const res = await fetch("/api/projects");
+        const data = await res.json();
+        setProjects(data);
+      } catch (error) {
+        console.error("Failed to fetch projects:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchProjects();
+  }, []);
+
   return (
     <SidebarProvider>
       <div className="flex min-h-screen w-full">
-        <AppSidebar role="admin" />
+        <AppSidebar
+          role="projectmanager"
+          projects={loading ? undefined : projects}
+        />
+        <div className="flex-1 flex flex-col">
+          <AppNavbar name="Dimas Dani" role="projectmanager" />
 
-        <div className="flex flex-1 flex-col w-full">
-          <AppNavbar name="Dimas Dani" role="admin" />
-          <main className="flex-1 w-full p-6">{children}</main>
+          {/* Main Content */}
+          <main className="flex-1 overflow-auto">{children}</main>
         </div>
       </div>
     </SidebarProvider>
