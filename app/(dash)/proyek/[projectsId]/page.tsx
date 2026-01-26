@@ -80,12 +80,6 @@ export default function ProjectPage() {
         deadline: "-",
         isCompleted: false,
       },
-      {
-        id: "7",
-        title: "Caor bosku",
-        deadline: "-",
-        isCompleted: false,
-      },
     ]);
   };
 
@@ -130,7 +124,7 @@ export default function ProjectPage() {
         </div>
         {activeTab === "milestone" && (
           <div className="bg-white rounded-xl border shadow-sm overflow-hidden">
-            <div className="grid grid-cols-3 px-6 py-3 text-sm text-muted-foreground border-b">
+            <div className="grid grid-cols-3 px-6 py-3 text-sm text-foreground border-b">
               <div className="flex items-center gap-2">
                 <AlignLeft size={16} /> <span>Milestone</span>
               </div>

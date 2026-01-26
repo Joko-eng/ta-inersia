@@ -18,13 +18,7 @@ import {
 } from "@/components/ui/sidebar";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 
-import {
-  getSidebarMenu,
-  MenuItem,
-  Project,
-  Role,
-  sidebarMenu,
-} from "@/config/menu";
+import { MenuItem, Project, Role, getSidebarMenu } from "@/config/menu";
 
 const ICON_SIZE = 20;
 const ICON_STYLE = { width: ICON_SIZE, height: ICON_SIZE };
@@ -110,9 +104,12 @@ export function AppSidebar({
   projects?: Project[];
 }) {
   const pathname = usePathname();
-  const menuConfig = projects ? getSidebarMenu(projects) : sidebarMenu;
-  const menus = menuConfig[role];
 
+  const menus = getSidebarMenu(
+    role,
+    role === "projectmanager" ? projects : [],
+    role === "member" ? projects : [],
+  );
   return (
     <Sidebar>
       <SidebarContent className="flex flex-col">
