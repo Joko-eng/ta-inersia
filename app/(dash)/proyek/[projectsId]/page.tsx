@@ -1,5 +1,11 @@
 "use client";
-import { BarChart2Icon, KanbanSquare, Plus } from "lucide-react";
+import {
+  AlignLeft,
+  BarChart2Icon,
+  Calendar,
+  KanbanSquare,
+  Plus,
+} from "lucide-react";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -29,14 +35,58 @@ export default function ProjectPage() {
     "milestone",
   );
   const [projectName, setProjectName] = useState("");
-  const [showTaskModal, setShowTaskModal] = useState(false);
-
+  const [setShowTaskModal] = useState(false);
+  const [milestones, setMilestones] = useState<Milestone[]>([]);
   useEffect(() => {
     fetchProjectData(projectId);
   }, [projectId]);
 
   const fetchProjectData = async (id: string) => {
-    setProjectName("Manajamen Toko ABC");
+    setProjectName("Inventaris PT XYZ");
+    setMilestones([
+      {
+        id: "1",
+        title: "Analisis Kebutuhan Sistem",
+        deadline: "23 Maret, 2025",
+        isCompleted: true,
+      },
+      {
+        id: "2",
+        title: "Perancangan Desain Arsitektur Sistem",
+        deadline: "9 Mei, 2025",
+        isCompleted: true,
+      },
+      {
+        id: "3",
+        title: "Pembuatan Fitur Fitur Utama Sistem",
+        deadline: "20 Mei, 2025",
+        isCompleted: true,
+      },
+      {
+        id: "4",
+        title: "Pengembangan Fitur Tambahan",
+        deadline: "28 April, 2025",
+        isCompleted: false,
+      },
+      {
+        id: "5",
+        title: "Pengujian Sistem",
+        deadline: "-",
+        isCompleted: false,
+      },
+      {
+        id: "6",
+        title: "Peluncuran Sistem Dan Pemeliharaan",
+        deadline: "-",
+        isCompleted: false,
+      },
+      {
+        id: "7",
+        title: "Caor bosku",
+        deadline: "-",
+        isCompleted: false,
+      },
+    ]);
   };
 
   return (
@@ -45,7 +95,7 @@ export default function ProjectPage() {
         <h1 className="text-2xl font-bold mb-6">{projectName}</h1>
 
         <div className="flex items-center justify-between mb-6">
-          <div className="flex gap-2 bg-muted/50 dark:bg-muted/20 rounded-full p-1">
+          <div className="flex gap-4">
             <button
               onClick={() => setActiveTab("milestone")}
               className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm transition ${
@@ -71,17 +121,66 @@ export default function ProjectPage() {
             </button>
           </div>
           <button
-            onClick={() =>
-              activeTab === "kanban"
-                ? setShowTaskModal(true)
-                : alert("Tambah Milestone")
-            }
+            onClick={() => activeTab === "kanban"}
             className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:bg-primary/90 transition"
           >
             <Plus className="h-4 w-4" />
             {activeTab === "kanban" ? "Tugas" : "Milestone"}
           </button>
         </div>
+        {activeTab === "milestone" && (
+          <div className="bg-white rounded-xl border shadow-sm overflow-hidden">
+            <div className="grid grid-cols-3 px-6 py-3 text-sm text-muted-foreground border-b">
+              <div className="flex items-center gap-2">
+                <AlignLeft size={16} /> <span>Milestone</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Calendar size={16} /> <span>Tanggal</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <AlignLeft size={16} /> <span>Status</span>
+              </div>
+            </div>
+
+            {milestones.map((item) => {
+              const status = item.isCompleted
+                ? "Selesai"
+                : item.deadline === "-"
+                  ? "Menunggu"
+                  : "Sedang Dikerjakan";
+
+              const statusStyle =
+                status === "Selesai"
+                  ? "bg-green-100 text-green-700"
+                  : status === "Menunggu"
+                    ? "bg-yellow-100 text-yellow-700"
+                    : "bg-gray-100 text-gray-700";
+
+              return (
+                <div
+                  key={item.id}
+                  className="grid grid-cols-3 items-center px-6 py-4 border-b last:border-b-0 text-sm"
+                >
+                  <div className="font-medium">{item.title}</div>
+                  <div className="text-muted-foreground">{item.deadline}</div>
+                  <div>
+                    <span
+                      className={`inline-flex rounded-md px-3 py-1 text-xs font-medium ${statusStyle}`}
+                    >
+                      {status}
+                    </span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        {activeTab === "kanban" && (
+          <div className="mt-8 text-muted-foreground">
+            Kanban view coming soon…
+          </div>
+        )}
       </div>
     </div>
   );
