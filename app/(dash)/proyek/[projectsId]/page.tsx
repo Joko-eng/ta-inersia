@@ -57,6 +57,8 @@ export default function ProjectPage() {
     dueDate: "",
     priority: "sedang" as "rendah" | "sedang" | "tinggi",
   });
+  const [showStatusSelect, setShowStatusSelect] = useState(false);
+
   useEffect(() => {
     fetchProjectData(projectId);
   }, [projectId]);
@@ -154,7 +156,13 @@ export default function ProjectPage() {
             </button>
           </div>
           <button
-            onClick={() => activeTab === "kanban"}
+            onClick={() => {
+              if (activeTab === "kanban") {
+                setTargertStatus("todo");
+                setShowStatusSelect(true);
+                setShowTaskModal(true);
+              }
+            }}
             className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:bg-primary/90 transition"
           >
             <Plus className="h-4 w-4" />
@@ -218,7 +226,7 @@ export default function ProjectPage() {
                     <div
                       ref={provided.innerRef}
                       {...provided.droppableProps}
-                      className="min-w-[300px] bg-[#F7F9FC] dark:bg-zinc-900 rounded-2xl p-4 flex flex-col border border-transparent dark:border-zinc-800"
+                      className="min-w-[300px] bg-slate-100 dark:bg-zinc-900 rounded-2xl p-4 flex flex-col border border-transparent dark:border-zinc-800"
                     >
                       <div
                         className={`${col.color} dark:opacity-90 text-white rounded-full px-4 py-2 mb-4 flex justify-between items-center shrink-0`}
@@ -231,6 +239,7 @@ export default function ProjectPage() {
                           onClick={() => {
                             setTargertStatus(col.id as any);
                             setShowTaskModal(true);
+                            setShowStatusSelect(false);
                           }}
                         >
                           +
@@ -265,19 +274,15 @@ export default function ProjectPage() {
                                     {task.priority.charAt(0).toUpperCase() +
                                       task.priority.slice(1)}
                                   </span>
-
                                   <h4 className="font-medium text-zinc-900 dark:text-zinc-100">
                                     {task.title}
                                   </h4>
-
                                   <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1">
                                     {task.description || "-"}
                                   </p>
-
-                                  <p className="text-xs mt-2 text-zinc-600 dark:text-zinc-400">
+                                  <p className="text-sm mt-2 text-zinc-600 dark:text-zinc-400">
                                     Milestone
                                   </p>
-
                                   <p className="text-xs text-zinc-500 dark:text-zinc-400">
                                     {
                                       milestones.find(
@@ -285,7 +290,7 @@ export default function ProjectPage() {
                                       )?.title
                                     }
                                   </p>
-
+                                  <div className="my-5 h-px w-full bg-zinc-200 dark:bg-zinc-800" />{" "}
                                   <div className="flex justify-between items-center mt-4 text-xs text-zinc-500 dark:text-zinc-400">
                                     <span>{task.assignee}</span>
                                     <span>{task.dueDate || "DD MM"}</span>
@@ -335,18 +340,43 @@ export default function ProjectPage() {
                 }
                 className="w-full border rounded px-3 py-2 dark:bg-zinc-950 dark:border-zinc-800 dark:text-zinc-100"
               />
+              {showStatusSelect && (
+                <div className="space-y-1">
+                  <p className="text-xs font-medium text-zinc-700 dark:text-zinc-300">
+                    Pilih Status
+                  </p>
 
-              <select
-                value={newTask.priority}
-                onChange={(e) =>
-                  setNewTask({ ...newTask, priority: e.target.value as any })
-                }
-                className="w-full border rounded px-3 py-2 dark:bg-zinc-950 dark:border-zinc-800 dark:text-zinc-100"
-              >
-                <option value="rendah">Rendah</option>
-                <option value="sedang">Sedang</option>
-                <option value="tinggi">Tinggi</option>
-              </select>
+                  <select
+                    value={targetStatus}
+                    onChange={(e) =>
+                      setTargertStatus(
+                        e.target.value as "todo" | "inprogress" | "done",
+                      )
+                    }
+                    className="w-full border rounded px-3 py-2 dark:bg-zinc-950 dark:border-zinc-800 dark:text-zinc-100"
+                  >
+                    <option value="todo">Daftar Tugas</option>
+                    <option value="inprogress">Sedang Dikerjakan</option>
+                    <option value="done">Selesai</option>
+                  </select>
+                </div>
+              )}
+              <div className="space-y-1">
+                <p className="text-xs font-medium text-zinc-700 dark:text-zinc-300">
+                  Pilih Prioritas
+                </p>
+                <select
+                  value={newTask.priority}
+                  onChange={(e) =>
+                    setNewTask({ ...newTask, priority: e.target.value as any })
+                  }
+                  className="w-full border rounded px-3 py-2 dark:bg-zinc-950 dark:border-zinc-800 dark:text-zinc-100"
+                >
+                  <option value="rendah">Rendah</option>
+                  <option value="sedang">Sedang</option>
+                  <option value="tinggi">Tinggi</option>
+                </select>
+              </div>
 
               <select
                 value={newTask.milestoneId}
