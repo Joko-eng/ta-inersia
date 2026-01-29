@@ -400,25 +400,32 @@ export default function ProjectPage() {
                   </option>
                 ))}
               </select>
-
-              <input
-                placeholder="Tim Pengembang"
-                value={newTask.assignee}
-                onChange={(e) =>
-                  setNewTask({ ...newTask, assignee: e.target.value })
-                }
-                className="w-full border rounded px-3 py-2 dark:bg-zinc-950 dark:border-zinc-800 dark:text-zinc-100"
-              />
-
-              <input
-                type="date"
-                value={newTask.dueDate}
-                onChange={(e) =>
-                  setNewTask({ ...newTask, dueDate: e.target.value })
-                }
-                className="w-full border rounded px-3 py-2 dark:bg-zinc-950 dark:border-zinc-800 dark:text-zinc-100"
-              />
-
+              <div className="space-y-1">
+                <p className="text-xs font-medium text-zinc-700 dark:text-zinc-300">
+                  Pilih Tim Pengembang
+                </p>
+                <input
+                  placeholder="Tim Pengembang"
+                  value={newTask.assignee}
+                  onChange={(e) =>
+                    setNewTask({ ...newTask, assignee: e.target.value })
+                  }
+                  className="w-full border rounded px-3 py-2 dark:bg-zinc-950 dark:border-zinc-800 dark:text-zinc-100"
+                />
+              </div>
+              <div className="space-y-1">
+                <p className="text-xs font-medium text-zinc-700 dark:text-zinc-300">
+                  Tentukan Deadline
+                </p>
+                <input
+                  type="date"
+                  value={newTask.dueDate}
+                  onChange={(e) =>
+                    setNewTask({ ...newTask, dueDate: e.target.value })
+                  }
+                  className="w-full border rounded px-3 py-2 dark:bg-zinc-950 dark:border-zinc-800 dark:text-zinc-100"
+                />
+              </div>
               <div className="flex justify-end gap-2 pt-2">
                 <button
                   onClick={() => setShowTaskModal(false)}
