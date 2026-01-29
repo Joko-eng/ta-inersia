@@ -10,11 +10,12 @@ import {
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
+type MilestoneStatus = "menunggu" | "progress" | "selesai";
 interface Milestone {
   id: string;
   title: string;
   deadline: string;
-  isCompleted: boolean;
+  status: MilestoneStatus;
 }
 
 interface Task {
@@ -27,14 +28,6 @@ interface Task {
   priority: "rendah" | "sedang" | "tinggi";
   status: "todo" | "inprogress" | "done";
 }
-interface NewTaskForm {
-  title: string;
-  description: string;
-  milestoneId: string;
-  assignee: string;
-  dueDate: string;
-  priority: "rendah" | "sedang" | "tinggi";
-}
 
 export default function ProjectPage() {
   const params = useParams();
@@ -46,6 +39,13 @@ export default function ProjectPage() {
   const [milestones, setMilestones] = useState<Milestone[]>([]);
   const [tasks, setTasks] = useState<Task[]>([]);
   const [showTaskModal, setShowTaskModal] = useState(false);
+  const [showMilestoneModal, setShowMilestoneModal] = useState(false);
+  const [newMilestone, setNewMilestone] = useState({
+    title: "",
+    deadline: "",
+    status: "progress" as MilestoneStatus,
+  });
+
   const [targetStatus, setTargertStatus] = useState<
     "todo" | "inprogress" | "done"
   >("todo");
@@ -58,6 +58,19 @@ export default function ProjectPage() {
     priority: "sedang" as "rendah" | "sedang" | "tinggi",
   });
   const [showStatusSelect, setShowStatusSelect] = useState(false);
+  const formatTanggalID = (date?: string) => {
+    if (!date || date === "-") return "-";
+
+    const d = new Date(date);
+
+    if (isNaN(d.getTime())) return "-";
+
+    return d.toLocaleDateString("id-ID", {
+      day: "2-digit",
+      month: "long",
+      year: "numeric",
+    });
+  };
 
   useEffect(() => {
     fetchProjectData(projectId);
@@ -70,37 +83,25 @@ export default function ProjectPage() {
         id: "1",
         title: "Analisis Kebutuhan Sistem",
         deadline: "23 Maret, 2025",
-        isCompleted: true,
+        status: "selesai",
       },
       {
         id: "2",
         title: "Perancangan Desain Arsitektur Sistem",
-        deadline: "9 Mei, 2025",
-        isCompleted: true,
+        deadline: "9 May, 2025",
+        status: "selesai",
       },
       {
         id: "3",
         title: "Pembuatan Fitur Fitur Utama Sistem",
-        deadline: "20 Mei, 2025",
-        isCompleted: true,
+        deadline: "20 May, 2025",
+        status: "selesai",
       },
       {
         id: "4",
         title: "Pengembangan Fitur Tambahan",
         deadline: "28 April, 2025",
-        isCompleted: false,
-      },
-      {
-        id: "5",
-        title: "Pengujian Sistem",
-        deadline: "-",
-        isCompleted: false,
-      },
-      {
-        id: "6",
-        title: "Peluncuran Sistem Dan Pemeliharaan",
-        deadline: "-",
-        isCompleted: false,
+        status: "progress",
       },
     ]);
   };
@@ -162,6 +163,9 @@ export default function ProjectPage() {
                 setShowStatusSelect(true);
                 setShowTaskModal(true);
               }
+              if (activeTab === "milestone") {
+                setShowMilestoneModal(true);
+              }
             }}
             className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:bg-primary/90 transition"
           >
@@ -184,16 +188,17 @@ export default function ProjectPage() {
             </div>
 
             {milestones.map((item) => {
-              const status = item.isCompleted
-                ? "Selesai"
-                : item.deadline === "-"
-                  ? "Menunggu"
-                  : "Sedang Dikerjakan";
+              const status =
+                item.status === "selesai"
+                  ? "Selesai"
+                  : item.status === "menunggu"
+                    ? "Menunggu"
+                    : "Sedang Dikerjakan";
 
               const statusStyle =
-                status === "Selesai"
+                item.status === "selesai"
                   ? "bg-green-100 text-green-700"
-                  : status === "Menunggu"
+                  : item.status === "menunggu"
                     ? "bg-yellow-100 text-yellow-700"
                     : "bg-gray-100 text-gray-700";
 
@@ -203,7 +208,10 @@ export default function ProjectPage() {
                   className="grid grid-cols-3 items-center px-6 py-4 border-b last:border-b-0 text-sm"
                 >
                   <div className="font-medium">{item.title}</div>
-                  <div className="text-muted-foreground">{item.deadline}</div>
+                  <div className="text-muted-foreground">
+                    {formatTanggalID(item.deadline)}
+                  </div>
+
                   <div>
                     <span
                       className={`inline-flex rounded-md px-3 py-1 text-xs font-medium ${statusStyle}`}
@@ -447,6 +455,111 @@ export default function ProjectPage() {
                     setShowTaskModal(false);
                   }}
                   className="px-4 py-2 bg-primary text-primary-foreground rounded"
+                >
+                  Simpan
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+        {showMilestoneModal && (
+          <div className="fixed inset-0 bg-black/40 dark:bg-black/70 flex items-center justify-center z-50">
+            <div className="bg-white dark:bg-zinc-900 rounded-xl w-full max-w-md p-6 border dark:border-zinc-800">
+              <h3 className="font-semibold text-lg text-zinc-900 dark:text-zinc-100">
+                Tambah Milestone
+              </h3>
+
+              <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1">
+                Ini adalah milestone project
+              </p>
+              <div className="space-y-4 mt-6">
+                <div className="space-y-1">
+                  <p className="text-xs font-medium text-zinc-700 dark:text-zinc-300">
+                    Milestone*
+                  </p>
+
+                  <input
+                    placeholder="Ini contoh milestone"
+                    value={newMilestone.title}
+                    onChange={(e) =>
+                      setNewMilestone({
+                        ...newMilestone,
+                        title: e.target.value,
+                      })
+                    }
+                    className="w-full border rounded-lg px-3 py-2 dark:bg-zinc-950 dark:border-zinc-800 dark:text-zinc-100"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <p className="text-xs font-medium text-zinc-700 dark:text-zinc-300">
+                    Tanggal
+                  </p>
+
+                  <div className="relative">
+                    <Calendar className="absolute left-3 top-2.5 h-4 w-4 text-zinc-400" />
+                    <input
+                      type="date"
+                      value={newMilestone.deadline}
+                      onChange={(e) =>
+                        setNewMilestone({
+                          ...newMilestone,
+                          deadline: e.target.value,
+                        })
+                      }
+                      className="w-full border rounded-lg pl-10 pr-3 py-2 dark:bg-zinc-950 dark:border-zinc-800 dark:text-zinc-100"
+                    />
+                  </div>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-xs font-medium text-zinc-700 dark:text-zinc-300">
+                    Status*
+                  </p>
+
+                  <select
+                    value={newMilestone.status}
+                    onChange={(e) =>
+                      setNewMilestone({
+                        ...newMilestone,
+                        status: e.target.value as MilestoneStatus,
+                      })
+                    }
+                    className="w-full border rounded-lg px-3 py-2 dark:bg-zinc-950 dark:border-zinc-800 dark:text-zinc-100"
+                  >
+                    <option value="menunggu">Menunggu</option>
+                    <option value="progress">Sedang Dikerjakan</option>
+                    <option value="selesai">Selesai</option>
+                  </select>
+                </div>
+              </div>
+              <div className="flex justify-end gap-3 mt-8">
+                <button
+                  onClick={() => setShowMilestoneModal(false)}
+                  className="px-4 py-2 rounded-lg border text-zinc-700 dark:text-zinc-300 dark:border-zinc-700"
+                >
+                  Batal
+                </button>
+
+                <button
+                  onClick={() => {
+                    setMilestones((prev) => [
+                      ...prev,
+                      {
+                        id: Date.now().toString(),
+                        title: newMilestone.title,
+                        deadline: newMilestone.deadline,
+                        status: newMilestone.status,
+                      },
+                    ]);
+
+                    setNewMilestone({
+                      title: "",
+                      deadline: "",
+                      status: "progress",
+                    });
+
+                    setShowMilestoneModal(false);
+                  }}
+                  className="px-5 py-2 rounded-lg bg-primary text-primary-foreground"
                 >
                   Simpan
                 </button>
