@@ -19,12 +19,17 @@ export default function DashboardLayout({
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Fetch projects dari API
     async function fetchProjects() {
       try {
         const res = await fetch("/api/projects");
         const data = await res.json();
-        setProjects(data);
+
+        setProjects(
+          data.map((p: any) => ({
+            id: p.id,
+            name: p.name,
+          })),
+        );
       } catch (error) {
         console.error("Failed to fetch projects:", error);
       } finally {

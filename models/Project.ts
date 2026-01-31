@@ -1,0 +1,43 @@
+import mongoose, { Document, Model, Schema } from "mongoose";
+
+export interface IProject extends Document {
+  name: string;
+  trackerCode: string;
+  projectManagerId: mongoose.Types.ObjectId;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+const ProjectSchema = new Schema<IProject>(
+  {
+    name: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+
+    trackerCode: {
+      type: String,
+      required: true,
+      uppercase: true,
+      trim: true,
+    },
+
+    projectManagerId: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+  },
+  {
+    timestamps: true,
+  },
+);
+
+// optional safety: tetap jaga kombinasi unik
+ProjectSchema.index({ trackerCode: 1 }, { unique: true });
+
+const Project: Model<IProject> =
+  mongoose.models.Project || mongoose.model<IProject>("Project", ProjectSchema);
+
+export default Project;

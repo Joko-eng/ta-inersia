@@ -1,8 +1,11 @@
-import { Schema, model, models } from "mongoose";
+import { Document, Schema, model, models } from "mongoose";
 
-export interface IUser {
+export type UserRole = "admin" | "project_manager" | "member";
+
+export interface IUser extends Document {
   name: string;
   email: string;
+  role: UserRole;
 }
 
 const UserSchema = new Schema<IUser>(
@@ -12,11 +15,20 @@ const UserSchema = new Schema<IUser>(
       required: true,
       trim: true,
     },
+
     email: {
       type: String,
       required: true,
       unique: true,
       lowercase: true,
+      trim: true,
+    },
+
+    role: {
+      type: String,
+      enum: ["admin", "project_manager", "member"],
+      default: "member",
+      required: true,
     },
   },
   {
