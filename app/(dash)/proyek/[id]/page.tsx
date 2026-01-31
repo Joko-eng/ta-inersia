@@ -10,7 +10,7 @@ import {
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
-type MilestoneStatus = "menunggu" | "progress" | "selesai";
+type MilestoneStatus = "menunggu" | "dikerjakan" | "selesai";
 interface Milestone {
   id: string;
   title: string;
@@ -31,7 +31,7 @@ interface Task {
 
 export default function ProjectPage() {
   const params = useParams();
-  const projectId = params.projectId as string;
+  const projectId = params.id as string;
   const [activeTab, setActiveTab] = useState<"milestone" | "kanban">(
     "milestone",
   );
@@ -75,36 +75,24 @@ export default function ProjectPage() {
   useEffect(() => {
     fetchProjectData(projectId);
   }, [projectId]);
-
   const fetchProjectData = async (id: string) => {
-    setProjectName("Inventaris PT XYZ");
-    setMilestones([
-      {
-        id: "1",
-        title: "Analisis Kebutuhan Sistem",
-        deadline: "23 Maret, 2025",
-        status: "selesai",
-      },
-      {
-        id: "2",
-        title: "Perancangan Desain Arsitektur Sistem",
-        deadline: "9 May, 2025",
-        status: "selesai",
-      },
-      {
-        id: "3",
-        title: "Pembuatan Fitur Fitur Utama Sistem",
-        deadline: "20 May, 2025",
-        status: "selesai",
-      },
-      {
-        id: "4",
-        title: "Pengembangan Fitur Tambahan",
-        deadline: "28 April, 2025",
-        status: "progress",
-      },
-    ]);
+    try {
+      const res = await fetch(`/api/milestones?projectId=${id}`);
+      const data = await res.json();
+
+      setMilestones(
+        data.map((m: any) => ({
+          id: m._id,
+          title: m.name,
+          deadline: m.dueDate,
+          status: m.status,
+        })),
+      );
+    } catch (e) {
+      console.error(e);
+    }
   };
+
   const COLUMNS = [
     { id: "todo", title: "Daftar Tugas", color: "bg-blue-500" },
     { id: "inprogress", title: "Sedang Dikerjakan", color: "bg-orange-400" },
@@ -128,7 +116,7 @@ export default function ProjectPage() {
   return (
     <div className="flex-1 p-8">
       <div className="max-w-6xl mx-auto">
-        <h1 className="text-2xl font-bold mb-6">{projectName}</h1>
+        {/* <h1 className="text-2xl font-bold mb-6">tes</h1> */}
 
         <div className="flex items-center justify-between mb-6">
           <div className="flex gap-4">
@@ -364,7 +352,7 @@ export default function ProjectPage() {
                     className="w-full border rounded px-3 py-2 dark:bg-zinc-950 dark:border-zinc-800 dark:text-zinc-100"
                   >
                     <option value="todo">Daftar Tugas</option>
-                    <option value="inprogress">Sedang Dikerjakan</option>
+                    <option value="dikerjakan">Sedang Dikerjakan</option>
                     <option value="done">Selesai</option>
                   </select>
                 </div>
@@ -547,24 +535,24 @@ export default function ProjectPage() {
                 </button>
 
                 <button
-                  onClick={() => {
-                    setMilestones((prev) => [
-                      ...prev,
-                      {
-                        id: Date.now().toString(),
-                        title: newMilestone.title,
-                        deadline: newMilestone.deadline,
-                        status: newMilestone.status,
-                      },
-                    ]);
+                  onClick={async () => {
+                    await fetch("/api/milestones", {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({
+                        name: newMilestone.title,
+                        dueDate: newMilestone.deadline,
+                        projectId,
+                      }),
+                    });
 
                     setNewMilestone({
                       title: "",
                       deadline: "",
-                      status: "progress",
+                      status: "menunggu",
                     });
-
                     setShowMilestoneModal(false);
+                    fetchProjectData(projectId);
                   }}
                   className="px-5 py-2 rounded-lg bg-primary text-primary-foreground"
                 >
