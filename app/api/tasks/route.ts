@@ -29,7 +29,7 @@ export async function POST(req: Request) {
     title,
     description,
     milestoneId,
-    assignee: assignee || "Rifa Yuwono",
+    assignee: assignee || null,
     dueDate: dueDate ? new Date(dueDate) : null,
     priority,
     status,
