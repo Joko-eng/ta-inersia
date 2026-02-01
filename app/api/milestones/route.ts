@@ -4,16 +4,14 @@ import Project from "@/models/Project";
 import mongoose from "mongoose";
 import { NextRequest, NextResponse } from "next/server";
 
-/* =========================
-   CREATE MILESTONE
-   ========================= */
+
 export async function POST(req: NextRequest) {
   try {
     await connectDB();
 
     const { name, dueDate, projectId, status } = await req.json();
 
-    if (!name || !dueDate || !projectId) {
+    if (!name || !projectId) {
       return NextResponse.json(
         { message: "name, dueDate, projectId wajib diisi" },
         { status: 400 },
@@ -43,7 +41,7 @@ export async function POST(req: NextRequest) {
 
     const milestone = await Milestone.create({
       name,
-      dueDate: new Date(dueDate),
+      dueDate: dueDate ? new Date(dueDate) : null,
       status: status || "menunggu",
       projectId,
       order: nextOrder,
@@ -59,9 +57,7 @@ export async function POST(req: NextRequest) {
   }
 }
 
-/* =========================
-   GET MILESTONE BY PROJECT
-   ========================= */
+
 export async function GET(req: NextRequest) {
   try {
     await connectDB();

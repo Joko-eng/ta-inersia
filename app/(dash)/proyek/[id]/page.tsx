@@ -10,7 +10,7 @@ import {
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
-type MilestoneStatus = "menunggu" | "dikerjakan" | "selesai";
+type MilestoneStatus = "menunggu" | "sedang_dikerjakan" | "selesai";
 interface Milestone {
   id: string;
   title: string;
@@ -43,7 +43,6 @@ export default function ProjectPage() {
   const [newMilestone, setNewMilestone] = useState({
     title: "",
     deadline: "",
-    status: "progress" as MilestoneStatus,
   });
 
   const [targetStatus, setTargertStatus] = useState<
@@ -71,10 +70,17 @@ export default function ProjectPage() {
       year: "numeric",
     });
   };
+  const fetchTasks = async (id: string) => {
+    const res = await fetch(`/api/tasks?projectId=${projectId}`);
+    const data = await res.json();
+    setTasks(data);
+  };
 
   useEffect(() => {
     fetchProjectData(projectId);
+    fetchTasks(projectId);
   }, [projectId]);
+
   const fetchProjectData = async (id: string) => {
     try {
       const res = await fetch(`/api/milestones?projectId=${id}`);
@@ -99,18 +105,29 @@ export default function ProjectPage() {
     { id: "done", title: "Selesai", color: "bg-green-500" },
   ];
 
-  const handleDragEnd = (result: any) => {
+  const handleDragEnd = async (result: any) => {
     if (!result.destination) return;
 
     const { draggableId, destination } = result;
 
+    const newStatus = destination.droppableId;
+
     setTasks((prev) =>
       prev.map((task) =>
-        task.id === draggableId
-          ? { ...task, status: destination.droppableId as any }
-          : task,
+        task.id === draggableId ? { ...task, status: newStatus as any } : task,
       ),
     );
+
+    await fetch("/api/tasks", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        taskId: draggableId,
+        status: newStatus,
+      }),
+    });
+
+    fetchProjectData(projectId);
   };
 
   return (
@@ -197,7 +214,7 @@ export default function ProjectPage() {
                 >
                   <div className="font-medium">{item.title}</div>
                   <div className="text-muted-foreground">
-                    {formatTanggalID(item.deadline)}
+                    {item.deadline ? formatTanggalID(item.deadline) : "-"}
                   </div>
 
                   <div>
@@ -289,7 +306,11 @@ export default function ProjectPage() {
                                   <div className="my-5 h-px w-full bg-zinc-200 dark:bg-zinc-800" />{" "}
                                   <div className="flex justify-between items-center mt-4 text-xs text-zinc-500 dark:text-zinc-400">
                                     <span>{task.assignee}</span>
-                                    <span>{task.dueDate || "DD MM"}</span>
+                                    <span>
+                                      {task.dueDate
+                                        ? formatTanggalID(task.dueDate)
+                                        : "DD MM"}
+                                    </span>
                                   </div>
                                 </div>
                               )}
@@ -352,7 +373,7 @@ export default function ProjectPage() {
                     className="w-full border rounded px-3 py-2 dark:bg-zinc-950 dark:border-zinc-800 dark:text-zinc-100"
                   >
                     <option value="todo">Daftar Tugas</option>
-                    <option value="dikerjakan">Sedang Dikerjakan</option>
+                    <option value="inprogress">Sedang Dikerjakan</option>
                     <option value="done">Selesai</option>
                   </select>
                 </div>
@@ -423,11 +444,11 @@ export default function ProjectPage() {
                 </button>
 
                 <button
-                  onClick={() => {
-                    setTasks((prev) => [
-                      ...prev,
-                      {
-                        id: Date.now().toString(),
+                  onClick={async () => {
+                    await fetch("/api/tasks", {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({
                         title: newTask.title,
                         description: newTask.description,
                         milestoneId: newTask.milestoneId,
@@ -435,8 +456,8 @@ export default function ProjectPage() {
                         dueDate: newTask.dueDate,
                         priority: newTask.priority,
                         status: targetStatus,
-                      },
-                    ]);
+                      }),
+                    });
 
                     setNewTask({
                       title: "",
@@ -448,6 +469,7 @@ export default function ProjectPage() {
                     });
 
                     setShowTaskModal(false);
+                    fetchTasks(projectId);
                   }}
                   className="px-4 py-2 bg-primary text-primary-foreground rounded"
                 >
@@ -505,26 +527,6 @@ export default function ProjectPage() {
                     />
                   </div>
                 </div>
-                <div className="space-y-1">
-                  <p className="text-xs font-medium text-zinc-700 dark:text-zinc-300">
-                    Status*
-                  </p>
-
-                  <select
-                    value={newMilestone.status}
-                    onChange={(e) =>
-                      setNewMilestone({
-                        ...newMilestone,
-                        status: e.target.value as MilestoneStatus,
-                      })
-                    }
-                    className="w-full border rounded-lg px-3 py-2 dark:bg-zinc-950 dark:border-zinc-800 dark:text-zinc-100"
-                  >
-                    <option value="menunggu">Menunggu</option>
-                    <option value="progress">Sedang Dikerjakan</option>
-                    <option value="selesai">Selesai</option>
-                  </select>
-                </div>
               </div>
               <div className="flex justify-end gap-3 mt-8">
                 <button
@@ -549,7 +551,6 @@ export default function ProjectPage() {
                     setNewMilestone({
                       title: "",
                       deadline: "",
-                      status: "menunggu",
                     });
                     setShowMilestoneModal(false);
                     fetchProjectData(projectId);
