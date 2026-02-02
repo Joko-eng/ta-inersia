@@ -6,6 +6,7 @@ import {
   Calendar,
   KanbanSquare,
   Plus,
+  Tag,
 } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -188,7 +189,7 @@ export default function ProjectPage() {
                 <Calendar size={16} /> <span>Tanggal</span>
               </div>
               <div className="flex items-center gap-2">
-                <AlignLeft size={16} /> <span>Status</span>
+                <Tag size={16} /> <span>Status</span>
               </div>
             </div>
 
