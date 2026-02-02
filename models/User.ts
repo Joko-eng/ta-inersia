@@ -5,22 +5,26 @@ export type UserRole = "admin" | "project_manager" | "member";
 export interface IUser extends Document {
   name: string;
   email: string;
+  username: string;
   role: UserRole;
 }
 
 const UserSchema = new Schema<IUser>(
   {
-    name: {
-      type: String,
-      required: true,
-      trim: true,
-    },
+    name: { type: String, required: true, trim: true },
 
     email: {
       type: String,
       required: true,
       unique: true,
       lowercase: true,
+      trim: true,
+    },
+
+    username: {
+      type: String,
+      required: true,
+      unique: true,
       trim: true,
     },
 
@@ -31,11 +35,7 @@ const UserSchema = new Schema<IUser>(
       required: true,
     },
   },
-  {
-    timestamps: true,
-  },
+  { timestamps: true },
 );
 
-const User = models.User || model<IUser>("User", UserSchema);
-
-export default User;
+export default models.User || model<IUser>("User", UserSchema);
