@@ -5,8 +5,11 @@ import {
   BarChart2Icon,
   Calendar,
   KanbanSquare,
+  MoreVertical,
+  PencilLine,
   Plus,
   Tag,
+  Trash,
 } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -36,11 +39,16 @@ export default function ProjectPage() {
   const [activeTab, setActiveTab] = useState<"milestone" | "kanban">(
     "milestone",
   );
-  const [projectName, setProjectName] = useState("");
   const [milestones, setMilestones] = useState<Milestone[]>([]);
   const [tasks, setTasks] = useState<Task[]>([]);
   const [showTaskModal, setShowTaskModal] = useState(false);
   const [showMilestoneModal, setShowMilestoneModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editMilestone, setEditMilestone] = useState<any>(null);
+  const [showTaskEdit, setShowTaskEdit] = useState(false);
+  const [editTask, setEditTask] = useState<any>(null);
+  const [openMenuId, setOpenMenuId] = useState<string | null>(null);
+
   const [newMilestone, setNewMilestone] = useState({
     title: "",
     deadline: "",
@@ -181,7 +189,7 @@ export default function ProjectPage() {
         </div>
         {activeTab === "milestone" && (
           <div className="bg-white dark:bg-muted rounded-xl border shadow-sm overflow-hidden">
-            <div className="grid grid-cols-3 px-6 py-3 text-sm text-foreground border-b">
+            <div className="grid grid-cols-4 px-6 py-3 text-sm text-foreground border-b">
               <div className="flex items-center gap-2">
                 <AlignLeft size={16} /> <span>Milestone</span>
               </div>
@@ -190,6 +198,9 @@ export default function ProjectPage() {
               </div>
               <div className="flex items-center gap-2">
                 <Tag size={16} /> <span>Status</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Tag size={16} /> <span>Aksi</span>
               </div>
             </div>
 
@@ -211,7 +222,7 @@ export default function ProjectPage() {
               return (
                 <div
                   key={item.id}
-                  className="grid grid-cols-3 items-center px-6 py-4 border-b last:border-b-0 text-sm"
+                  className="grid grid-cols-4 items-center px-6 py-4 border-b last:border-b-0 text-sm"
                 >
                   <div className="font-medium">{item.title}</div>
                   <div className="text-muted-foreground">
@@ -224,6 +235,34 @@ export default function ProjectPage() {
                     >
                       {status}
                     </span>
+                  </div>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => {
+                        setEditMilestone(item);
+                        setShowEditModal(true);
+                      }}
+                      className="text-blue-500 text-xs"
+                    >
+                      <PencilLine size={16} />
+                    </button>
+
+                    <button
+                      onClick={async () => {
+                        if (!confirm("Hapus milestone ini?")) return;
+
+                        await fetch("/api/milestones", {
+                          method: "DELETE",
+                          headers: { "Content-Type": "application/json" },
+                          body: JSON.stringify({ id: item.id }),
+                        });
+
+                        fetchProjectData(projectId);
+                      }}
+                      className="text-red-500 text-xs"
+                    >
+                      <Trash size={16} />
+                    </button>
                   </div>
                 </div>
               );
@@ -276,18 +315,74 @@ export default function ProjectPage() {
                                   {...provided.dragHandleProps}
                                   className="bg-white dark:bg-zinc-950 rounded-2xl border border-gray-100 dark:border-zinc-800 p-4 shadow-sm"
                                 >
-                                  <span
-                                    className={`inline-block text-xs rounded px-2 py-0.5 mb-2 ${
-                                      task.priority === "tinggi"
-                                        ? "bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300"
-                                        : task.priority === "sedang"
-                                          ? "bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300"
-                                          : "bg-gray-100 text-gray-700 dark:bg-zinc-800 dark:text-zinc-300"
-                                    }`}
-                                  >
-                                    {task.priority.charAt(0).toUpperCase() +
-                                      task.priority.slice(1)}
-                                  </span>
+                                  <div className="flex justify-between items-start">
+                                    <span
+                                      className={`inline-block text-xs rounded px-2 py-0.5 mb-2 ${
+                                        task.priority === "tinggi"
+                                          ? "bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300"
+                                          : task.priority === "sedang"
+                                            ? "bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300"
+                                            : "bg-gray-100 text-gray-700 dark:bg-zinc-800 dark:text-zinc-300"
+                                      }`}
+                                    >
+                                      {task.priority.charAt(0).toUpperCase() +
+                                        task.priority.slice(1)}
+                                    </span>
+
+                                    <div className="relative">
+                                      <button
+                                        onClick={() =>
+                                          setOpenMenuId(
+                                            openMenuId === task.id
+                                              ? null
+                                              : task.id,
+                                          )
+                                        }
+                                        className="p-1 rounded hover:bg-zinc-100 dark:hover:bg-zinc-800"
+                                      >
+                                        <MoreVertical size={16} />
+                                      </button>
+
+                                      {openMenuId === task.id && (
+                                        <div className="absolute right-0 mt-1 bg-white dark:bg-zinc-900 border dark:border-zinc-800 rounded shadow text-xs z-20">
+                                          <button
+                                            className="block px-3 py-2 hover:bg-gray-100 dark:hover:bg-zinc-800 w-full text-left"
+                                            onClick={() => {
+                                              setEditTask(task);
+                                              setShowTaskEdit(true);
+                                              setOpenMenuId(null);
+                                            }}
+                                          >
+                                            Edit
+                                          </button>
+
+                                          <button
+                                            className="block px-3 py-2 hover:bg-gray-100 dark:hover:bg-zinc-800 w-full text-left text-red-500"
+                                            onClick={async () => {
+                                              if (!confirm("Hapus task ini?"))
+                                                return;
+
+                                              await fetch("/api/tasks", {
+                                                method: "DELETE",
+                                                headers: {
+                                                  "Content-Type":
+                                                    "application/json",
+                                                },
+                                                body: JSON.stringify({
+                                                  id: task.id,
+                                                }),
+                                              });
+
+                                              setOpenMenuId(null);
+                                              fetchTasks(projectId);
+                                            }}
+                                          >
+                                            Hapus
+                                          </button>
+                                        </div>
+                                      )}
+                                    </div>
+                                  </div>
                                   <h4 className="font-medium text-zinc-900 dark:text-zinc-100">
                                     {task.title}
                                   </h4>
@@ -557,6 +652,128 @@ export default function ProjectPage() {
                     fetchProjectData(projectId);
                   }}
                   className="px-5 py-2 rounded-lg bg-primary text-primary-foreground"
+                >
+                  Simpan
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+        {showEditModal && editMilestone && (
+          <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+            <div className="bg-white rounded-xl w-full max-w-md p-6">
+              <h3 className="font-semibold text-lg mb-4">Edit Milestone</h3>
+
+              <input
+                value={editMilestone.title}
+                onChange={(e) =>
+                  setEditMilestone({ ...editMilestone, title: e.target.value })
+                }
+                className="w-full border rounded px-3 py-2 mb-3"
+              />
+
+              <input
+                type="date"
+                value={editMilestone.deadline?.slice(0, 10) || ""}
+                onChange={(e) =>
+                  setEditMilestone({
+                    ...editMilestone,
+                    deadline: e.target.value,
+                  })
+                }
+                className="w-full border rounded px-3 py-2"
+              />
+
+              <div className="flex justify-end gap-3 mt-6">
+                <button onClick={() => setShowEditModal(false)}>Batal</button>
+
+                <button
+                  onClick={async () => {
+                    await fetch("/api/milestones", {
+                      method: "PATCH",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({
+                        id: editMilestone.id,
+                        name: editMilestone.title,
+                        dueDate: editMilestone.deadline,
+                      }),
+                    });
+
+                    setShowEditModal(false);
+                    fetchProjectData(projectId);
+                  }}
+                  className="px-4 py-2 bg-primary text-primary-foreground rounded"
+                >
+                  Simpan
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+        {showTaskEdit && editTask && (
+          <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+            <div className="bg-white rounded-xl w-full max-w-md p-6 space-y-3">
+              <h3 className="font-semibold text-lg">Edit Task</h3>
+
+              <input
+                value={editTask.title}
+                onChange={(e) =>
+                  setEditTask({ ...editTask, title: e.target.value })
+                }
+                className="w-full border rounded px-3 py-2"
+              />
+
+              <textarea
+                value={editTask.description}
+                onChange={(e) =>
+                  setEditTask({ ...editTask, description: e.target.value })
+                }
+                className="w-full border rounded px-3 py-2"
+              />
+
+              <select
+                value={editTask.priority}
+                onChange={(e) =>
+                  setEditTask({ ...editTask, priority: e.target.value })
+                }
+                className="w-full border rounded px-3 py-2"
+              >
+                <option value="rendah">Rendah</option>
+                <option value="sedang">Sedang</option>
+                <option value="tinggi">Tinggi</option>
+              </select>
+
+              <input
+                type="date"
+                value={editTask.dueDate?.slice(0, 10) || ""}
+                onChange={(e) =>
+                  setEditTask({ ...editTask, dueDate: e.target.value })
+                }
+                className="w-full border rounded px-3 py-2"
+              />
+
+              <div className="flex justify-end gap-3 pt-2">
+                <button onClick={() => setShowTaskEdit(false)}>Batal</button>
+
+                <button
+                  onClick={async () => {
+                    await fetch("/api/tasks", {
+                      method: "PUT",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({
+                        id: editTask.id,
+                        title: editTask.title,
+                        description: editTask.description,
+                        assignee: editTask.assignee,
+                        dueDate: editTask.dueDate,
+                        priority: editTask.priority,
+                      }),
+                    });
+
+                    setShowTaskEdit(false);
+                    fetchTasks(projectId);
+                  }}
+                  className="px-4 py-2 bg-primary text-primary-foreground rounded"
                 >
                   Simpan
                 </button>

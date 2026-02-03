@@ -55,6 +55,56 @@ export async function PATCH(req: Request) {
   return NextResponse.json(task);
 }
 
+// EDIT task (judul, deskripsi, assignee, dueDate, priority, milestoneId optional)
+export async function PUT(req: Request) {
+  await connectDB();
+  const body = await req.json();
+
+  const { id, title, description, assignee, dueDate, priority, milestoneId } =
+    body;
+
+  if (!id) {
+    return NextResponse.json({ error: "id required" }, { status: 400 });
+  }
+
+  const task = await Task.findByIdAndUpdate(
+    id,
+    {
+      title,
+      description,
+      assignee: assignee || null,
+      dueDate: dueDate ? new Date(dueDate) : null,
+      priority,
+      ...(milestoneId ? { milestoneId } : {}),
+    },
+    { new: true },
+  );
+
+  if (task) {
+    await recomputeMilestone(task.milestoneId.toString());
+  }
+
+  return NextResponse.json(task);
+}
+
+// DELETE task
+export async function DELETE(req: Request) {
+  await connectDB();
+  const { id } = await req.json();
+
+  if (!id) {
+    return NextResponse.json({ error: "id required" }, { status: 400 });
+  }
+
+  const task = await Task.findById(id);
+  if (!task) return NextResponse.json({ success: true });
+
+  await Task.findByIdAndDelete(id);
+  await recomputeMilestone(task.milestoneId.toString());
+
+  return NextResponse.json({ success: true });
+}
+
 export async function GET(req: Request) {
   await connectDB();
 

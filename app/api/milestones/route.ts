@@ -4,7 +4,6 @@ import Project from "@/models/Project";
 import mongoose from "mongoose";
 import { NextRequest, NextResponse } from "next/server";
 
-
 export async function POST(req: NextRequest) {
   try {
     await connectDB();
@@ -57,7 +56,6 @@ export async function POST(req: NextRequest) {
   }
 }
 
-
 export async function GET(req: NextRequest) {
   try {
     await connectDB();
@@ -75,5 +73,51 @@ export async function GET(req: NextRequest) {
   } catch (err) {
     console.error(err);
     return NextResponse.json([], { status: 500 });
+  }
+}
+// UPDATE milestone
+export async function PATCH(req: NextRequest) {
+  try {
+    await connectDB();
+
+    const { id, name, dueDate } = await req.json();
+
+    if (!id || !mongoose.Types.ObjectId.isValid(id)) {
+      return NextResponse.json({ message: "id tidak valid" }, { status: 400 });
+    }
+
+    const milestone = await Milestone.findByIdAndUpdate(
+      id,
+      {
+        name,
+        dueDate: dueDate ? new Date(dueDate) : null,
+      },
+      { new: true },
+    );
+
+    return NextResponse.json(milestone);
+  } catch (err) {
+    console.error(err);
+    return NextResponse.json({ message: "error" }, { status: 500 });
+  }
+}
+
+// DELETE milestone
+export async function DELETE(req: NextRequest) {
+  try {
+    await connectDB();
+
+    const { id } = await req.json();
+
+    if (!id || !mongoose.Types.ObjectId.isValid(id)) {
+      return NextResponse.json({ message: "id tidak valid" }, { status: 400 });
+    }
+
+    await Milestone.findByIdAndDelete(id);
+
+    return NextResponse.json({ success: true });
+  } catch (err) {
+    console.error(err);
+    return NextResponse.json({ message: "error" }, { status: 500 });
   }
 }
