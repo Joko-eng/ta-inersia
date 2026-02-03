@@ -1,6 +1,6 @@
 "use client";
 
-import { Plus, X } from "lucide-react";
+import { Plus, Trash, X } from "lucide-react";
 import { useEffect, useState } from "react";
 
 export default function TeamPage() {
@@ -38,7 +38,6 @@ export default function TeamPage() {
 
   return (
     <div className="p-8">
-      {/* HEADER */}
       <div className="flex justify-between items-center mb-6">
         <div>
           <h1 className="text-xl font-semibold">Tim Pengembang</h1>
@@ -55,7 +54,6 @@ export default function TeamPage() {
         </button>
       </div>
 
-      {/* TABLE CARD */}
       <div className="bg-white rounded-xl border shadow-sm overflow-hidden">
         <div className="grid grid-cols-5 px-6 py-3 bg-gray-50 text-sm font-medium">
           <div>Nama</div>
@@ -97,14 +95,13 @@ export default function TeamPage() {
                 }}
                 className="text-red-500 hover:text-red-700 text-sm"
               >
-                🗑
+                <Trash size={16} />
               </button>
             </div>
           </div>
         ))}
       </div>
 
-      {/* MODAL */}
       {open && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
           <div className="bg-white rounded-xl w-full max-w-md p-6 relative">
