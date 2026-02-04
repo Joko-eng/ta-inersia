@@ -29,7 +29,7 @@ export async function POST(req: Request) {
     title,
     description,
     milestoneId,
-    assignee: assignee || null,
+    assignee: assignee,
     dueDate: dueDate ? new Date(dueDate) : null,
     priority,
     status,
@@ -72,7 +72,7 @@ export async function PUT(req: Request) {
     {
       title,
       description,
-      assignee: assignee || null,
+      assignee: assignee,
       dueDate: dueDate ? new Date(dueDate) : null,
       priority,
       ...(milestoneId ? { milestoneId } : {}),
@@ -119,7 +119,13 @@ export async function GET(req: Request) {
 
   const tasks = await Task.find({
     milestoneId: { $in: milestoneIds },
-  }).lean();
+    assignee: { $ne: null },
+  })
+    .populate({
+      path: "assignee",
+      populate: { path: "userId" },
+    })
+    .lean();
 
   return NextResponse.json(
     tasks.map((t) => ({
@@ -127,7 +133,14 @@ export async function GET(req: Request) {
       title: t.title,
       description: t.description,
       milestoneId: t.milestoneId.toString(),
-      assignee: t.assignee,
+      assignee:
+        t.assignee && typeof t.assignee === "object"
+          ? {
+              id: t.assignee._id?.toString(),
+              name: t.assignee.userId?.name || "-",
+              division: t.assignee.division || "-",
+            }
+          : null,
       dueDate: t.dueDate,
       priority: t.priority,
       status: t.status,

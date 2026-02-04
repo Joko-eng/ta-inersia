@@ -4,7 +4,7 @@ export interface ITask extends Document {
   title: string;
   description?: string;
   milestoneId: mongoose.Types.ObjectId;
-  assignee: string;
+  assignee: mongoose.Types.ObjectId;
   dueDate?: Date | null;
   priority: "rendah" | "sedang" | "tinggi";
   status: "todo" | "inprogress" | "done";
@@ -21,7 +21,11 @@ const TaskSchema = new Schema<ITask>(
       ref: "Milestone",
       required: true,
     },
-    assignee: { type: String, default: "Rifa Yuwono" },
+    assignee: {
+      type: Schema.Types.ObjectId,
+      ref: "TeamMember",
+      required: true,
+    },
     dueDate: { type: Date, default: null },
     priority: {
       type: String,

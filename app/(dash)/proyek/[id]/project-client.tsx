@@ -35,7 +35,11 @@ interface Task {
   title: string;
   description: string;
   milestoneId: string;
-  assignee: string;
+  assignee: {
+    id: string;
+    name: string;
+    division: string;
+  } | null;
   dueDate: string;
   priority: "rendah" | "sedang" | "tinggi";
   status: "todo" | "inprogress" | "done";
@@ -55,6 +59,7 @@ export default function ProjectClient({
   const milestones = initialMilestones;
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
   const [tasks, setTasks] = useState<Task[]>([]);
+  const [teamMembers, setTeamMembers] = useState<any[]>([]);
   const [showTaskModal, setShowTaskModal] = useState(false);
   const [showMilestoneModal, setShowMilestoneModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
@@ -98,10 +103,15 @@ export default function ProjectClient({
     const data = await res.json();
     setTasks(data);
   };
-
+  const fetchTeam = async () => {
+    const res = await fetch("/api/team");
+    const data = await res.json();
+    setTeamMembers(data);
+  };
   useEffect(() => {
     if (!projectId) return;
     fetchTasks();
+    fetchTeam();
   }, [projectId]);
 
   const COLUMNS = [
@@ -390,7 +400,7 @@ export default function ProjectClient({
                                   </p>
                                   <div className="my-5 h-px w-full bg-zinc-200 dark:bg-zinc-800" />{" "}
                                   <div className="flex justify-between items-center mt-4 text-xs text-zinc-500 dark:text-zinc-400">
-                                    <span>{task.assignee}</span>
+                                    <span>{task.assignee?.name}</span>
                                     <span>
                                       {task.dueDate
                                         ? formatTanggalID(task.dueDate)
@@ -497,17 +507,21 @@ export default function ProjectClient({
                 ))}
               </select>
               <div className="space-y-1">
-                <p className="text-xs font-medium text-zinc-700 dark:text-zinc-300">
-                  Pilih Tim Pengembang
-                </p>
-                <input
-                  placeholder="Tim Pengembang"
+                <select
                   value={newTask.assignee}
                   onChange={(e) =>
                     setNewTask({ ...newTask, assignee: e.target.value })
                   }
                   className="w-full border rounded px-3 py-2 dark:bg-zinc-950 dark:border-zinc-800 dark:text-zinc-100"
-                />
+                >
+                  <option value="">Pilih Tim Pengembang</option>
+
+                  {teamMembers.map((m) => (
+                    <option key={m._id} value={m._id}>
+                      {m.userId.name} — {m.division}
+                    </option>
+                  ))}
+                </select>
               </div>
               <div className="space-y-1">
                 <p className="text-xs font-medium text-zinc-700 dark:text-zinc-300">
