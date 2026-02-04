@@ -32,7 +32,6 @@ export async function updateMilestone(
   projectId: string,
   formData: FormData,
 ) {
-  "use server";
 
   await connectDB();
 

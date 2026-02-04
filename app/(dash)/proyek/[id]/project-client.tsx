@@ -414,10 +414,12 @@ export default function ProjectClient({
         {showTaskModal && (
           <div className="fixed inset-0 bg-black/40 dark:bg-black/70 flex items-center justify-center z-50">
             <div className="bg-white dark:bg-zinc-900 rounded-xl w-full max-w-md p-6 space-y-4 border dark:border-zinc-800">
-              <h3 className="font-semibold text-lg text-zinc-900 dark:text-zinc-100">
+              <h3 className="font-semibold text-lg text-zinc-900 dark:text-zinc-100 mb-0">
                 Tambah Task
               </h3>
-
+              <p className="text-sm text-zinc-500 dark:text-zinc-400">
+                Form tambah task project
+              </p>
               {[
                 {
                   value: newTask.title,
@@ -572,8 +574,8 @@ export default function ProjectClient({
                 Tambah Milestone
               </h3>
 
-              <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1">
-                Ini adalah milestone project
+              <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-0 mb-3">
+                Form tambah milestone project
               </p>
 
               <form
@@ -589,7 +591,7 @@ export default function ProjectClient({
 
                 <div className="space-y-1">
                   <p className="text-xs font-medium text-zinc-700 dark:text-zinc-300">
-                    Milestone*
+                    Milestone
                   </p>
 
                   <input
