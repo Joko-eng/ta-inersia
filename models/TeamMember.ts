@@ -11,7 +11,7 @@ const TeamMemberSchema = new Schema<ITeamMember>(
       type: Schema.Types.ObjectId,
       ref: "User",
       required: true,
-      unique: true, // satu user cuma sekali di tim
+      unique: true, 
     },
 
     division: {

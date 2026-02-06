@@ -34,7 +34,6 @@ const ProjectSchema = new Schema<IProject>(
   },
 );
 
-// optional safety: tetap jaga kombinasi unik
 ProjectSchema.index({ trackerCode: 1 }, { unique: true });
 
 const Project: Model<IProject> =
