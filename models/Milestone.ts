@@ -2,6 +2,7 @@ import mongoose, { Document, Schema } from "mongoose";
 
 export interface IMilestone extends Document {
   name: string;
+  description?: string;
   projectId: mongoose.Types.ObjectId;
   dueDate?: Date | null;
   status: "menunggu" | "sedang_dikerjakan" | "selesai";
@@ -11,6 +12,11 @@ export interface IMilestone extends Document {
 const MilestoneSchema = new Schema<IMilestone>(
   {
     name: { type: String, required: true },
+    description: {
+      type: String,
+      default: "",
+      trim: true,
+    },
     projectId: {
       type: Schema.Types.ObjectId,
       ref: "Project",

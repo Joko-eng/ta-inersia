@@ -14,6 +14,7 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
   const mapped = milestones.map((m: any) => ({
     id: m._id.toString(),
     title: m.name,
+    description: m.description || "",
     deadline: m.dueDate ? m.dueDate.toISOString() : "",
     status: m.status,
   }));

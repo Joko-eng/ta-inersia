@@ -11,7 +11,9 @@ import {
   BarChart2Icon,
   Calendar,
   KanbanSquare,
+  ListChecks,
   MoreVertical,
+  NotepadText,
   PencilLine,
   Plus,
   Tag,
@@ -26,6 +28,7 @@ type MilestoneStatus = "menunggu" | "sedang_dikerjakan" | "selesai";
 interface Milestone {
   id: string;
   title: string;
+  description: string;
   deadline: string;
   status: MilestoneStatus;
 }
@@ -70,6 +73,7 @@ export default function ProjectClient({
 
   const [newMilestone, setNewMilestone] = useState({
     title: "",
+    description: "",
     deadline: "",
   });
 
@@ -148,8 +152,6 @@ export default function ProjectClient({
   return (
     <div className="flex-1 p-8">
       <div className="max-w-6xl mx-auto">
-        {/* <h1 className="text-2xl font-bold mb-6">tes</h1> */}
-
         <div className="flex items-center justify-between mb-6">
           <div className="flex gap-4">
             <button
@@ -195,7 +197,7 @@ export default function ProjectClient({
         </div>
         {activeTab === "milestone" && (
           <div className="bg-white dark:bg-muted rounded-xl border shadow-sm overflow-hidden">
-            <div className="grid grid-cols-4 px-6 py-3 text-sm text-foreground border-b">
+            <div className="grid grid-cols-5 px-7 py-3 text-sm text-foreground border-b">
               <div className="flex items-center gap-2">
                 <AlignLeft size={16} /> <span>Milestone</span>
               </div>
@@ -203,8 +205,13 @@ export default function ProjectClient({
                 <Calendar size={16} /> <span>Tanggal</span>
               </div>
               <div className="flex items-center gap-2">
-                <Tag size={16} /> <span>Status</span>
+                <NotepadText size={16} /> <span>Deskripsi</span>
               </div>
+
+              <div className="flex items-center gap-2">
+                <ListChecks size={16} /> <span>Status</span>
+              </div>
+
               <div className="flex items-center gap-2">
                 <Tag size={16} /> <span>Aksi</span>
               </div>
@@ -228,13 +235,13 @@ export default function ProjectClient({
               return (
                 <div
                   key={item.id}
-                  className="grid grid-cols-4 items-center px-6 py-4 border-b last:border-b-0 text-sm"
+                  className="grid grid-cols-5 items-center px-7 py-4 border-b last:border-b-0 text-sm"
                 >
                   <div className="font-medium">{item.title}</div>
                   <div className="text-muted-foreground">
                     {item.deadline ? formatTanggalID(item.deadline) : "-"}
                   </div>
-
+                  <div className="font-medium">{item.description}</div>
                   <div>
                     <span
                       className={`inline-flex rounded-md px-3 py-1 text-xs font-medium ${statusStyle}`}
@@ -596,7 +603,7 @@ export default function ProjectClient({
                 action={createMilestone}
                 onSubmit={() => {
                   setShowMilestoneModal(false);
-                  setNewMilestone({ title: "", deadline: "" });
+                  setNewMilestone({ title: "", description: "", deadline: "" });
                   router.refresh();
                   toast.success("Milestone Berhasil Ditambahkan");
                 }}
@@ -610,7 +617,7 @@ export default function ProjectClient({
 
                   <input
                     name="name"
-                    placeholder="Ini contoh milestone"
+                    placeholder="Isi nama milestone disini"
                     value={newMilestone.title}
                     onChange={(e) =>
                       setNewMilestone({
@@ -619,6 +626,26 @@ export default function ProjectClient({
                       })
                     }
                     className="w-full border rounded-lg px-3 py-2 dark:bg-zinc-950 dark:border-zinc-800 dark:text-zinc-100"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <p className="text-xs font-medium text-zinc-700 dark:text-zinc-300">
+                    Deskripsi
+                  </p>
+
+                  <textarea
+                    name="description"
+                    placeholder="Isi deskripsi milestone"
+                    value={newMilestone.description || ""}
+                    onChange={(e) =>
+                      setNewMilestone({
+                        ...newMilestone,
+                        description: e.target.value,
+                      })
+                    }
+                    rows={3}
+                    className="w-full border rounded-lg px-3 py-2 text-sm
+               dark:bg-zinc-950 dark:border-zinc-800 dark:text-zinc-100"
                   />
                 </div>
 
@@ -685,6 +712,19 @@ export default function ProjectClient({
                   defaultValue={editMilestone.title}
                   className="w-full border dark:border-zinc-700 rounded px-3 py-2 dark:bg-zinc-950 dark:text-zinc-100"
                 />
+                <div className="space-y-1">
+                  <p className="text-xs font-medium text-zinc-700 dark:text-zinc-300">
+                    Deskripsi
+                  </p>
+
+                  <textarea
+                    name="description"
+                    defaultValue={editMilestone.description || ""}
+                    rows={3}
+                    className="w-full border rounded-lg px-3 py-2 text-sm
+               dark:bg-zinc-950 dark:border-zinc-700 dark:text-zinc-100"
+                  />
+                </div>
 
                 <input
                   type="date"
@@ -786,6 +826,21 @@ export default function ProjectClient({
                 <option value="rendah">Rendah</option>
                 <option value="sedang">Sedang</option>
                 <option value="tinggi">Tinggi</option>
+              </select>
+              <select
+                value={editTask.assignee || ""}
+                onChange={(e) =>
+                  setEditTask({ ...editTask, assignee: e.target.value })
+                }
+                className="w-full border rounded px-3 py-2 dark:bg-zinc-950 dark:border-zinc-800 dark:text-zinc-100"
+              >
+                <option value="">Pilih Tim Pengembang</option>
+
+                {teamMembers.map((m) => (
+                  <option key={m._id} value={m._id}>
+                    {m.userId.name} — {m.division}
+                  </option>
+                ))}
               </select>
 
               <input

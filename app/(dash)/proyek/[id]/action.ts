@@ -10,14 +10,14 @@ export async function createMilestone(formData: FormData) {
 
   await Milestone.create({
     name: formData.get("name"),
+    description: formData.get("description") || "",
     dueDate: formData.get("dueDate"),
-    projectId: projectId,
+    projectId,
     status: "menunggu",
   });
 
   revalidatePath(`/proyek/${projectId}`);
 }
-
 export async function deleteMilestone(id: string, projectId: string) {
   "use server";
 
@@ -32,11 +32,11 @@ export async function updateMilestone(
   projectId: string,
   formData: FormData,
 ) {
-
   await connectDB();
 
   await Milestone.findByIdAndUpdate(id, {
     name: formData.get("name"),
+    description: formData.get("description") || "",
     dueDate: formData.get("dueDate"),
   });
 
