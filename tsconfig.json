@@ -29,6 +29,6 @@
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts",
     "**/*.mts"
-  ],
+, "docker/mongo-init/01-init.js"  ],
   "exclude": ["node_modules"]
 }
