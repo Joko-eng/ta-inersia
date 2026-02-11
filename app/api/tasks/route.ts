@@ -55,39 +55,43 @@ export async function PATCH(req: Request) {
   return NextResponse.json(task);
 }
 
-// EDIT task (judul, deskripsi, assignee, dueDate, priority, milestoneId optional)
 export async function PUT(req: Request) {
   await connectDB();
   const body = await req.json();
 
-  const { id, title, description, assignee, dueDate, priority, milestoneId } =
-    body;
+  const { id, title, description, assignee, dueDate, priority } = body;
 
   if (!id) {
     return NextResponse.json({ error: "id required" }, { status: 400 });
   }
 
-  const task = await Task.findByIdAndUpdate(
-    id,
-    {
-      title,
-      description,
-      assignee: assignee,
-      dueDate: dueDate ? new Date(dueDate) : null,
-      priority,
-      ...(milestoneId ? { milestoneId } : {}),
-    },
-    { new: true },
-  );
+  try {
+    const task = await Task.findByIdAndUpdate(
+      id,
+      {
+        title,
+        description,
+        assignee: assignee || null,
+        dueDate: dueDate ? new Date(dueDate) : null,
+        priority,
+      },
+      {
+        new: true,
+        runValidators: true,
+      },
+    );
 
-  if (task) {
-    await recomputeMilestone(task.milestoneId.toString());
+    if (task) {
+      await recomputeMilestone(task.milestoneId.toString());
+    }
+
+    return NextResponse.json(task);
+  } catch (err) {
+    console.error(err);
+    return NextResponse.json({ error: "update failed" }, { status: 500 });
   }
-
-  return NextResponse.json(task);
 }
 
-// DELETE task
 export async function DELETE(req: Request) {
   await connectDB();
   const { id } = await req.json();

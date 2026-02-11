@@ -351,7 +351,15 @@ export default function ProjectClient({
                                           <button
                                             className="block px-3 py-2 hover:bg-gray-100 dark:hover:bg-zinc-800 w-full text-left"
                                             onClick={() => {
-                                              setEditTask(task);
+                                              setEditTask({
+                                                ...task,
+                                                assignee:
+                                                  typeof task.assignee ===
+                                                  "object"
+                                                    ? task.assignee?.id
+                                                    : (task.assignee ?? null),
+                                              });
+
                                               setShowTaskEdit(true);
                                               setOpenMenuId(null);
                                             }}
@@ -834,7 +842,9 @@ export default function ProjectClient({
                 }
                 className="w-full border rounded px-3 py-2 dark:bg-zinc-950 dark:border-zinc-800 dark:text-zinc-100"
               >
-                <option value="">Pilih Tim Pengembang</option>
+                <option value="" disabled>
+                  Pilih Tim Pengembang
+                </option>
 
                 {teamMembers.map((m) => (
                   <option key={m._id} value={m._id}>
@@ -869,7 +879,7 @@ export default function ProjectClient({
                         id: editTask.id,
                         title: editTask.title,
                         description: editTask.description,
-                        assignee: editTask.assignee,
+                        assignee: editTask.assignee || null,
                         dueDate: editTask.dueDate,
                         priority: editTask.priority,
                       }),

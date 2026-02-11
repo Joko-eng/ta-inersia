@@ -24,8 +24,9 @@ const TaskSchema = new Schema<ITask>(
     assignee: {
       type: Schema.Types.ObjectId,
       ref: "TeamMember",
-      required: true,
+      default: null,
     },
+
     dueDate: { type: Date, default: null },
     priority: {
       type: String,
