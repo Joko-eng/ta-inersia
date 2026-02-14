@@ -7,7 +7,6 @@ import { NextResponse } from "next/server";
 export async function POST(req: Request) {
   await connectDB();
   const body = await req.json();
-
   const {
     title,
     description,
@@ -17,14 +16,12 @@ export async function POST(req: Request) {
     priority,
     status,
   } = body;
-
   if (!title || !milestoneId) {
     return NextResponse.json(
       { error: "title & milestoneId required" },
       { status: 400 },
     );
   }
-
   const task = await Task.create({
     title,
     description,
@@ -36,7 +33,6 @@ export async function POST(req: Request) {
   });
 
   await recomputeMilestone(milestoneId);
-
   return NextResponse.json(task);
 }
 
@@ -58,13 +54,10 @@ export async function PATCH(req: Request) {
 export async function PUT(req: Request) {
   await connectDB();
   const body = await req.json();
-
   const { id, title, description, assignee, dueDate, priority } = body;
-
   if (!id) {
     return NextResponse.json({ error: "id required" }, { status: 400 });
   }
-
   try {
     const task = await Task.findByIdAndUpdate(
       id,
@@ -111,16 +104,11 @@ export async function DELETE(req: Request) {
 
 export async function GET(req: Request) {
   await connectDB();
-
   const { searchParams } = new URL(req.url);
   const projectId = searchParams.get("projectId");
-
   if (!projectId) return NextResponse.json([]);
-
   const milestones = await Milestone.find({ projectId }).select("_id");
-
   const milestoneIds = milestones.map((m) => m._id);
-
   const tasks = await Task.find({
     milestoneId: { $in: milestoneIds },
     assignee: { $ne: null },
