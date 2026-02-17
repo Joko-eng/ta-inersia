@@ -4,6 +4,7 @@ export interface IProject extends Document {
   name: string;
   trackerCode: string;
   projectManagerId: mongoose.Types.ObjectId;
+  isArchived: boolean; 
   createdAt: Date;
   updatedAt: Date;
 }
@@ -15,23 +16,23 @@ const ProjectSchema = new Schema<IProject>(
       required: true,
       trim: true,
     },
-
     trackerCode: {
       type: String,
       required: true,
       uppercase: true,
       trim: true,
     },
-
     projectManagerId: {
       type: Schema.Types.ObjectId,
       ref: "User",
       required: true,
     },
+    isArchived: {
+      type: Boolean,
+      default: false,
+    },
   },
-  {
-    timestamps: true,
-  },
+  { timestamps: true },
 );
 
 ProjectSchema.index({ trackerCode: 1 }, { unique: true });

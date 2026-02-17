@@ -1,22 +1,22 @@
 import { connectDB } from "@/lib/mongodb";
 import Project from "@/models/Project";
 import Link from "next/link";
-import ArchiveButton from "./components/ArchiveButton";
+import RestoreButton from "../components/RestoreButton";
 
-export default async function Page() {
+export default async function ArsipPage() {
   await connectDB();
 
-  const projects = await Project.find({ isArchived: false }).lean();
+  const projects = await Project.find({ isArchived: true }).lean();
+
   return (
     <div className="flex-1 p-8 space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-xl font-semibold">Daftar Proyek</h1>
-
+        <h1 className="text-xl font-semibold">Proyek Diarsipkan</h1>
         <Link
-          href="/kelola-proyek/arsip"
+          href="/kelola-proyek"
           className="px-4 py-2 text-xs font-semibold rounded-md bg-primary text-primary-foreground shadow-sm hover:shadow hover:opacity-90 transition"
         >
-          Lihat Proyek Diarsipkan
+          Kembali ke Daftar Proyek
         </Link>
       </div>
 
@@ -35,7 +35,6 @@ export default async function Page() {
             <div className="col-span-5 font-medium text-zinc-800 dark:text-zinc-100">
               {p.name}
             </div>
-
             <div className="col-span-3 text-zinc-500 dark:text-zinc-400">
               {new Date(p.createdAt).toLocaleDateString("id-ID", {
                 day: "2-digit",
@@ -43,23 +42,15 @@ export default async function Page() {
                 year: "numeric",
               })}
             </div>
-
             <div className="col-span-4 flex justify-end gap-3">
-              <Link
-                href={`/proyek/${p._id}`}
-                className="px-4 py-1.5 text-xs font-semibold rounded-md bg-primary text-primary-foreground hover:opacity-90 transition"
-              >
-                Detail
-              </Link>
-
-              <ArchiveButton projectId={p._id.toString()} />
+              <RestoreButton projectId={p._id.toString()} />
             </div>
           </div>
         ))}
 
         {projects.length === 0 && (
           <div className="px-8 py-10 text-center text-sm text-zinc-500">
-            Belum ada proyek.
+            Tidak ada proyek yang diarsipkan.
           </div>
         )}
       </div>
