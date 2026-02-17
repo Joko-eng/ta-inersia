@@ -244,7 +244,7 @@ export default function ProjectClient({
                   <div className="text-muted-foreground">
                     {item.deadline ? formatTanggalID(item.deadline) : "-"}
                   </div>
-                  <div className="font-medium">{item.description}</div>
+                  <div className="font-medium pr-2">{item.description}</div>
                   <div>
                     <span
                       className={`inline-flex rounded-md px-3 py-1 text-xs font-medium ${statusStyle}`}
