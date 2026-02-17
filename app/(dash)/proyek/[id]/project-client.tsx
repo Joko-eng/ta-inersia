@@ -200,7 +200,7 @@ export default function ProjectClient({
         </div>
         {activeTab === "milestone" && (
           <div className="bg-white dark:bg-muted rounded-xl border shadow-sm overflow-hidden">
-            <div className="grid grid-cols-5 px-7 py-3 text-sm text-foreground border-b">
+            <div className="grid grid-cols-5 px-8 py-3 text-sm text-foreground border-b">
               <div className="flex items-center gap-2">
                 <AlignLeft size={16} /> <span>Milestone</span>
               </div>
@@ -238,9 +238,9 @@ export default function ProjectClient({
               return (
                 <div
                   key={item.id}
-                  className="grid grid-cols-5 items-center px-7 py-4 border-b last:border-b-0 text-sm"
+                  className="grid grid-cols-5 items-center px-8 py-4 border-b last:border-b-0 text-sm"
                 >
-                  <div className="font-medium">{item.title}</div>
+                  <div className="font-medium pr-4">{item.title}</div>
                   <div className="text-muted-foreground">
                     {item.deadline ? formatTanggalID(item.deadline) : "-"}
                   </div>
