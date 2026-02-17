@@ -1,3 +1,4 @@
+import DeadlinePopup from "@/components/deadline-popup";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
 import { SidebarTrigger } from "@/components/ui/sidebar";
@@ -16,6 +17,7 @@ export function AppNavbar({ name, role }: AppNavbarProps) {
       </div>
       <div className="flex-1" />
       <div className="flex items-center gap-3">
+        <DeadlinePopup />
         <Avatar>
           <AvatarImage src="/avatar.png" />
           <AvatarFallback>{name.charAt(0)}</AvatarFallback>
