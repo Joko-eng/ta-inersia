@@ -84,24 +84,12 @@ export const sidebarMenu: Record<Role, MenuItem[]> = {
     },
   ],
 };
-function buildProjectMenu(projects: Project[]): MenuItem {
-  return {
-    label: "Kelola Proyek",
-    icon: Layers,
-    children: projects.map((p) => ({
-      label: p.name,
-      href: `/proyek/${p.id}`,
-    })),
-  };
-}
+
 function buildMemberProjectMenu(projects: Project[]): MenuItem {
   return {
     label: "Lihat Proyek",
     icon: Layers,
-    children: projects.map((p) => ({
-      label: p.name,
-      href: `/proyek/${p.id}`,
-    })),
+    href: "/proyek",
   };
 }
 
@@ -132,7 +120,7 @@ export function getSidebarMenu(
       return [
         { label: "Dashboard", href: "/dashboard", icon: House },
         { label: "Tim Pengembang", href: "/team", icon: Users },
-        buildProjectMenu(managedProjects),
+        { label: "Kelola Proyek", href: "/kelola-proyek", icon: Layers },
       ];
 
     case "member":
