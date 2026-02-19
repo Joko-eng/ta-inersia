@@ -35,7 +35,6 @@ export async function POST(req: Request) {
   await recomputeMilestone(milestoneId);
   return NextResponse.json(task);
 }
-
 export async function PATCH(req: Request) {
   await connectDB();
   const body = await req.json();
@@ -50,7 +49,6 @@ export async function PATCH(req: Request) {
 
   return NextResponse.json(task);
 }
-
 export async function PUT(req: Request) {
   await connectDB();
   const body = await req.json();

@@ -19,8 +19,6 @@ export async function createMilestone(formData: FormData) {
   revalidatePath(`/proyek/${projectId}`);
 }
 export async function deleteMilestone(id: string, projectId: string) {
-  "use server";
-
   await connectDB();
   await Milestone.findByIdAndDelete(id);
 
