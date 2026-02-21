@@ -2,11 +2,14 @@ import { connectDB } from "@/lib/mongodb";
 import { recomputeMilestone } from "@/lib/recomputeMilestone";
 import Milestone from "@/models/Milestone";
 import Task from "@/models/Task";
+import TeamMember from "@/models/TeamMember";
+import "@/models/User";
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
   await connectDB();
   const body = await req.json();
+
   const {
     title,
     description,
@@ -16,30 +19,31 @@ export async function POST(req: Request) {
     priority,
     status,
   } = body;
-  if (!title || !milestoneId) {
+
+  if (!title || !milestoneId)
     return NextResponse.json(
       { error: "title & milestoneId required" },
       { status: 400 },
     );
-  }
+
   const task = await Task.create({
     title,
     description,
     milestoneId,
-    assignee: assignee,
+    assignee: assignee || null,
     dueDate: dueDate ? new Date(dueDate) : null,
     priority,
     status,
   });
 
   await recomputeMilestone(milestoneId);
+
   return NextResponse.json(task);
 }
+
 export async function PATCH(req: Request) {
   await connectDB();
-  const body = await req.json();
-
-  const { taskId, status } = body;
+  const { taskId, status } = await req.json();
 
   const task = await Task.findByIdAndUpdate(
     taskId,
@@ -53,47 +57,34 @@ export async function PATCH(req: Request) {
 
   return NextResponse.json(task);
 }
+
 export async function PUT(req: Request) {
   await connectDB();
-  const body = await req.json();
-  const { id, title, description, assignee, dueDate, priority } = body;
-  if (!id) {
-    return NextResponse.json({ error: "id required" }, { status: 400 });
-  }
-  try {
-    const task = await Task.findByIdAndUpdate(
-      id,
-      {
-        title,
-        description,
-        assignee: assignee || null,
-        dueDate: dueDate ? new Date(dueDate) : null,
-        priority,
-      },
-      {
-        new: true,
-        runValidators: true,
-      },
-    );
+  const { id, title, description, assignee, dueDate, priority } =
+    await req.json();
 
-    if (task) {
-      await recomputeMilestone(task.milestoneId.toString());
-    }
+  const task = await Task.findByIdAndUpdate(
+    id,
+    {
+      title,
+      description,
+      assignee: assignee || null,
+      dueDate: dueDate ? new Date(dueDate) : null,
+      priority,
+    },
+    { new: true },
+  );
 
-    return NextResponse.json(task);
-  } catch (err) {
-    console.error(err);
-    return NextResponse.json({ error: "update failed" }, { status: 500 });
+  if (task) {
+    await recomputeMilestone(task.milestoneId.toString());
   }
+
+  return NextResponse.json(task);
 }
 
 export async function DELETE(req: Request) {
   await connectDB();
   const { id } = await req.json();
-
-  if (!id) {
-    return NextResponse.json({ error: "id required" }, { status: 400 });
-  }
 
   const task = await Task.findById(id);
   if (!task) return NextResponse.json({ success: true });
@@ -106,23 +97,31 @@ export async function DELETE(req: Request) {
 
 export async function GET(req: Request) {
   await connectDB();
+
   const { searchParams } = new URL(req.url);
   const projectId = searchParams.get("projectId");
-  if (!projectId) return NextResponse.json([]);
+
+  if (!projectId) return NextResponse.json({ tasks: [], team: [] });
+
   const milestones = await Milestone.find({ projectId }).select("_id");
   const milestoneIds = milestones.map((m) => m._id);
+
   const tasks = await Task.find({
     milestoneId: { $in: milestoneIds },
-    assignee: { $ne: null },
   })
     .populate({
       path: "assignee",
-      populate: { path: "userId" },
+      populate: {
+        path: "userId",
+        select: "name",
+      },
     })
     .lean();
 
-  return NextResponse.json(
-    tasks.map((t) => ({
+  const team = await TeamMember.find().populate("userId", "name").lean();
+
+  return NextResponse.json({
+    tasks: tasks.map((t) => ({
       id: t._id.toString(),
       title: t.title,
       description: t.description,
@@ -139,5 +138,10 @@ export async function GET(req: Request) {
       status: t.status,
       statusUpdatedAt: t.statusUpdatedAt,
     })),
-  );
+    team: team.map((m) => ({
+      _id: m._id.toString(),
+      division: m.division,
+      userId: { name: m.userId?.name || "-" },
+    })),
+  });
 }

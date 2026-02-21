@@ -63,6 +63,7 @@ export default function ProjectClient({
   );
   const router = useRouter();
   const milestones = initialMilestones;
+  const [milestoneErrors, setMilestoneErrors] = useState<any>({});
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
   const [tasks, setTasks] = useState<Task[]>([]);
   const [teamMembers, setTeamMembers] = useState<any[]>([]);
@@ -80,7 +81,13 @@ export default function ProjectClient({
     description: "",
     deadline: "",
   });
+  const validateMilestoneClient = () => {
+    if (!newMilestone.title) return { name: ["Nama milestone wajib diisi"] };
 
+    if (!newMilestone.deadline) return { dueDate: ["Tanggal wajib diisi"] };
+
+    return null;
+  };
   const [targetStatus, setTargetStatus] = useState<
     "todo" | "inprogress" | "done"
   >("todo");
@@ -108,17 +115,13 @@ export default function ProjectClient({
   const fetchTasks = async () => {
     const res = await fetch(`/api/tasks?projectId=${projectId}`);
     const data = await res.json();
-    setTasks(data);
+    setTasks(data.tasks);
+    setTeamMembers(data.team);
   };
-  const fetchTeam = async () => {
-    const res = await fetch("/api/team");
-    const data = await res.json();
-    setTeamMembers(data);
-  };
+
   useEffect(() => {
     if (!projectId) return;
     fetchTasks();
-    fetchTeam();
   }, [projectId]);
 
   const COLUMNS = [
@@ -402,7 +405,10 @@ export default function ProjectClient({
                                   </p>
                                   <div className="my-5 h-px w-full bg-zinc-200 dark:bg-zinc-800" />{" "}
                                   <div className="flex justify-between items-center mt-4 text-xs text-zinc-500 dark:text-zinc-400">
-                                    <span>{task.assignee?.name}</span>
+                                    <span>
+                                      {task.assignee?.name ||
+                                        "Belum ditugaskan"}
+                                    </span>
                                     <span>
                                       {task.statusUpdatedAt
                                         ? formatTanggalID(task.statusUpdatedAt)
@@ -520,14 +526,17 @@ export default function ProjectClient({
 
                   {teamMembers.map((m) => (
                     <option key={m._id} value={m._id}>
-                      {m.userId.name} — {m.division}
+                      {m.userId?.name || "-"} — {m.division}
                     </option>
                   ))}
                 </select>
               </div>
               <div className="flex justify-end gap-2 pt-2">
                 <button
-                  onClick={() => setShowTaskModal(false)}
+                  onClick={() => {
+                    setShowMilestoneModal(false);
+                    setMilestoneErrors({});
+                  }}
                   className="px-4 py-2 text-sm text-zinc-600 dark:text-zinc-400"
                 >
                   Batal
@@ -542,7 +551,7 @@ export default function ProjectClient({
                         title: newTask.title,
                         description: newTask.description,
                         milestoneId: newTask.milestoneId,
-                        assignee: newTask.assignee,
+                        assignee: newTask.assignee || null,
                         priority: newTask.priority,
                         status: targetStatus,
                       }),
@@ -580,59 +589,91 @@ export default function ProjectClient({
               </p>
 
               <form
-                action={createMilestone}
-                onSubmit={() => {
+                action={async (formData) => {
+                  setMilestoneErrors({});
+
+                  const clientError = validateMilestoneClient();
+                  if (clientError) {
+                    setMilestoneErrors(clientError);
+                    return;
+                  }
+
+                  const result = await createMilestone(formData);
+
+                  if (result?.error) {
+                    setMilestoneErrors(result.error);
+                    return;
+                  }
+
+                  // reset state setelah sukses
+                  setMilestoneErrors({});
                   setShowMilestoneModal(false);
                   setNewMilestone({ title: "", description: "", deadline: "" });
+
                   router.refresh();
-                  toast.success("Milestone Berhasil Ditambahkan");
+                  toast.success("Milestone berhasil ditambahkan");
                 }}
               >
                 <input type="hidden" name="projectId" value={projectId} />
 
+                {/* NAME */}
                 <div className="space-y-1">
-                  <p className="text-xs font-medium text-zinc-700 dark:text-zinc-300">
-                    Milestone
-                  </p>
+                  <p className="text-xs font-medium">Milestone</p>
 
                   <input
                     name="name"
                     placeholder="Isi nama milestone disini"
                     value={newMilestone.title}
-                    onChange={(e) =>
+                    onChange={(e) => {
                       setNewMilestone({
                         ...newMilestone,
                         title: e.target.value,
-                      })
-                    }
-                    className="w-full border rounded-lg px-3 py-2 dark:bg-zinc-950 dark:border-zinc-800 dark:text-zinc-100"
+                      });
+                      setMilestoneErrors((p: any) => ({
+                        ...p,
+                        name: undefined,
+                      }));
+                    }}
+                    className="w-full border rounded-lg px-3 py-2 dark:bg-zinc-950"
                   />
+
+                  {milestoneErrors?.name && (
+                    <p className="text-xs text-red-500">
+                      {milestoneErrors.name[0]}
+                    </p>
+                  )}
                 </div>
-                <div className="space-y-1">
-                  <p className="text-xs font-medium text-zinc-700 dark:text-zinc-300">
-                    Deskripsi
-                  </p>
+
+                <div className="space-y-1 mt-3">
+                  <p className="text-xs font-medium">Deskripsi</p>
 
                   <textarea
                     name="description"
                     placeholder="Isi deskripsi milestone"
                     value={newMilestone.description || ""}
-                    onChange={(e) =>
+                    onChange={(e) => {
                       setNewMilestone({
                         ...newMilestone,
                         description: e.target.value,
-                      })
-                    }
+                      });
+                      setMilestoneErrors((p: any) => ({
+                        ...p,
+                        description: undefined,
+                      }));
+                    }}
                     rows={3}
-                    className="w-full border rounded-lg px-3 py-2 text-sm
-                dark:bg-zinc-950 dark:border-zinc-800 dark:text-zinc-100"
+                    className="w-full border rounded-lg px-3 py-2 text-sm dark:bg-zinc-950"
                   />
+
+                  {milestoneErrors?.description && (
+                    <p className="text-xs text-red-500">
+                      {milestoneErrors.description[0]}
+                    </p>
+                  )}
                 </div>
 
-                <div className="space-y-1">
-                  <p className="text-xs font-medium text-zinc-700 dark:text-zinc-300">
-                    Tanggal
-                  </p>
+                <div className="space-y-1 mt-3">
+                  <p className="text-xs font-medium">Tanggal Deadline</p>
 
                   <div className="relative">
                     <Calendar className="absolute left-3 top-2.5 h-4 w-4 text-zinc-400" />
@@ -640,22 +681,48 @@ export default function ProjectClient({
                       type="date"
                       name="dueDate"
                       value={newMilestone.deadline}
-                      onChange={(e) =>
+                      onChange={(e) => {
+                        const value = e.target.value;
+
                         setNewMilestone({
                           ...newMilestone,
-                          deadline: e.target.value,
-                        })
-                      }
-                      className="w-full border rounded-lg pl-10 pr-3 py-2 dark:bg-zinc-950 dark:border-zinc-800 dark:text-zinc-100"
+                          deadline: value,
+                        });
+
+                        const today = new Date().toISOString().split("T")[0];
+
+                        if (value && value < today) {
+                          setMilestoneErrors({
+                            dueDate: ["Tanggal tidak boleh sebelum hari ini"],
+                          });
+                        } else {
+                          setMilestoneErrors((p: any) => ({
+                            ...p,
+                            dueDate: undefined,
+                          }));
+                        }
+                      }}
+                      className="w-full border rounded-lg pl-10 pr-3 py-2 dark:bg-zinc-950"
                     />
                   </div>
+
+                  {milestoneErrors?.dueDate && (
+                    <p className="text-xs text-red-500">
+                      {milestoneErrors.dueDate[0]}
+                    </p>
+                  )}
                 </div>
+
+              
 
                 <div className="flex justify-end gap-3 mt-8">
                   <button
                     type="button"
-                    onClick={() => setShowMilestoneModal(false)}
-                    className="px-4 py-2 rounded-lg border text-zinc-700 dark:text-zinc-300 dark:border-zinc-700"
+                    onClick={() => {
+                      setShowMilestoneModal(false);
+                      setMilestoneErrors({});
+                    }}
+                    className="px-4 py-2 rounded-lg border"
                   >
                     Batal
                   </button>
@@ -679,13 +746,24 @@ export default function ProjectClient({
               </h3>
 
               <form
-                action={updateMilestone.bind(null, editMilestone.id, projectId)}
-                onSubmit={() => {
+                action={async (formData) => {
+                  setMilestoneErrors({});
+
+                  const result = await updateMilestone(
+                    editMilestone.id,
+                    projectId,
+                    formData,
+                  );
+
+                  if (result?.error) {
+                    setMilestoneErrors(result.error);
+                    return;
+                  }
+
                   setShowEditModal(false);
                   router.refresh();
-                  toast.success("Milestone Berhasil Diperbarui");
+                  toast.success("Milestone berhasil diperbarui");
                 }}
-                className="space-y-3"
               >
                 <input
                   name="name"
@@ -754,8 +832,17 @@ export default function ProjectClient({
                 </button>
 
                 <form
-                  action={deleteMilestone.bind(null, deleteTarget, projectId)}
-                  onSubmit={() => {
+                  action={async () => {
+                    const result = await deleteMilestone(
+                      deleteTarget,
+                      projectId,
+                    );
+
+                    if (result?.error) {
+                      toast.error(result.error);
+                      return;
+                    }
+
                     setDeleteTarget(null);
                     router.refresh();
                     toast.success("Milestone berhasil dihapus");
