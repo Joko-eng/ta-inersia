@@ -1,5 +1,6 @@
 import { connectDB } from "@/lib/mongodb";
 import TeamMember from "@/models/TeamMember";
+import "@/models/User";
 import TeamClient from "./team-client";
 
 async function getMembers() {
