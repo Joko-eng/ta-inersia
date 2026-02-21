@@ -46,6 +46,7 @@ interface Task {
   dueDate: string;
   priority: "rendah" | "sedang" | "tinggi";
   status: "todo" | "inprogress" | "done";
+  statusUpdatedAt?: string;
 }
 
 export default function ProjectClient({
@@ -88,7 +89,6 @@ export default function ProjectClient({
     description: "",
     milestoneId: "",
     assignee: "",
-    dueDate: "",
     priority: "sedang" as "rendah" | "sedang" | "tinggi",
   });
   const [showStatusSelect, setShowStatusSelect] = useState(false);
@@ -404,8 +404,8 @@ export default function ProjectClient({
                                   <div className="flex justify-between items-center mt-4 text-xs text-zinc-500 dark:text-zinc-400">
                                     <span>{task.assignee?.name}</span>
                                     <span>
-                                      {task.dueDate
-                                        ? formatTanggalID(task.dueDate)
+                                      {task.statusUpdatedAt
+                                        ? formatTanggalID(task.statusUpdatedAt)
                                         : "DD MM"}
                                     </span>
                                   </div>
@@ -525,19 +525,6 @@ export default function ProjectClient({
                   ))}
                 </select>
               </div>
-              <div className="space-y-1">
-                <p className="text-xs font-medium text-zinc-700 dark:text-zinc-300">
-                  Tentukan Deadline
-                </p>
-                <input
-                  type="date"
-                  value={newTask.dueDate}
-                  onChange={(e) =>
-                    setNewTask({ ...newTask, dueDate: e.target.value })
-                  }
-                  className="w-full border rounded px-3 py-2 dark:bg-zinc-950 dark:border-zinc-800 dark:text-zinc-100"
-                />
-              </div>
               <div className="flex justify-end gap-2 pt-2">
                 <button
                   onClick={() => setShowTaskModal(false)}
@@ -556,7 +543,6 @@ export default function ProjectClient({
                         description: newTask.description,
                         milestoneId: newTask.milestoneId,
                         assignee: newTask.assignee,
-                        dueDate: newTask.dueDate,
                         priority: newTask.priority,
                         status: targetStatus,
                       }),
@@ -567,7 +553,6 @@ export default function ProjectClient({
                       description: "",
                       milestoneId: "",
                       assignee: "",
-                      dueDate: "",
                       priority: "sedang",
                     });
 
@@ -839,15 +824,6 @@ export default function ProjectClient({
                 ))}
               </select>
 
-              <input
-                type="date"
-                value={editTask.dueDate?.slice(0, 10) || ""}
-                onChange={(e) =>
-                  setEditTask({ ...editTask, dueDate: e.target.value })
-                }
-                className="w-full border dark:border-zinc-700 rounded px-3 py-2 dark:bg-zinc-950 dark:text-zinc-100"
-              />
-
               <div className="flex justify-end gap-3 pt-2">
                 <button
                   onClick={() => setShowTaskEdit(false)}
@@ -866,7 +842,6 @@ export default function ProjectClient({
                         title: editTask.title,
                         description: editTask.description,
                         assignee: editTask.assignee || null,
-                        dueDate: editTask.dueDate,
                         priority: editTask.priority,
                       }),
                     });

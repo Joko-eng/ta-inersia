@@ -5,9 +5,9 @@ export interface ITask extends Document {
   description?: string;
   milestoneId: mongoose.Types.ObjectId;
   assignee: mongoose.Types.ObjectId;
-  dueDate?: Date | null;
   priority: "rendah" | "sedang" | "tinggi";
   status: "todo" | "inprogress" | "done";
+  statusUpdatedAt: Date;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -27,7 +27,6 @@ const TaskSchema = new Schema<ITask>(
       default: null,
     },
 
-    dueDate: { type: Date, default: null },
     priority: {
       type: String,
       enum: ["rendah", "sedang", "tinggi"],
@@ -37,6 +36,10 @@ const TaskSchema = new Schema<ITask>(
       type: String,
       enum: ["todo", "inprogress", "done"],
       default: "todo",
+    },
+    statusUpdatedAt: {
+      type: Date,
+      default: Date.now,
     },
   },
   { timestamps: true },

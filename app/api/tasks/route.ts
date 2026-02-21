@@ -41,7 +41,11 @@ export async function PATCH(req: Request) {
 
   const { taskId, status } = body;
 
-  const task = await Task.findByIdAndUpdate(taskId, { status }, { new: true });
+  const task = await Task.findByIdAndUpdate(
+    taskId,
+    { status, statusUpdatedAt: new Date() },
+    { new: true },
+  );
 
   if (task) {
     await recomputeMilestone(task.milestoneId.toString());
@@ -131,9 +135,9 @@ export async function GET(req: Request) {
               division: t.assignee.division || "-",
             }
           : null,
-      dueDate: t.dueDate,
       priority: t.priority,
       status: t.status,
+      statusUpdatedAt: t.statusUpdatedAt,
     })),
   );
 }
