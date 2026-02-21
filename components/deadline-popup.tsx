@@ -37,7 +37,7 @@ export default function DeadlinePopup() {
         onClick={() => setOpen(!open)}
         className="relative p-2 rounded-lg hover:bg-zinc-100"
       >
-        <Bell size={20} />
+        <Bell size={20} className="text-blue-500" />
 
         {unreadCount > 0 && (
           <span className="absolute -top-1 -right-1 text-xs bg-red-600 text-white px-1.5 rounded-full">
