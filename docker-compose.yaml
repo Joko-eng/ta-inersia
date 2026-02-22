@@ -12,21 +12,5 @@ services:
       - mongo_data:/data/db
       - ./docker/mongo-init:/docker-entrypoint-initdb.d:ro
 
-  web:
-    image: node:20-alpine
-    working_dir: /app
-    depends_on:
-      - mongo
-    ports:
-      - "3000:3000"
-    environment:
-      NODE_ENV: development
-      MONGODB_URI: "mongodb://${MONGO_APP_USER}:${MONGO_APP_PASS}@mongo:27017/${MONGO_DB}"
-      WATCHPACK_POLLING: "true"
-    volumes:
-      - ./:/app
-      - /app/node_modules
-    command: sh -c "npm ci && npm run dev"
-
 volumes:
   mongo_data:

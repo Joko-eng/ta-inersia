@@ -22,10 +22,10 @@ export default async function DashboardLayout({
   return (
     <SidebarProvider>
       <div className="flex min-h-screen w-full">
-        <AppSidebar role="projectmanager" projects={mappedProjects} />
+        <AppSidebar role="admin" projects={mappedProjects} />
 
         <div className="flex-1 flex flex-col">
-          <AppNavbar name="Dimas Dani" role="projectmanager" />
+          <AppNavbar name="Dimas Dani" role="admin" />
 
           <main className="flex-1 overflow-auto">{children}</main>
         </div>

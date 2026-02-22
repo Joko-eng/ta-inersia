@@ -33,8 +33,8 @@ export const sidebarMenu: Record<Role, MenuItem[]> = {
       icon: House,
     },
     {
-      label: "Prospek Klien",
-      href: "/prospek-klien",
+      label: "Lead Generation",
+      href: "/lead",
       icon: Briefcase,
     },
     {
@@ -114,7 +114,7 @@ export function getSidebarMenu(
     case "admin":
       return [
         { label: "Dashboard", href: "/dashboard", icon: House },
-        { label: "Prospek Klien", href: "/prospek-klien", icon: Briefcase },
+        { label: "Lead Generation", href: "/lead", icon: Briefcase },
         { label: "Klien", href: "/klien", icon: UserCheck },
         { label: "Project Manager", href: "/project-manager", icon: Users },
         {
