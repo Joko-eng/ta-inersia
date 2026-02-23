@@ -58,7 +58,7 @@ export default function ProjectClient({
   initialMilestones: Milestone[];
   name?: string;
 }) {
-  const [activeTab, setActiveTab] = useState<"milestone" | "kanban">(
+  const [activeTab, setActiveTab] = useState<"milestone" | "tugas">(
     "milestone",
   );
   const router = useRouter();
@@ -66,6 +66,7 @@ export default function ProjectClient({
   const [milestoneErrors, setMilestoneErrors] = useState<any>({});
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
   const [tasks, setTasks] = useState<Task[]>([]);
+  const [taskErrors, setTaskErrors] = useState<any>({});
   const [teamMembers, setTeamMembers] = useState<any[]>([]);
   const [showTaskModal, setShowTaskModal] = useState(false);
   const [showMilestoneModal, setShowMilestoneModal] = useState(false);
@@ -98,6 +99,15 @@ export default function ProjectClient({
     assignee: "",
     priority: "sedang" as "rendah" | "sedang" | "tinggi",
   });
+  const validateTaskClient = () => {
+    const errors: any = {};
+
+    if (!newTask.title.trim()) errors.title = ["Judul task wajib diisi"];
+
+    if (!newTask.milestoneId) errors.milestoneId = ["Milestone wajib dipilih"];
+
+    return Object.keys(errors).length ? errors : null;
+  };
   const [showStatusSelect, setShowStatusSelect] = useState(false);
   const formatTanggalID = (date?: string) => {
     if (!date || date === "-") return "-";
@@ -174,20 +184,20 @@ export default function ProjectClient({
             </button>
 
             <button
-              onClick={() => setActiveTab("kanban")}
+              onClick={() => setActiveTab("tugas")}
               className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm transition ${
-                activeTab === "kanban"
+                activeTab === "tugas"
                   ? "bg-background dark:bg-muted shadow text-foreground"
                   : "text-muted-foreground hover:text-foreground"
               }`}
             >
               <KanbanSquare className="h-4 w-4" />
-              Kanban
+              Tugas
             </button>
           </div>
           <button
             onClick={() => {
-              if (activeTab === "kanban") {
+              if (activeTab === "tugas") {
                 setTargetStatus("todo");
                 setShowStatusSelect(true);
                 setShowTaskModal(true);
@@ -199,7 +209,7 @@ export default function ProjectClient({
             className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:bg-primary/90 transition"
           >
             <Plus className="h-4 w-4" />
-            {activeTab === "kanban" ? "Tugas" : "Milestone"}
+            {activeTab === "tugas" ? "Tugas" : "Milestone"}
           </button>
         </div>
         {activeTab === "milestone" && (
@@ -280,7 +290,7 @@ export default function ProjectClient({
           </div>
         )}
 
-        {activeTab === "kanban" && (
+        {activeTab === "tugas" && (
           <DragDropContext onDragEnd={handleDragEnd}>
             <div className="flex gap-6 overflow-x-auto items-start">
               {COLUMNS.map((col) => (
@@ -453,7 +463,11 @@ export default function ProjectClient({
                   className="w-full border rounded px-3 py-2 dark:bg-zinc-950 dark:border-zinc-800 dark:text-zinc-100"
                 />
               ))}
-
+              {taskErrors?.title && (
+                <p className="text-xs text-red-500 mt-1">
+                  {taskErrors.title[0]}
+                </p>
+              )}
               <textarea
                 placeholder="Deskripsi"
                 value={newTask.description}
@@ -514,6 +528,11 @@ export default function ProjectClient({
                   </option>
                 ))}
               </select>
+              {taskErrors?.milestoneId && (
+                <p className="text-xs text-red-500 mt-1">
+                  {taskErrors.milestoneId[0]}
+                </p>
+              )}
               <div className="space-y-1">
                 <select
                   value={newTask.assignee}
@@ -530,12 +549,18 @@ export default function ProjectClient({
                     </option>
                   ))}
                 </select>
+                {taskErrors?.assignee && (
+                  <p className="text-xs text-red-500 mt-1">
+                    {taskErrors.assignee[0]}
+                  </p>
+                )}
               </div>
               <div className="flex justify-end gap-2 pt-2">
                 <button
+                  type="button"
                   onClick={() => {
-                    setShowMilestoneModal(false);
-                    setMilestoneErrors({});
+                    setShowTaskModal(false);
+                    setTaskErrors({});
                   }}
                   className="px-4 py-2 text-sm text-zinc-600 dark:text-zinc-400"
                 >
@@ -544,7 +569,14 @@ export default function ProjectClient({
 
                 <button
                   onClick={async () => {
-                    await fetch("/api/tasks", {
+                    setTaskErrors({});
+                    const clientError = validateTaskClient();
+                    if (clientError) {
+                      setTaskErrors(clientError);
+                      return;
+                    }
+
+                    const res = await fetch("/api/tasks", {
                       method: "POST",
                       headers: { "Content-Type": "application/json" },
                       body: JSON.stringify({
@@ -557,6 +589,10 @@ export default function ProjectClient({
                       }),
                     });
 
+                    if (!res.ok) {
+                      toast.error("Gagal menambahkan task");
+                      return;
+                    }
                     setNewTask({
                       title: "",
                       description: "",
@@ -605,7 +641,6 @@ export default function ProjectClient({
                     return;
                   }
 
-                  // reset state setelah sukses
                   setMilestoneErrors({});
                   setShowMilestoneModal(false);
                   setNewMilestone({ title: "", description: "", deadline: "" });

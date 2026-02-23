@@ -5,7 +5,7 @@ export interface IProject extends Document {
   trackerCode: string;
   projectManagerId: mongoose.Types.ObjectId;
   isArchived: boolean; 
-  createdAt: Date;
+  createdAt: Date;  
   updatedAt: Date;
 }
 
