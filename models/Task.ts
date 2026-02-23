@@ -9,7 +9,6 @@ export interface ITask extends Document {
   status: "todo" | "inprogress" | "done";
   statusUpdatedAt: Date;
   createdAt: Date;
-  updatedAt: Date;
 }
 
 const TaskSchema = new Schema<ITask>(

@@ -153,7 +153,7 @@ export default function ProjectClient({
       ),
     );
 
-    await fetch("/api/tasks", {
+    const res = await fetch("/api/tasks", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -161,6 +161,18 @@ export default function ProjectClient({
         status: newStatus,
       }),
     });
+    const updatedTask = await res.json();
+    setTasks((prev) =>
+      prev.map((task) =>
+        task.id === draggableId
+          ? {
+              ...task,
+              status: updatedTask.status,
+              statusUpdatedAt: updatedTask.statusUpdatedAt,
+            }
+          : task,
+      ),
+    );
     toast.success("Status task diperbarui");
     router.refresh();
   };
