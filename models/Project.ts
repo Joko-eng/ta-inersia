@@ -1,13 +1,5 @@
-import mongoose, { Document, Model, Schema } from "mongoose";
-
-export interface IProject extends Document {
-  name: string;
-  trackerCode: string;
-  projectManagerId: mongoose.Types.ObjectId;
-  isArchived: boolean; 
-  createdAt: Date;  
-  updatedAt: Date;
-}
+import { IProject } from "@/types/IProject";
+import mongoose, { Model, Schema } from "mongoose";
 
 const ProjectSchema = new Schema<IProject>(
   {
