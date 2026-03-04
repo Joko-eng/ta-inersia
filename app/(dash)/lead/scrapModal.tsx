@@ -36,7 +36,7 @@ export default function ScrapingModal({
 }: ScrapingModalProps) {
   const [location, setLocation] = useState("");
   const [category, setCategory] = useState("");
-  const [dataCount, setDataCount] = useState("10");
+  const [dataCount, setDataCount] = useState("");
   const [isRunning, setIsRunning] = useState(false);
 
   const logRef = useRef<HTMLDivElement>(null);
@@ -118,7 +118,7 @@ export default function ScrapingModal({
         body: JSON.stringify({
           lokasi: trimmedLocation,
           kategori: trimmedCategory,
-          jumlahData: parseInt(dataCount) || 10,
+          jumlahData: dataCount ? parseInt(dataCount) : null,
         }),
         signal: controller.signal,
       });
@@ -229,16 +229,17 @@ export default function ScrapingModal({
 
           <div className="flex flex-col gap-1.5">
             <label className="text-xs font-medium text-gray-700 dark:text-gray-300 flex items-center gap-1.5">
-              <Hash size={12} /> Jumlah Data
+              <Hash size={12} /> Jumlah Data{" "}
+              <span className="text-gray-400 font-normal">(opsional — kosong = semua)</span>
             </label>
             <input
               type="number"
               value={dataCount}
               onChange={(e) => setDataCount(e.target.value)}
               min={1}
-              max={500}
+              placeholder="Kosongkan untuk ambil semua data"
               disabled={isRunning}
-              className="w-full px-3 py-2 text-xs rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 transition disabled:opacity-50"
+              className="w-full px-3 py-2 text-xs rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-800 dark:text-gray-200 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition disabled:opacity-50"
             />
           </div>
 

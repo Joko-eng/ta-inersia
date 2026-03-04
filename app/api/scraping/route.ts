@@ -19,7 +19,10 @@ function buildSSELine(type: string, message?: string, data?: unknown): Uint8Arra
 export async function POST(req: Request): Promise<Response> {
   const { lokasi, kategori, jumlahData } = await req.json();
 
-  const target      = Math.min(parseInt(jumlahData) || 10, SCRAPING_CONFIG.MAX_DATA_PER_SESSION);
+  const parsed      = parseInt(jumlahData);
+  const target      = (!jumlahData || isNaN(parsed) || parsed <= 0)
+    ? Infinity
+    : parsed;
   const searchQuery = `${kategori} di ${lokasi}`;
   const userAgent   = pickRandom(SCRAPING_CONFIG.USER_AGENTS);
 
@@ -37,7 +40,7 @@ export async function POST(req: Request): Promise<Response> {
         send("info", "Sesi scraping dimulai.");
         send("info", `Keyword  : ${kategori}`);
         send("info", `Lokasi   : ${lokasi}`);
-        send("info", `Target   : ${target} data`);
+        send("info", `Target   : ${target === Infinity ? "Tidak terbatas" : target + " data"}`);
 
         send("info", "Menjalankan browser...");
         const { browser: b, page } = await launchBrowser(userAgent);

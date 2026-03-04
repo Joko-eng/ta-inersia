@@ -35,7 +35,7 @@ export async function collectAllBusinesses(
 
       if (currentIndex >= totalLinks) {
         send("loading", `Memuat lebih banyak hasil (indeks saat ini: ${currentIndex})...`);
-        await scrollResultsPanel(page, 10, target, send);
+        await scrollResultsPanel(page, 10, target === Infinity ? 9999 : target, send);
 
         links      = await page.locator(PLACE_LINK_SELECTOR).all();
         totalLinks = links.length;
@@ -51,7 +51,7 @@ export async function collectAllBusinesses(
         continue;
       }
 
-      send("info", `Memproses item ke-${currentIndex + 1} dari ${totalLinks} — terkumpul: ${results.length} dari ${target}`);
+      send("info", `Memproses item ke-${currentIndex + 1} dari ${totalLinks} — terkumpul: ${results.length}${target === Infinity ? "" : ` dari ${target}`}`);
 
       links = await page.locator(PLACE_LINK_SELECTOR).all();
       if (currentIndex >= links.length) {

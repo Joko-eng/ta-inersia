@@ -8,7 +8,7 @@ export const SCRAPING_CONFIG = {
   SCROLL_DELAY_MAX_MS:   2500,
   CLICK_DELAY_MIN_MS:    1500,
   CLICK_DELAY_MAX_MS:    2500,
-  MAX_DATA_PER_SESSION:  50,
+  MAX_DATA_PER_SESSION:  Infinity,
 
   USER_AGENTS: [
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
