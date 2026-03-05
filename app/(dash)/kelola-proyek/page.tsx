@@ -1,68 +1,17 @@
 import { connectDB } from "@/lib/mongodb";
 import Project from "@/models/Project";
-import Link from "next/link";
-import ArchiveButton from "./components/ArchiveButton";
+import ProjectList from "./components/ProjectList";
 
 export default async function Page() {
   await connectDB();
 
-  const projects = await Project.find({ isArchived: false }).lean();
-  return (
-    <div className="flex-1 p-8 space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-xl font-semibold">Daftar Proyek</h1>
+  const raw = await Project.find({ isArchived: false }).lean();
 
-        <Link
-          href="/kelola-proyek/arsip"
-          className="px-4 py-2 text-xs font-semibold rounded-md bg-primary text-primary-foreground shadow-sm hover:shadow hover:opacity-90 transition"
-        >
-          Lihat Proyek Diarsipkan
-        </Link>
-      </div>
+  const projects = raw.map((p: any) => ({
+    _id: p._id.toString(),
+    name: p.name,
+    createdAt: p.createdAt.toISOString(),
+  }));
 
-      <div className="overflow-hidden rounded-2xl border bg-white dark:bg-zinc-900 shadow-sm">
-        <div className="grid grid-cols-12 px-8 py-4 text-sm font-semibold border-b bg-zinc-50 dark:bg-zinc-800/40 text-zinc-700 dark:text-zinc-300">
-          <div className="col-span-5">Nama Proyek</div>
-          <div className="col-span-3">Tanggal Dibuat</div>
-          <div className="col-span-4 text-right pr-2">Aksi</div>
-        </div>
-
-        {projects.map((p: any) => (
-          <div
-            key={p._id}
-            className="grid grid-cols-12 items-center px-8 py-5 text-sm border-b last:border-b-0 hover:bg-zinc-50 dark:hover:bg-zinc-800/40 transition"
-          >
-            <div className="col-span-5 font-medium text-zinc-800 dark:text-zinc-100">
-              {p.name}
-            </div>
-
-            <div className="col-span-3 text-zinc-500 dark:text-zinc-400">
-              {new Date(p.createdAt).toLocaleDateString("id-ID", {
-                day: "2-digit",
-                month: "long",
-                year: "numeric",
-              })}
-            </div>
-
-            <div className="col-span-4 flex justify-end gap-3">
-              <Link
-                href={`/proyek/${p._id}`}
-                className="px-4 py-1.5 text-xs font-semibold rounded-md bg-primary text-primary-foreground hover:opacity-90 transition"
-              >
-                Detail
-              </Link>
-
-              <ArchiveButton projectId={p._id.toString()} />
-            </div>
-          </div>
-        ))}
-
-        {projects.length === 0 && (
-          <div className="px-8 py-10 text-center text-sm text-zinc-500">
-            Belum ada proyek.
-          </div>
-        )}
-      </div>
-    </div>
-  );
+  return <ProjectList projects={projects} />;
 }
