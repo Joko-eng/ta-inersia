@@ -7,6 +7,7 @@ import { addMember, deleteMember } from "./actions";
 export default function TeamClient({ initialMembers }: any) {
   const [members, setMembers] = useState(initialMembers);
   const [open, setOpen] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
 
   const [form, setForm] = useState({
     name: "",
@@ -76,9 +77,7 @@ export default function TeamClient({ initialMembers }: any) {
 
             <div>
               <span
-                className={`inline-flex px-3 py-1 rounded-full text-xs ${badge(
-                  m.division,
-                )}`}
+                className={`inline-flex px-3 py-1 rounded-full text-xs ${badge(m.division)}`}
               >
                 {m.division}
               </span>
@@ -86,15 +85,7 @@ export default function TeamClient({ initialMembers }: any) {
 
             <div>
               <button
-                onClick={async () => {
-                  if (!confirm("Hapus member ini?")) return;
-
-                  await deleteMember(m._id);
-
-                  setMembers((prev: any[]) =>
-                    prev.filter((x) => x._id !== m._id),
-                  );
-                }}
+                onClick={() => setDeleteTarget(m._id)}
                 className="text-red-500 hover:text-red-700 text-sm"
               >
                 <Trash size={16} />
@@ -103,6 +94,43 @@ export default function TeamClient({ initialMembers }: any) {
           </div>
         ))}
       </div>
+
+      {deleteTarget && (
+        <div className="fixed inset-0 bg-black/40 dark:bg-black/70 flex items-center justify-center z-50">
+          <div className="bg-white dark:bg-zinc-900 rounded-xl w-full max-w-sm p-6 space-y-4 border dark:border-zinc-800">
+            <h3 className="font-semibold text-lg text-zinc-900 dark:text-zinc-100">
+              Hapus Tim Pengembang
+            </h3>
+            <p className="text-sm text-zinc-500 dark:text-zinc-400">
+              Yakin ingin menghapus Tim Pengembang ?
+            </p>
+            <div className="flex justify-end gap-3 pt-2">
+              <button
+                onClick={() => setDeleteTarget(null)}
+                className="px-4 py-2 text-sm text-zinc-600 dark:text-zinc-400"
+              >
+                Batal
+              </button>
+              <form
+                action={async () => {
+                  await deleteMember(deleteTarget);
+                  setMembers((prev: any[]) =>
+                    prev.filter((x) => x._id !== deleteTarget),
+                  );
+                  setDeleteTarget(null);
+                }}
+              >
+                <button
+                  type="submit"
+                  className="px-4 py-2 bg-red-500 text-white text-sm rounded-lg hover:bg-red-600 transition"
+                >
+                  Hapus
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
 
       {open && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
