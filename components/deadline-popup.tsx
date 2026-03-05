@@ -1,18 +1,23 @@
 "use client";
 
 import { Bell } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
-export default function DeadlinePopup() {
+type MilestoneItem = {
+  _id: string;
+  name: string;
+  dueDate: string;
+  projectId?: { name: string };
+};
+
+export default function DeadlinePopup({
+  initialItems,
+}: {
+  initialItems: MilestoneItem[];
+}) {
   const [open, setOpen] = useState(false);
-  const [items, setItems] = useState<any[]>([]);
+  const [items, setItems] = useState<MilestoneItem[]>(initialItems);
   const [readIds, setReadIds] = useState<string[]>([]);
-
-  useEffect(() => {
-    fetch("/api/deadlines")
-      .then((res) => res.json())
-      .then(setItems);
-  }, []);
 
   const unreadCount = items.filter((i) => !readIds.includes(i._id)).length;
 
@@ -81,16 +86,14 @@ export default function DeadlinePopup() {
                     <div
                       key={m._id}
                       onClick={() => markAsRead(m._id)}
-                      className={`p-3 border-b cursor-pointer transition
-              ${unread ? "bg-red-50" : "bg-white"}
-              hover:bg-zinc-100`}
+                      className={`p-3 border-b cursor-pointer transition ${
+                        unread ? "bg-red-50" : "bg-white"
+                      } hover:bg-zinc-100`}
                     >
                       <p className="font-medium text-sm">{m.name}</p>
-
                       <p className="text-xs text-zinc-500">
                         {m.projectId?.name}
                       </p>
-
                       <p className="text-xs font-medium">
                         H-{daysLeft(m.dueDate)}
                       </p>
