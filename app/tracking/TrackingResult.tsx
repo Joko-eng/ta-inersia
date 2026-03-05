@@ -10,7 +10,6 @@ const statusConfig: Record<
     dotBorder: string;
     dotText: string;
     badge: string;
-    cardBorderLeft: string;
     lineBg: string;
     completedText: string;
   }
@@ -22,7 +21,6 @@ const statusConfig: Record<
     dotText: "text-white",
     badge:
       "bg-blue-50 text-blue-600 border border-blue-200 dark:bg-blue-500/10 dark:text-blue-400 dark:border-blue-500/30",
-    cardBorderLeft: "border-l-emerald-400",
     lineBg: "bg-emerald-300 dark:bg-emerald-700",
     completedText: "text-emerald-600 dark:text-emerald-400",
   },
@@ -33,7 +31,6 @@ const statusConfig: Record<
     dotText: "text-white",
     badge:
       "bg-yellow-50 text-yellow-600 border border-yellow-200 dark:bg-yellow-500/10 dark:text-yellow-400 dark:border-yellow-500/30",
-    cardBorderLeft: "border-l-blue-400",
     lineBg: "bg-slate-200 dark:bg-slate-700",
     completedText: "text-yellow-600 dark:text-yellow-400",
   },
@@ -44,7 +41,6 @@ const statusConfig: Record<
     dotText: "text-slate-400",
     badge:
       "bg-slate-100 text-slate-500 border border-slate-200 dark:bg-slate-700/50 dark:text-slate-400 dark:border-slate-600/50",
-    cardBorderLeft: "border-l-slate-300 dark:border-l-slate-600",
     lineBg: "bg-slate-200 dark:bg-slate-700",
     completedText: "text-slate-400",
   },
@@ -147,7 +143,7 @@ export default function TrackingResult({ result }: { result: TrackResult }) {
             </div>
 
             <div
-              className={`flex-1 mb-4 bg-white dark:bg-slate-800 rounded-xl border border-slate-100 dark:border-slate-700 border-l-4 p-4 ${cfg.cardBorderLeft}`}
+              className={`flex-1 mb-4 bg-white dark:bg-slate-800 rounded-xl border border-slate-100 dark:border-slate-700 border-l-4 p-4`}
             >
               <div className="flex justify-between mb-1">
                 <h4 className="text-sm font-semibold">{m.name}</h4>

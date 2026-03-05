@@ -1,47 +1,22 @@
-import {
-  getTrackingByCode,
-  getTrackingCodeFromCookie,
-  submitTrackingCode,
-} from "./action";
-import TrackingResult from "./TrackingResult";
+import TrackingForm from "./TrackingForm";
 
-export const dynamic = "force-dynamic";
-
-export default async function Page() {
-  const code = await getTrackingCodeFromCookie();
-  const result = code ? await getTrackingByCode(code) : null;
-
+export default function Page() {
   return (
-    <div className="max-w-5xl mx-auto p-10">
-      <h1 className="text-xl font-bold">Dashboard Tracking</h1>
-      <form action={submitTrackingCode} className="mt-6 flex gap-3">
-        <input
-          type="text"
-          name="code"
-          defaultValue={code ?? ""}
-          required
-          className="border px-3 py-2 rounded"
-          placeholder="Masukkan kode tracking"
-        />
-        <button
-          type="submit"
-          className="bg-blue-600 text-white px-4 py-2 rounded"
-        >
-          Cari
-        </button>
-      </form>
-
-      {!code && (
-        <div className="mt-10 text-sm text-gray-400">
-          Masukkan kode tracking.
+    <div className="min-h-screen bg-white">
+      <div className="max-w-5xl mx-auto px-8 py-10">
+        <div className="mb-8">
+          <h1 className="text-2xl font-bold text-blue-800 tracking-tight">
+            Dashboard Pemantauan Proyek
+          </h1>
+          <p className="text-sm text-blue-600 mt-1">
+            Pantau perkembangan proyek Anda dengan mudah
+          </p>
         </div>
-      )}
 
-      {code && !result && (
-        <div className="mt-6 text-red-500 text-sm">Proyek tidak ditemukan.</div>
-      )}
-
-      {result && <TrackingResult result={result} />}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 px-8 py-8">
+          <TrackingForm />
+        </div>
+      </div>
     </div>
   );
 }
