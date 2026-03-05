@@ -1,33 +1,32 @@
-import { getTrackingByCode } from "./action";
+import {
+  getTrackingByCode,
+  getTrackingCodeFromCookie,
+  submitTrackingCode,
+} from "./action";
 import TrackingResult from "./TrackingResult";
 
 export const dynamic = "force-dynamic";
 
-interface PageProps {
-  searchParams: Promise<{
-    code?: string;
-  }>;
-}
-
-export default async function Page({ searchParams }: PageProps) {
-  const params = await searchParams;
-  const code = params.code?.trim();
-
+export default async function Page() {
+  const code = await getTrackingCodeFromCookie();
   const result = code ? await getTrackingByCode(code) : null;
 
   return (
     <div className="max-w-5xl mx-auto p-10">
       <h1 className="text-xl font-bold">Dashboard Tracking</h1>
-
-      <form method="GET" className="mt-6 flex gap-3">
+      <form action={submitTrackingCode} className="mt-6 flex gap-3">
         <input
           type="text"
           name="code"
-          defaultValue={code}
+          defaultValue={code ?? ""}
           required
           className="border px-3 py-2 rounded"
+          placeholder="Masukkan kode tracking"
         />
-        <button className="bg-blue-600 text-white px-4 py-2 rounded">
+        <button
+          type="submit"
+          className="bg-blue-600 text-white px-4 py-2 rounded"
+        >
           Cari
         </button>
       </form>

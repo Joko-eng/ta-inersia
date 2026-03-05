@@ -1,5 +1,5 @@
 import { Calendar, CheckCircle, TrendingUp } from "lucide-react";
-import { IMilestone, TrackResult } from "./types";
+import { IMilestone, TrackResult } from "./Types";
 type MilestoneStatus = "menunggu" | "sedang_dikerjakan" | "selesai";
 
 const statusConfig: Record<
