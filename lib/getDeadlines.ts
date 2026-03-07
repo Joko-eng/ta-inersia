@@ -1,6 +1,5 @@
 import { connectDB } from "@/lib/mongodb";
 import Milestone from "@/models/Milestone";
-
 export async function getDeadlines() {
   await connectDB();
   const today = new Date();
