@@ -1,7 +1,10 @@
-import React from 'react'
-
-export default function page() {
+import { LoginForm } from "@/components/login-form";
+export default function Page() {
   return (
-    <div>page</div>
-  )
+    <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10 bg-green-100">
+      <div className="w-full max-w-sm">
+        <LoginForm />
+      </div>
+    </div>
+  );
 }
