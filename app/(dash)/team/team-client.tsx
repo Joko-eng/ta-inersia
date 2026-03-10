@@ -51,14 +51,14 @@ export default function TeamClient({ initialMembers }: any) {
 
         <button
           onClick={() => setOpen(true)}
-          className="flex items-center gap-2 bg-primary text-white px-4 py-2 rounded-lg text-sm"
+          className="flex items-center gap-2 bg-primary dark:bg-black/70 text-white dark:text-white px-4 py-2 rounded-lg text-sm"
         >
           <Plus size={16} /> Tim Pengembang
         </button>
       </div>
 
-      <div className="bg-white rounded-xl border shadow-sm overflow-hidden">
-        <div className="grid grid-cols-5 px-6 py-3 bg-gray-50 text-sm font-medium">
+      <div className="bg-white rounded-xl border dark:bg-zinc-900 shadow-sm overflow-hidden">
+        <div className=" dark:bg-zinc-900 grid grid-cols-5 px-6 py-3 bg-gray-50 text-sm font-medium">
           <div>Nama</div>
           <div>Email</div>
           <div>Username</div>
@@ -134,7 +134,7 @@ export default function TeamClient({ initialMembers }: any) {
 
       {open && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl w-full max-w-md p-6 relative">
+          <div className="bg-white dark:bg-zinc-900 rounded-xl w-full max-w-md p-6 relative">
             <button
               onClick={() => {
                 setErrors({});
@@ -259,7 +259,7 @@ export default function TeamClient({ initialMembers }: any) {
                     division: "",
                   });
                 }}
-                className="px-4 py-2 bg-primary text-white rounded text-sm"
+                className="px-4 py-2 bg-primary dark:bg-black/70 text-white rounded text-sm"
               >
                 Simpan
               </button>
