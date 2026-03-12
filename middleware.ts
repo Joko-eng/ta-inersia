@@ -5,14 +5,12 @@ export async function middleware(req: NextRequest) {
   const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
   const { pathname } = req.nextUrl;
 
-  // Belum login → redirect ke login
   if (!token) {
-    return NextResponse.redirect(new URL("/login", req.url));
+    return NextResponse.redirect(new URL("/unauthorized", req.url));
   }
 
   const role = token.role;
 
-  // Halaman dalam (dash) → hanya project_manager
   if (
     pathname.startsWith("/dashboard") ||
     pathname.startsWith("/kelola-proyek") ||

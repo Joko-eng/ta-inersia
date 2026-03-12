@@ -1,8 +1,8 @@
 import DeadlinePopup from "@/components/deadline-popup";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { getDeadlines } from "@/lib/getDeadlines";
+import { NavbarUserMenu } from "./navbar-user";
 
 interface AppNavbarProps {
   name: string;
@@ -20,15 +20,7 @@ export async function AppNavbar({ name, role }: AppNavbarProps) {
       <div className="flex-1" />
       <div className="flex items-center gap-3">
         <DeadlinePopup initialItems={deadlines} />
-        <Avatar>
-          <AvatarImage src="/avatar.png" />
-          <AvatarFallback>{name.charAt(0)}</AvatarFallback>
-        </Avatar>
-
-        <div className="leading-tight text-sm">
-          <p className="font-medium">{name}</p>
-          <p className="text-muted-foreground capitalize">{role}</p>
-        </div>
+        <NavbarUserMenu name={name} role={role} />
       </div>
     </header>
   );
