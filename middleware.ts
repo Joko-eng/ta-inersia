@@ -15,7 +15,8 @@ export async function middleware(req: NextRequest) {
     pathname.startsWith("/dashboard") ||
     pathname.startsWith("/kelola-proyek") ||
     pathname.startsWith("/proyek") ||
-    pathname.startsWith("/team")
+    pathname.startsWith("/team") ||
+    pathname.startsWith("/profile")
   ) {
     if (role !== "project_manager") {
       return NextResponse.redirect(new URL("/unauthorized", req.url));
