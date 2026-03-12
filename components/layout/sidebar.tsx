@@ -105,11 +105,7 @@ export function AppSidebar({
 }) {
   const pathname = usePathname();
 
-  const menus = getSidebarMenu(
-    role,
-    role === "projectmanager" ? projects : [],
-    role === "member" ? projects : [],
-  );
+  const menus = getSidebarMenu(role, role === "member" ? projects : []) ?? [];
   return (
     <Sidebar>
       <SidebarContent className="flex flex-col">

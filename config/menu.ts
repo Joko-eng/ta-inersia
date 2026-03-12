@@ -8,7 +8,7 @@ import {
   Users,
 } from "lucide-react";
 
-export type Role = "admin" | "projectmanager" | "member";
+export type Role = "admin" | "project_manager" | "member";
 
 export interface Project {
   id: string;
@@ -25,66 +25,6 @@ export interface MenuItem {
   children?: MenuItem[];
 }
 
-export const sidebarMenu: Record<Role, MenuItem[]> = {
-  admin: [
-    {
-      label: "Dashboard",
-      href: "/dashboard",
-      icon: House,
-    },
-    {
-      label: "Prospek Klien",
-      href: "/prospek-klien",
-      icon: Briefcase,
-    },
-    {
-      label: "Klien",
-      href: "/klien",
-      icon: UserCheck,
-    },
-    {
-      label: "Project Manager",
-      href: "/project-manager",
-      icon: Users,
-    },
-    {
-      label: "Income",
-      icon: BarChart3,
-      children: [
-        {
-          label: "Ringkasan",
-          href: "/income",
-        },
-        {
-          label: "Laporan",
-          href: "/income/laporan",
-        },
-      ],
-    },
-  ],
-
-  projectmanager: [
-    {
-      label: "Dashboard",
-      href: "/dashboard",
-      icon: House,
-    },
-    {
-      label: "Tim Pengembang",
-      href: "/dashboard/team",
-      icon: Users,
-    },
-  ],
-
-  member: [
-    {
-      label: "Dashboard",
-      href: "/dashboard",
-      icon: House,
-    },
-  ],
-};
-
 function buildMemberProjectMenu(projects: Project[]): MenuItem {
   return {
     label: "Lihat Proyek",
@@ -95,7 +35,6 @@ function buildMemberProjectMenu(projects: Project[]): MenuItem {
 
 export function getSidebarMenu(
   role: Role,
-  managedProjects: Project[] = [],
   assignedProjects: Project[] = [],
 ): MenuItem[] {
   switch (role) {
@@ -116,7 +55,7 @@ export function getSidebarMenu(
         { label: "Pengaturan", href: "/settings", icon: Settings },
       ];
 
-    case "projectmanager":
+    case "project_manager":
       return [
         { label: "Dashboard", href: "/dashboard", icon: House },
         { label: "Tim Pengembang", href: "/team", icon: Users },

@@ -6,7 +6,7 @@ import { getDeadlines } from "@/lib/getDeadlines";
 
 interface AppNavbarProps {
   name: string;
-  role: "admin" | "projectmanager" | "member";
+  role: "admin" | "project_manager" | "member";
 }
 
 export async function AppNavbar({ name, role }: AppNavbarProps) {
