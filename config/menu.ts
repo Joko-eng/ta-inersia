@@ -29,7 +29,7 @@ function buildMemberProjectMenu(projects: Project[]): MenuItem {
   return {
     label: "Lihat Proyek",
     icon: Layers,
-    href: "/proyek",
+    href: "/proyek-tim",
   };
 }
 

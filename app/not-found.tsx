@@ -20,9 +20,7 @@ export default function NotFound() {
       `}</style>
 
       <div className="min-h-screen flex flex-col items-center justify-center p-8">
-        {/* Ilustrasi */}
         <div className="relative w-[280px] h-[180px] mb-8">
-          {/* Bintang-bintang */}
           {[
             { w: 4, left: 20, top: 30, delay: "0s" },
             { w: 3, left: 60, top: 15, delay: "0.4s" },
@@ -45,7 +43,6 @@ export default function NotFound() {
             />
           ))}
 
-          {/* Planet */}
           <div
             className="planet absolute rounded-full bg-primary"
             style={{
@@ -56,7 +53,6 @@ export default function NotFound() {
               transform: "translate(-50%, -50%)",
             }}
           >
-            {/* Cincin planet */}
             <div
               style={{
                 position: "absolute",
@@ -71,7 +67,6 @@ export default function NotFound() {
             />
           </div>
 
-          {/* Tali astronot */}
           <div
             style={{
               position: "absolute",
@@ -85,12 +80,10 @@ export default function NotFound() {
             }}
           />
 
-          {/* Astronot */}
           <div
             className="astronaut absolute"
             style={{ right: 20, top: 20, width: 48, height: 48 }}
           >
-            {/* Helm */}
             <div
               style={{
                 width: 26,
@@ -101,7 +94,6 @@ export default function NotFound() {
                 position: "relative",
               }}
             >
-              {/* Visor */}
               <div
                 style={{
                   width: 14,
@@ -115,7 +107,6 @@ export default function NotFound() {
               />
             </div>
 
-            {/* Badan */}
             <div
               style={{
                 width: 28,
@@ -126,7 +117,6 @@ export default function NotFound() {
                 position: "relative",
               }}
             >
-              {/* Tangan kiri */}
               <div
                 style={{
                   position: "absolute",
@@ -139,7 +129,6 @@ export default function NotFound() {
                   transform: "rotate(20deg)",
                 }}
               />
-              {/* Tangan kanan */}
               <div
                 style={{
                   position: "absolute",
@@ -152,7 +141,6 @@ export default function NotFound() {
                   transform: "rotate(-20deg)",
                 }}
               />
-              {/* Kaki kiri */}
               <div
                 style={{
                   position: "absolute",
@@ -164,7 +152,6 @@ export default function NotFound() {
                   borderRadius: 3,
                 }}
               />
-              {/* Kaki kanan */}
               <div
                 style={{
                   position: "absolute",
@@ -180,7 +167,6 @@ export default function NotFound() {
           </div>
         </div>
 
-        {/* Teks */}
         <h1 className="text-7xl font-medium tracking-tight leading-none mb-2">
           404
         </h1>
@@ -190,13 +176,12 @@ export default function NotFound() {
           Kembali ke halaman utama yuk!
         </p>
 
-        {/* Tombol */}
         <div className="flex gap-3">
           <a
-            href="/dashboard"
+            href="/"
             className="px-5 py-2 rounded-lg bg-primary text-white text-sm font-medium hover:bg-primary transition"
           >
-            Kembali ke Dashboard
+            Kembali ke Beranda
           </a>
           <a
             href="javascript:history.back()"

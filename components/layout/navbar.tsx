@@ -19,7 +19,9 @@ export async function AppNavbar({ name, role }: AppNavbarProps) {
       </div>
       <div className="flex-1" />
       <div className="flex items-center gap-3">
-        <DeadlinePopup initialItems={deadlines} />
+        {role === "project_manager" && (
+          <DeadlinePopup initialItems={deadlines} />
+        )}
         <NavbarUserMenu name={name} role={role} />
       </div>
     </header>

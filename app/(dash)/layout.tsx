@@ -12,10 +12,8 @@ export default async function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
-  // Ambil session
   const session = await getSession();
 
-  // Jika belum login atau user tidak ada, redirect ke halaman login
   if (!session || !session.user) redirect("/login");
 
   const role = (session.user as any).role as
@@ -36,11 +34,9 @@ export default async function DashboardLayout({
   return (
     <SidebarProvider>
       <div className="flex min-h-screen w-full">
-        {/* Role dari session, bukan hardcode */}
         <AppSidebar role={role} projects={mappedProjects} />
 
         <div className="flex-1 flex flex-col">
-          {/* Nama & role dari session */}
           <AppNavbar name={name} role={role} />
 
           <main className="flex-1 overflow-auto">{children}</main>
