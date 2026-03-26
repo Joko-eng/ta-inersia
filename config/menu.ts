@@ -52,7 +52,7 @@ export function getSidebarMenu(
             { label: "Laporan", href: "/income/laporan" },
           ],
         },
-        { label: "Pengaturan", href: "/settings", icon: Settings },
+        { label: "Profile", href: "/profile", icon: Settings },
       ];
 
     case "project_manager":
@@ -60,12 +60,14 @@ export function getSidebarMenu(
         { label: "Dashboard", href: "/dashboard", icon: House },
         { label: "Tim Pengembang", href: "/team", icon: Users },
         { label: "Kelola Proyek", href: "/kelola-proyek", icon: Layers },
+        { label: "Profile", href: "/profile", icon: Settings },
       ];
 
     case "member":
       return [
         { label: "Dashboard", href: "/dashboard", icon: House },
         buildMemberProjectMenu(assignedProjects),
+        { label: "Profile", href: "/profile", icon: Settings },
       ];
   }
 }
