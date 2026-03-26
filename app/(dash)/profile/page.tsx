@@ -7,12 +7,10 @@ export default async function ProfilePage() {
   if (!session?.user) redirect("/login");
 
   return (
-    <div className="flex-1 p-8">
-      <div className="max-w-xl mx-auto">
-        <h1 className="text-2xl font-bold mb-2">Profil Saya</h1>
-        <p className="text-muted-foreground mb-8">Kelola informasi akun kamu</p>
-
-        {/* Info Akun */}
+    <div className="flex-1 p-6">
+      <h1 className="text-2xl font-bold mb-2">Profil Saya</h1>
+      <p className="text-muted-foreground mb-8">Kelola informasi akun kamu</p>
+      <div className="grid grid-cols-2 gap-6">
         <div className="bg-white dark:bg-muted rounded-xl border shadow-sm p-6 mb-6">
           <h2 className="text-sm font-medium text-muted-foreground mb-4">
             Informasi Akun
@@ -35,7 +33,6 @@ export default async function ProfilePage() {
           </div>
         </div>
 
-        {/* Update Password */}
         <UpdatePasswordForm />
       </div>
     </div>

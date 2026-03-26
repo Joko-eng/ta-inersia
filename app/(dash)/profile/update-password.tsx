@@ -1,9 +1,9 @@
 "use client";
 
+import { Eye, EyeOff, Lock } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { updatePassword } from "./action";
-import { Eye, EyeOff, Lock } from "lucide-react";
 
 export function UpdatePasswordForm() {
   const [loading, setLoading] = useState(false);
@@ -29,10 +29,13 @@ export function UpdatePasswordForm() {
     (e.target as HTMLFormElement).reset();
   };
 
+  const inputClass =
+    "w-full border rounded-lg px-3 py-2 pr-10 text-sm dark:bg-zinc-950 dark:border-zinc-700 dark:text-zinc-100 [&::-ms-reveal]:hidden [&::-ms-clear]:hidden [&::-webkit-contacts-auto-fill-button]:hidden [&::-webkit-credentials-auto-fill-button]:hidden";
+
   return (
     <div className="bg-white dark:bg-muted rounded-xl border shadow-sm p-6">
       <div className="flex items-center gap-2 mb-1">
-        <Lock size={16} className="text-violet-600" />
+        <Lock size={16} className="text-primary" />
         <h2 className="text-sm font-medium">Ubah Password</h2>
       </div>
       <p className="text-xs text-muted-foreground mb-6">
@@ -40,7 +43,6 @@ export function UpdatePasswordForm() {
       </p>
 
       <form onSubmit={handleSubmit} className="space-y-4">
-        {/* Password Saat Ini */}
         <div className="space-y-1">
           <label className="text-xs font-medium text-zinc-700 dark:text-zinc-300">
             Password Saat Ini
@@ -51,7 +53,7 @@ export function UpdatePasswordForm() {
               type={showCurrent ? "text" : "password"}
               required
               placeholder="Masukkan password saat ini"
-              className="w-full border rounded-lg px-3 py-2 pr-10 text-sm dark:bg-zinc-950 dark:border-zinc-700 dark:text-zinc-100"
+              className={inputClass}
             />
             <button
               type="button"
@@ -63,7 +65,6 @@ export function UpdatePasswordForm() {
           </div>
         </div>
 
-        {/* Password Baru */}
         <div className="space-y-1">
           <label className="text-xs font-medium text-zinc-700 dark:text-zinc-300">
             Password Baru
@@ -74,7 +75,7 @@ export function UpdatePasswordForm() {
               type={showNew ? "text" : "password"}
               required
               placeholder="Masukkan password baru"
-              className="w-full border rounded-lg px-3 py-2 pr-10 text-sm dark:bg-zinc-950 dark:border-zinc-700 dark:text-zinc-100"
+              className={inputClass}
             />
             <button
               type="button"
@@ -86,7 +87,6 @@ export function UpdatePasswordForm() {
           </div>
         </div>
 
-        {/* Konfirmasi Password */}
         <div className="space-y-1">
           <label className="text-xs font-medium text-zinc-700 dark:text-zinc-300">
             Konfirmasi Password Baru
@@ -97,7 +97,7 @@ export function UpdatePasswordForm() {
               type={showConfirm ? "text" : "password"}
               required
               placeholder="Ulangi password baru"
-              className="w-full border rounded-lg px-3 py-2 pr-10 text-sm dark:bg-zinc-950 dark:border-zinc-700 dark:text-zinc-100"
+              className={inputClass}
             />
             <button
               type="button"
