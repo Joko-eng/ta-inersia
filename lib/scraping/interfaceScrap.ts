@@ -8,6 +8,7 @@ export interface BusinessData {
   phone:         string;
   website:       string;
   address:       string;
+  maps_url:      string;
 }
 
 export interface DatabaseCounter {

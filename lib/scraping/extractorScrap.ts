@@ -11,10 +11,21 @@ export async function extractBusinessDetails(page: Page): Promise<BusinessData> 
     phone:         "",
     website:       "",
     address:       "",
+    maps_url:      "",
   };
 
   try {
     await page.waitForSelector("h1.DUwDvf", { timeout: 5000 });
+
+    // Capture current URL as maps URL (clean up tracking params)
+    try {
+      const currentUrl = page.url();
+      if (currentUrl.includes("google.com/maps")) {
+        // Keep only up to the place ID portion for a clean shareable link
+        const cleanUrl = currentUrl.split("?")[0];
+        data.maps_url = cleanUrl || currentUrl;
+      }
+    } catch {}
 
     try {
       const text = await page.locator("h1.DUwDvf").first().innerText({ timeout: 3000 });

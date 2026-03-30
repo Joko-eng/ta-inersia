@@ -22,6 +22,8 @@ export async function saveBusinessToDatabase(
       jumlahUlasan: item.review_count,
       noTelp:       item.phone,
       alamat:       item.address,
+      mapsUrl:      item.maps_url,
+      keterangan:   "",
       status:       "Belum Diproses",
       keyword:      category,
       lokasi:       location,

@@ -6,7 +6,9 @@ export interface ILead extends Document {
   jumlahUlasan: number;
   noTelp: string;
   alamat: string;
-  status: "Prospek" | "Belum Prospek" | "Belum Diproses";
+  mapsUrl: string;
+  keterangan: string;
+  status: "Prospek" | "Belum Prospek" | "Tidak Prospek" | "Belum Diproses";
   keyword: string;
   lokasi: string;
   createdAt: Date;
@@ -19,9 +21,11 @@ const LeadSchema = new Schema<ILead>(
     jumlahUlasan: { type: Number, default: 0 },
     noTelp: { type: String, default: "" },
     alamat: { type: String, default: "" },
+    mapsUrl: { type: String, default: "" },
+    keterangan: { type: String, default: "" },
     status: {
       type: String,
-      enum: ["Prospek", "Belum Prospek", "Belum Diproses"],
+      enum: ["Prospek", "Belum Prospek", "Tidak Prospek", "Belum Diproses"],
       default: "Belum Diproses",
     },
     keyword: { type: String, default: "" },
@@ -30,7 +34,6 @@ const LeadSchema = new Schema<ILead>(
   { timestamps: true }
 );
 
-// Hindari re-compile model saat hot reload Next.js
 const Lead: Model<ILead> =
   mongoose.models.Lead || mongoose.model<ILead>("Lead", LeadSchema);
 

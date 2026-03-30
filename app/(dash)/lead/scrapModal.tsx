@@ -2,7 +2,6 @@
 
 import { useState, useRef, useCallback } from "react";
 import axios from "axios";
-import { X, MapPin, Tag, Hash, Play, Loader2 } from "lucide-react";
 
 type LogType = "info" | "success" | "error" | "loading";
 
@@ -11,56 +10,45 @@ interface ScrapingModalProps {
   onScrapingDone?: () => void;
 }
 
-interface LogEntry {
-  type: LogType;
-  message: string;
-}
-
-const LOG_ICONS: Record<LogType, string> = {
-  success: `<svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-green-500 mt-0.5 shrink-0"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>`,
-  error: `<svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-red-500 mt-0.5 shrink-0"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>`,
-  loading: `<svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-blue-400 mt-0.5 shrink-0 animate-spin"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>`,
-  info: `<span class="w-[11px] h-[11px] mt-0.5 shrink-0 rounded-full bg-gray-400 inline-block"></span>`,
+const LOG_DOT: Record<LogType, string> = {
+  success: "bg-emerald-400",
+  error:   "bg-rose-400",
+  loading: "bg-blue-400 animate-pulse",
+  info:    "bg-zinc-500 dark:bg-zinc-600",
 };
 
-const LOG_COLORS: Record<LogType, string> = {
-  success: "text-green-400",
-  error: "text-red-400",
+const LOG_TEXT: Record<LogType, string> = {
+  success: "text-emerald-400",
+  error:   "text-rose-400",
   loading: "text-blue-400",
-  info: "text-gray-300",
+  info:    "text-zinc-400",
 };
 
-export default function ScrapingModal({
-  onClose,
-  onScrapingDone,
-}: ScrapingModalProps) {
-  const [location, setLocation] = useState("");
-  const [category, setCategory] = useState("");
+export default function ScrapingModal({ onClose, onScrapingDone }: ScrapingModalProps) {
+  const [location,  setLocation]  = useState("");
+  const [category,  setCategory]  = useState("");
   const [dataCount, setDataCount] = useState("");
   const [isRunning, setIsRunning] = useState(false);
 
-  const logRef = useRef<HTMLDivElement>(null);
+  const logRef   = useRef<HTMLDivElement>(null);
   const emptyRef = useRef<HTMLParagraphElement>(null);
   const abortRef = useRef<AbortController | null>(null);
 
   const appendLog = useCallback((type: LogType, message: string) => {
     const container = logRef.current;
     if (!container) return;
-
     if (emptyRef.current) emptyRef.current.style.display = "none";
 
     const time = new Date().toLocaleTimeString("id-ID", {
-      hour: "2-digit",
-      minute: "2-digit",
-      second: "2-digit",
+      hour: "2-digit", minute: "2-digit", second: "2-digit",
     });
 
     const row = document.createElement("div");
     row.className = "flex items-start gap-2";
     row.innerHTML =
-      `${LOG_ICONS[type]}` +
-      `<span class="text-gray-500 text-[10px] shrink-0 mt-0.5">${time}</span>` +
-      `<span class="text-[11px] leading-relaxed ${LOG_COLORS[type]}">${message}</span>`;
+      `<div class="mt-1.5 shrink-0 w-1.5 h-1.5 rounded-full ${LOG_DOT[type]}"></div>` +
+      `<span class="text-[10px] text-zinc-600 shrink-0 tabular-nums font-mono w-16">${time}</span>` +
+      `<span class="text-[11px] leading-relaxed ${LOG_TEXT[type]}">${message}</span>`;
 
     container.appendChild(row);
     container.scrollTop = container.scrollHeight;
@@ -80,16 +68,11 @@ export default function ScrapingModal({
     appendLog("info", "Memulai klasifikasi Machine Learning...");
     try {
       const { data, status } = await axios.post("/api/ml");
-
       if (status !== 200 || data.error) {
         appendLog("error", `Klasifikasi gagal: ${data.error ?? status}`);
         return;
       }
-
-      appendLog(
-        "success",
-        `Klasifikasi selesai — ${data.prospek} Prospek, ${data.belum_prospek} Belum Prospek`,
-      );
+      appendLog("success", `Klasifikasi selesai — ${data.prospek} Prospek, ${data.belum_prospek} Belum Prospek`);
       appendLog("info", "Data siap ditampilkan di tabel.");
       onScrapingDone?.();
     } catch (err) {
@@ -116,8 +99,8 @@ export default function ScrapingModal({
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          lokasi: trimmedLocation,
-          kategori: trimmedCategory,
+          lokasi:     trimmedLocation,
+          kategori:   trimmedCategory,
           jumlahData: dataCount ? parseInt(dataCount) : null,
         }),
         signal: controller.signal,
@@ -128,9 +111,9 @@ export default function ScrapingModal({
         return;
       }
 
-      const reader = response.body.getReader();
+      const reader  = response.body.getReader();
       const decoder = new TextDecoder();
-      let buffer = "";
+      let buffer    = "";
 
       outer: while (true) {
         const { done, value } = await reader.read();
@@ -141,15 +124,10 @@ export default function ScrapingModal({
         let newlineIndex: number;
         while ((newlineIndex = buffer.indexOf("\n")) !== -1) {
           const line = buffer.slice(0, newlineIndex);
-          buffer = buffer.slice(newlineIndex + 1);
-
+          buffer     = buffer.slice(newlineIndex + 1);
           if (!line.startsWith("data: ")) continue;
-
           try {
-            const json = JSON.parse(line.slice(6)) as {
-              type: string;
-              message: string;
-            };
+            const json = JSON.parse(line.slice(6)) as { type: string; message: string };
             if (json.type === "done") {
               await runMLClassification();
               break outer;
@@ -173,64 +151,65 @@ export default function ScrapingModal({
     onClose();
   }, [onClose]);
 
+  const inputCls =
+    "w-full h-9 px-3 text-[13px] rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-800 dark:text-zinc-100 placeholder-zinc-300 dark:placeholder-zinc-600 focus:outline-none focus:border-zinc-400 dark:focus:border-zinc-500 transition-colors disabled:opacity-40 disabled:cursor-not-allowed";
+
+  const labelCls =
+    "block text-[10px] font-semibold uppercase tracking-[0.15em] text-zinc-400 dark:text-zinc-600 mb-1.5";
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div
-        className="absolute inset-0 bg-black/50 backdrop-blur-sm"
-        onClick={handleClose}
-      />
+      <div className="absolute inset-0 bg-black/40 dark:bg-black/60 backdrop-blur-[3px]" onClick={handleClose} />
 
-      <div className="relative w-full max-w-md bg-white dark:bg-gray-900 rounded-2xl shadow-2xl border border-gray-100 dark:border-gray-800 flex flex-col overflow-hidden">
-        <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100 dark:border-gray-800">
+      <div className="relative w-full max-w-md bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-2xl flex flex-col overflow-hidden">
+        {/* Header */}
+        <div className="px-6 py-5 border-b border-zinc-100 dark:border-zinc-800 flex items-start justify-between">
           <div>
-            <h2 className="text-sm font-bold text-gray-900 dark:text-white">
+            <h2 className="text-[15px] font-semibold text-zinc-900 dark:text-white tracking-tight">
               Scraping Data Baru
             </h2>
-            <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
-              Scraping → Klasifikasi Random Forest → Status otomatis
+            <p className="text-[12px] text-zinc-400 dark:text-zinc-600 mt-0.5">
+              Scraping dan klasifikasi Random Forest secara otomatis
             </p>
           </div>
           <button
             onClick={handleClose}
-            className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-400 transition-colors"
+            className="ml-4 h-8 w-8 flex items-center justify-center rounded-lg text-[12px] text-zinc-400 dark:text-zinc-600 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors font-medium"
           >
-            <X size={16} />
+            x
           </button>
         </div>
 
-        <div className="px-5 py-4 flex flex-col gap-3">
-          <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-medium text-gray-700 dark:text-gray-300 flex items-center gap-1.5">
-              <MapPin size={12} /> Lokasi
-            </label>
+        {/* Form */}
+        <div className="px-6 py-5 flex flex-col gap-4">
+          <div>
+            <label className={labelCls}>Lokasi</label>
             <input
               type="text"
               value={location}
               onChange={(e) => setLocation(e.target.value)}
-              placeholder="contoh: Banyuwangi, Surabaya..."
+              placeholder="contoh: Surabaya, Banyuwangi..."
               disabled={isRunning}
-              className="w-full px-3 py-2 text-xs rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-800 dark:text-gray-200 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition disabled:opacity-50"
+              className={inputCls}
             />
           </div>
 
-          <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-medium text-gray-700 dark:text-gray-300 flex items-center gap-1.5">
-              <Tag size={12} /> Kategori / Nama Bisnis
-            </label>
+          <div>
+            <label className={labelCls}>Kategori atau Nama Bisnis</label>
             <input
               type="text"
               value={category}
               onChange={(e) => setCategory(e.target.value)}
               placeholder="contoh: Restoran, Bengkel, Apotek..."
               disabled={isRunning}
-              className="w-full px-3 py-2 text-xs rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-800 dark:text-gray-200 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition disabled:opacity-50"
+              className={inputCls}
             />
           </div>
 
-          <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-medium text-gray-700 dark:text-gray-300 flex items-center gap-1.5">
-              <Hash size={12} /> Jumlah Data{" "}
-              <span className="text-gray-400 font-normal">(opsional — kosong = semua)</span>
+          <div>
+            <label className={labelCls}>
+              Jumlah Data
+              <span className="ml-1.5 font-normal normal-case tracking-normal text-zinc-300 dark:text-zinc-700">— opsional</span>
             </label>
             <input
               type="number"
@@ -239,37 +218,29 @@ export default function ScrapingModal({
               min={1}
               placeholder="Kosongkan untuk ambil semua data"
               disabled={isRunning}
-              className="w-full px-3 py-2 text-xs rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-800 dark:text-gray-200 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition disabled:opacity-50"
+              className={inputCls}
             />
           </div>
 
           <button
             onClick={handleScrape}
             disabled={isRunning || !location.trim() || !category.trim()}
-            className="flex items-center justify-center gap-2 w-full py-2.5 rounded-lg bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-white text-xs font-semibold transition-colors mt-1"
+            className="w-full h-10 rounded-lg bg-zinc-900 dark:bg-white hover:bg-zinc-700 dark:hover:bg-zinc-100 disabled:opacity-40 disabled:cursor-not-allowed text-white dark:text-zinc-900 text-[13px] font-semibold transition-colors"
           >
-            {isRunning ? (
-              <>
-                <Loader2 size={13} className="animate-spin" /> Sedang
-                Memproses...
-              </>
-            ) : (
-              <>
-                <Play size={13} /> Mulai Scraping
-              </>
-            )}
+            {isRunning ? "Memproses..." : "Mulai Scraping"}
           </button>
         </div>
 
-        <div className="px-5 pb-5 flex flex-col gap-2">
-          <p className="text-xs font-medium text-gray-500 dark:text-gray-400">
+        {/* Log */}
+        <div className="px-6 pb-5 flex flex-col gap-2">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.15em] text-zinc-400 dark:text-zinc-600">
             Log Aktivitas
           </p>
           <div
             ref={logRef}
-            className="h-40 bg-gray-950 dark:bg-black rounded-xl p-3 overflow-y-auto font-mono flex flex-col gap-1.5 border border-gray-800"
+            className="h-36 bg-zinc-950 dark:bg-black rounded-xl p-3 overflow-y-auto flex flex-col gap-0.5 border border-zinc-800"
           >
-            <p ref={emptyRef} className="text-xs text-gray-600 italic">
+            <p ref={emptyRef} className="text-[11px] text-zinc-600 font-light">
               Menunggu scraping dimulai...
             </p>
           </div>

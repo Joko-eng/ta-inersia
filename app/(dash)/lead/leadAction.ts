@@ -11,6 +11,8 @@ export type LeadData = {
   jumlahUlasan: number;
   noTelp:       string;
   alamat:       string;
+  mapsUrl:      string;
+  keterangan:   string;
   status:       string;
 };
 
@@ -24,6 +26,8 @@ export async function getLeads(): Promise<LeadData[]> {
     jumlahUlasan: item.jumlahUlasan,
     noTelp:       item.noTelp,
     alamat:       item.alamat,
+    mapsUrl:      item.mapsUrl   ?? "",
+    keterangan:   item.keterangan ?? "",
     status:       item.status,
   }));
 }
