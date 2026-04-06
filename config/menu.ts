@@ -25,6 +25,75 @@ export interface MenuItem {
   children?: MenuItem[];
 }
 
+export const sidebarMenu: Record<Role, MenuItem[]> = {
+  admin: [
+    {
+      label: "Dashboard",
+      href: "/dashboard",
+      icon: House,
+    },
+    {
+      label: "Lead Generation",
+      href: "/lead",
+      icon: Briefcase,
+    },
+    {
+      label: "Project",
+      href: "/admin/project",
+      icon: UserCheck,
+    },
+    {
+      label: "Project Manager",
+      href: "/project-manager",
+      icon: Users,
+    },
+    {
+      label: "Income",
+      icon: BarChart3,
+      children: [
+        {
+          label: "Ringkasan",
+          href: "/income",
+        },
+        {
+          label: "Laporan",
+          href: "/income/laporan",
+        },
+      ],
+    },
+  ],
+
+  projectmanager: [
+    {
+      label: "Dashboard",
+      href: "/dashboard",
+      icon: House,
+    },
+    {
+      label: "Tim Pengembang",
+      href: "/dashboard/team",
+      icon: Users,
+    },
+  ],
+
+  member: [
+    {
+      label: "Dashboard",
+      href: "/dashboard",
+      icon: House,
+    },
+  ],
+};
+function buildProjectMenu(projects: Project[]): MenuItem {
+  return {
+    label: "Kelola Proyek",
+    icon: Layers,
+    children: projects.map((p) => ({
+      label: p.name,
+      href: `/proyek/${p.id}`,
+    })),
+  };
+}
 function buildMemberProjectMenu(projects: Project[]): MenuItem {
   return {
     label: "Lihat Proyek",
@@ -41,8 +110,8 @@ export function getSidebarMenu(
     case "admin":
       return [
         { label: "Dashboard", href: "/dashboard", icon: House },
-        { label: "Prospek Klien", href: "/prospek-klien", icon: Briefcase },
-        { label: "Klien", href: "/klien", icon: UserCheck },
+        { label: "Lead Generation", href: "/lead", icon: Briefcase },
+        { label: "Project", href: "/admin/project", icon: UserCheck },
         { label: "Project Manager", href: "/project-manager", icon: Users },
         {
           label: "Income",
