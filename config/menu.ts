@@ -63,7 +63,7 @@ export const sidebarMenu: Record<Role, MenuItem[]> = {
     },
   ],
 
-  projectmanager: [
+  project_manager: [
     {
       label: "Dashboard",
       href: "/dashboard",
