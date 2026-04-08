@@ -107,7 +107,7 @@ export default function ShareTaskView({
                           className="bg-white dark:bg-zinc-950 rounded-2xl border border-gray-100 dark:border-zinc-800 p-4"
                         >
                           <span
-                            className={`inline-block text-xs rounded px-2 py-0.5 mb-2 ${priorityStyle(task.priority)}`}
+                            className={`inline-block text-xs rounded px-2 py-0.5 mb-2 ${priorityStyle(task.priority)} capitalize`}
                           >
                             {task.priority}
                           </span>
