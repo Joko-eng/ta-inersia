@@ -11,6 +11,7 @@ import {
   BarChart2Icon,
   Calendar,
   KanbanSquare,
+  Link,
   ListChecks,
   MoreVertical,
   NotepadText,
@@ -207,22 +208,36 @@ export default function ProjectClient({
               Tugas
             </button>
           </div>
-          <button
-            onClick={() => {
-              if (activeTab === "tugas") {
-                setTargetStatus("todo");
-                setShowStatusSelect(true);
-                setShowTaskModal(true);
-              }
-              if (activeTab === "milestone") {
-                setShowMilestoneModal(true);
-              }
-            }}
-            className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:bg-primary/90 transition"
-          >
-            <Plus className="h-4 w-4" />
-            {activeTab === "tugas" ? "Tugas" : "Milestone"}
-          </button>
+          <div className="flex gap-2">
+            <button
+              onClick={() => {
+                if (activeTab === "tugas") {
+                  setTargetStatus("todo");
+                  setShowStatusSelect(true);
+                  setShowTaskModal(true);
+                }
+                if (activeTab === "milestone") {
+                  setShowMilestoneModal(true);
+                }
+              }}
+              className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:bg-primary/90 transition"
+            >
+              <Plus className="h-4 w-4" />
+              {activeTab === "tugas" ? "Tugas" : "Milestone"}
+            </button>
+            <button
+              onClick={() => {
+                const shareUrl = `${window.location.origin}/proyek/${projectId}/share`;
+                navigator.clipboard.writeText(shareUrl).then(() => {
+                  toast.success("Link berhasil disalin!");
+                });
+              }}
+              className="flex items-center gap-2 px-4 py-2 border border-zinc-300 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 rounded-lg text-sm font-medium hover:bg-zinc-100 dark:hover:bg-zinc-800 transition"
+            >
+              <Link className="h-4 w-4" />
+              Salin Link
+            </button>
+          </div>
         </div>
         {activeTab === "milestone" && (
           <div className="bg-white dark:bg-muted rounded-xl border shadow-sm overflow-hidden">
