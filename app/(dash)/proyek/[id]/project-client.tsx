@@ -227,7 +227,7 @@ export default function ProjectClient({
             </button>
             <button
               onClick={() => {
-                const shareUrl = `${window.location.origin}/proyek/${projectId}/share`;
+                const shareUrl = `${window.location.origin}/proyek-member/${projectId}/share`;
                 navigator.clipboard.writeText(shareUrl).then(() => {
                   toast.success("Link berhasil disalin!");
                 });
