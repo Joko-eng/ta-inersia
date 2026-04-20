@@ -1,15 +1,23 @@
 "use client";
 
 import Image from "next/image";
+import { useLang } from "./LanguageContext";
 
 export default function Footer() {
   const year = new Date().getFullYear();
+  const { t } = useLang();
+
+  const navLinks = [
+    t("footer.nav.about"),
+    t("footer.nav.services"),
+    t("footer.nav.pricing"),
+    t("footer.nav.portfolio"),
+  ];
 
   return (
-    <footer className="bg-gray-900 text-gray-400 py-16">
+    <footer className="bg-gray-900 dark:bg-primary text-gray-400 py-16">
       <div className="max-w-7xl mx-auto px-6">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
-          {/* Brand */}
           <div className="md:col-span-2 space-y-4">
             <div className="flex items-center gap-2">
               <div className="w-10 h-10 rounded-lg overflow-hidden">
@@ -26,8 +34,7 @@ export default function Footer() {
               </span>
             </div>
             <p className="text-sm leading-relaxed max-w-xs">
-              We develop websites, design, and digital systems that enhance
-              credibility, attract customers, and drive business growth.
+              {t("footer.desc")}
             </p>
             <p className="text-sm">
               <a
@@ -42,10 +49,10 @@ export default function Footer() {
 
           <div>
             <h4 className="text-white font-semibold mb-4 text-sm">
-              Navigation
+              {t("footer.nav")}
             </h4>
             <ul className="space-y-2.5">
-              {["About Us", "Services", "Pricing", "Contact"].map((link) => (
+              {navLinks.map((link) => (
                 <li key={link}>
                   <a
                     href="#"
@@ -60,7 +67,7 @@ export default function Footer() {
 
           <div>
             <h4 className="text-white font-semibold mb-4 text-sm">
-              Contact & Location
+              {t("footer.contact")}
             </h4>
             <ul className="space-y-2.5 text-sm">
               <li>
@@ -77,9 +84,11 @@ export default function Footer() {
         </div>
 
         <div className="border-t border-gray-800 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs">
-          <p>© {year} InersiaDev. All rights reserved.</p>
+          <p>
+            © {year} InersiaDev. {t("footer.rights")}
+          </p>
           <div className="flex gap-6">
-            {["Privacy Policy", "Terms of Service", "Cookie Settings"].map(
+            {[t("footer.privacy"), t("footer.terms"), t("footer.cookie")].map(
               (item) => (
                 <a
                   key={item}

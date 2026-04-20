@@ -1,10 +1,12 @@
 "use client";
 import Image from "next/image";
 import { useEffect, useRef } from "react";
+import { useLang } from "./LanguageContext";
 
 export default function Hero() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const sectionRef = useRef<HTMLElement>(null);
+  const { t } = useLang();
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -50,7 +52,6 @@ export default function Hero() {
     function getDisplace(baseX: number, baseY: number) {
       let ox = 0,
         oy = 0;
-
       const dx = baseX - mx,
         dy = baseY - my;
       const dist = Math.sqrt(dx * dx + dy * dy);
@@ -60,7 +61,6 @@ export default function Hero() {
         ox += Math.cos(angle) * force;
         oy += Math.sin(angle) * force;
       }
-
       ripples.forEach((rp) => {
         const rdx = baseX - rp.x,
           rdy = baseY - rp.y;
@@ -75,7 +75,6 @@ export default function Hero() {
           oy += Math.sin(a) * strength;
         }
       });
-
       return { ox, oy };
     }
 
@@ -83,13 +82,10 @@ export default function Hero() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       ripples = ripples.filter((rp) => rp.t < 1);
       ripples.forEach((rp) => (rp.t += 0.018));
-
       const cols = Math.ceil(canvas.width / GRID) + 2;
       const rows = Math.ceil(canvas.height / GRID) + 2;
-
       ctx.strokeStyle = "rgba(0,0,0,0.1)";
       ctx.lineWidth = 1;
-
       for (let r = 0; r < rows; r++) {
         ctx.beginPath();
         for (let c = 0; c < cols; c++) {
@@ -101,7 +97,6 @@ export default function Hero() {
         }
         ctx.stroke();
       }
-
       for (let c = 0; c < cols; c++) {
         ctx.beginPath();
         for (let r = 0; r < rows; r++) {
@@ -113,7 +108,6 @@ export default function Hero() {
         }
         ctx.stroke();
       }
-
       animId = requestAnimationFrame(draw);
     };
 
@@ -140,43 +134,30 @@ export default function Hero() {
 
       <div className="relative max-w-7xl mx-auto px-6 grid lg:grid-cols-2 gap-12 items-center w-full py-10">
         <div className="space-y-6 pt-6 lg:pt-8">
-          <div className="inline-flex items-center gap-2 text-blue-600 text-xs dark:ring-blue dark:text-white sm:text-sm font-semibold">
-            <span className="w-2 h-2 ring-2 rounded-full bg-blue-600 dark:bg-white dark:ring-2 dark:ring-white/60" />
-            InersiaDev — Digital Solutions for Growing Businesses
+          <div className="inline-flex items-center gap-2 text-blue-600 text-xs dark:text-white sm:text-sm font-semibold">
+            <span className="w-2 h-2 ring-2 rounded-full bg-blue-600 dark:bg-white dark:ring-white/60" />
+            {t("hero.badge")}
           </div>
           <h1 className="text-3xl sm:text-4xl lg:text-6xl dark:text-white font-bold leading-[1.1] text-gray-900 tracking-tight">
-            Build Strong Digital Presence
+            {t("hero.title1")}
             <br />
-            <span className="text-gray-400 font-bold">
-              That Drives Real Business Growth
-            </span>
+            <span className="text-gray-400 font-bold">{t("hero.title2")}</span>
           </h1>
           <p className="text-gray-500 text-base sm:text-lg leading-snug max-w-md">
-            We develop websites, design, and digital systems that enhance
-            credibility, attract customers, and drive business growth.
+            {t("hero.desc")}
           </p>
           <div className="flex flex-wrap items-center gap-4">
             <a
               href="#contact"
               className="inline-flex items-center gap-2 bg-primary dark:bg-white text-white dark:text-black font-semibold px-6 py-3 rounded-full hover:bg-blue-800 transition-all hover:shadow-lg hover:shadow-blue-200 hover:-translate-y-0.5"
             >
-              Start Your Project
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                <path
-                  d="M3 8h10M9 4l4 4-4 4"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
+              {t("hero.cta1")}
             </a>
-
             <a
               href="#services"
-              className="text-gray-700 font-semibold dark:text-white dark:hover:text-blue-400 transition-colors"
+              className="text-gray-700 font-semibold hover:text-blue-600 dark:text-white dark:hover:text-gray-400 transition-colors"
             >
-              Explore Our Services
+              {t("hero.cta2")}
             </a>
           </div>
         </div>
@@ -193,25 +174,25 @@ export default function Hero() {
             />
             <div className="absolute inset-0 bg-gradient-to-t from-transparent via-transparent to-black/20" />
           </div>
-
-          {/* FLOATING CARD - TOP LEFT */}
           <div className="flex absolute top-2 left-2 lg:-top-6 lg:-left-8 z-20 bg-white rounded-xl px-4 py-3 items-center gap-3 shadow-[0_8px_25px_rgba(0,0,0,0.12),0_4px_10px_rgba(59,130,246,0.15)]">
             <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center text-white text-sm">
               ●
             </div>
             <div className="text-sm leading-tight">
-              <p className="font-semibold text-gray-800">Web Developer</p>
-              <p className="text-gray-500 text-xs">Consistent & scalable</p>
+              <p className="font-semibold text-gray-800">
+                {t("hero.card1.title")}
+              </p>
+              <p className="text-gray-500 text-xs">{t("hero.card1.sub")}</p>
             </div>
           </div>
-
-          {/* FLOATING CARD - BOTTOM RIGHT */}
           <div className="flex absolute bottom-2 right-2 lg:-bottom-6 lg:-right-8 z-20 bg-white rounded-xl px-4 py-3 items-center gap-3 shadow-[0_10px_30px_rgba(0,0,0,0.15),0_6px_15px_rgba(59,130,246,0.18)]">
             <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center text-white text-sm">
               ↗
             </div>
             <div className="text-sm leading-tight">
-              <p className="font-semibold text-gray-800">Product Strategy</p>
+              <p className="font-semibold text-gray-800">
+                {t("hero.card2.title")}
+              </p>
             </div>
           </div>
         </div>

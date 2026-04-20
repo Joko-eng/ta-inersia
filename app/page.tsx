@@ -3,7 +3,7 @@ import ContactCTA from "@/components/ContactCTA";
 import Footer from "@/components/Footer";
 import Hero from "@/components/Hero";
 import Navbar from "@/components/Navbar";
-import Testimonials from "@/components/Testimonials";
+import Providers from "@/components/Provider";
 import WhyChooseUs from "@/components/WhyChooseUs";
 
 export const metadata = {
@@ -14,14 +14,16 @@ export const metadata = {
 
 export default function Home() {
   return (
-    <main className="min-h-screen font-sans antialiased">
-      <Navbar />
-      <Hero />
-      <WhyChooseUs />
-      <Testimonials />
-      <About />
-      <ContactCTA />
-      <Footer />
-    </main>
+    <Providers>
+      <main className="min-h-screen font-sans antialiased">
+        <Navbar />
+        <Hero />
+        <WhyChooseUs />
+        {/* <Testimonials /> */}
+        <About />
+        <ContactCTA />
+        <Footer />
+      </main>
+    </Providers>
   );
 }
