@@ -21,7 +21,7 @@ export default function ProjectList({ projects }: { projects: Project[] }) {
         <h1 className="text-xl font-semibold">Daftar Proyek</h1>
         <Link
           href="/kelola-proyek/arsip"
-          className="px-4 py-2 text-xs font-semibold rounded-md bg-primary text-primary-foreground shadow-sm hover:shadow hover:opacity-90 transition"
+          className="px-4 py-2 text-xs font-semibold rounded-md bg-primary dark:bg-white text-primary-foreground shadow-sm hover:shadow hover:opacity-90 transition"
         >
           Lihat Proyek Diarsipkan
         </Link>
@@ -52,7 +52,7 @@ export default function ProjectList({ projects }: { projects: Project[] }) {
             <div className="col-span-4 flex justify-end gap-3">
               <Link
                 href={`/proyek/${p._id}`}
-                className="px-4 py-1.5 text-xs font-semibold rounded-md bg-primary text-primary-foreground hover:opacity-90 transition"
+                className="px-4 py-1.5 text-xs font-semibold rounded-md bg-primary dark:bg-white text-primary-foreground hover:opacity-90 transition"
               >
                 Detail
               </Link>

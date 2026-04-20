@@ -35,7 +35,7 @@ export function UpdatePasswordForm() {
   return (
     <div className="bg-white dark:bg-muted rounded-xl border shadow-sm p-6">
       <div className="flex items-center gap-2 mb-1">
-        <Lock size={16} className="text-primary" />
+        <Lock size={16} className="text-primary dark:text-white" />
         <h2 className="text-sm font-medium">Ubah Password</h2>
       </div>
       <p className="text-xs text-muted-foreground mb-6">
@@ -113,7 +113,7 @@ export function UpdatePasswordForm() {
           <button
             type="submit"
             disabled={loading}
-            className="px-5 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:bg-primary/90 transition disabled:opacity-50"
+            className="px-5 py-2 bg-primary dark:bg-white text-primary-foreground rounded-lg text-sm font-medium hover:bg-primary/90 transition disabled:opacity-50"
           >
             {loading ? "Menyimpan..." : "Simpan Password"}
           </button>

@@ -220,7 +220,7 @@ export default function ProjectClient({
                   setShowMilestoneModal(true);
                 }
               }}
-              className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:bg-primary/90 transition"
+              className="flex items-center gap-2 px-4 py-2 bg-primary dark:bg-white text-primary-foreground rounded-lg text-sm font-medium hover:bg-primary/90 transition"
             >
               <Plus className="h-4 w-4" />
               {activeTab === "tugas" ? "Tugas" : "Milestone"}
@@ -632,7 +632,7 @@ export default function ProjectClient({
                     toast.success("Task berhasil ditambahkan");
                     fetchTasks();
                   }}
-                  className="px-4 py-2 bg-primary text-primary-foreground rounded"
+                  className="px-4 py-2 bg-primary dark:bg-white text-primary-foreground rounded"
                 >
                   Simpan
                 </button>
@@ -788,7 +788,7 @@ export default function ProjectClient({
 
                   <button
                     type="submit"
-                    className="px-5 py-2 rounded-lg bg-primary text-primary-foreground"
+                    className="px-5 py-2 rounded-lg bg-primary dark:bg-white text-primary-foreground"
                   >
                     Simpan
                   </button>
@@ -861,7 +861,7 @@ export default function ProjectClient({
 
                   <button
                     type="submit"
-                    className="px-4 py-2 bg-primary text-primary-foreground rounded"
+                    className="px-4 py-2 bg-primary dark:bg-white text-primary-foreground rounded"
                   >
                     Simpan
                   </button>
@@ -996,7 +996,7 @@ export default function ProjectClient({
                     toast.success("Task berhasil diperbarui");
                     fetchTasks();
                   }}
-                  className="px-4 py-2 bg-primary text-primary-foreground rounded"
+                  className="px-4 py-2 bg-primary dark:bg-white text-primary-foreground rounded"
                 >
                   Simpan
                 </button>

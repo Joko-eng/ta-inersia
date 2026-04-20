@@ -25,7 +25,6 @@ export default function ProjectSidebar({
         </div>
       </div>
 
-      {/* Info proyek */}
       <div className="p-5 space-y-4">
         <div className="flex items-center gap-2 text-zinc-600 dark:text-zinc-300">
           <KanbanSquare className="h-4 w-4" />

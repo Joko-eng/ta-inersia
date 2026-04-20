@@ -15,7 +15,7 @@ export async function AppNavbar({ name, role }: AppNavbarProps) {
     <header className="w-full flex h-16 items-center border-b bg-background px-6">
       <SidebarTrigger className="mr-4" />
       <div className="flex-1 max-w-lg">
-        <Input placeholder="Search..." />
+        <Input placeholder="Search..." /> 
       </div>
       <div className="flex-1" />
       <div className="flex items-center gap-3">

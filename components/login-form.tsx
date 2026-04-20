@@ -89,7 +89,11 @@ export function LoginForm({
               {error && <p className="text-sm text-red-500">{error}</p>}
 
               <Field>
-                <Button type="submit" disabled={loading}>
+                <Button
+                  type="submit"
+                  className="dark:bg-white"
+                  disabled={loading}
+                >
                   {loading ? "Memproses..." : "Login"}
                 </Button>
               </Field>
