@@ -162,7 +162,6 @@ export default function ScrapingModal({ onClose, onScrapingDone }: ScrapingModal
       <div className="absolute inset-0 bg-black/40 dark:bg-black/60 backdrop-blur-[3px]" onClick={handleClose} />
 
       <div className="relative w-full max-w-md bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-2xl flex flex-col overflow-hidden">
-        {/* Header */}
         <div className="px-6 py-5 border-b border-zinc-100 dark:border-zinc-800 flex items-start justify-between">
           <div>
             <h2 className="text-[15px] font-semibold text-zinc-900 dark:text-white tracking-tight">
@@ -231,7 +230,6 @@ export default function ScrapingModal({ onClose, onScrapingDone }: ScrapingModal
           </button>
         </div>
 
-        {/* Log */}
         <div className="px-6 pb-5 flex flex-col gap-2">
           <p className="text-[10px] font-semibold uppercase tracking-[0.15em] text-zinc-400 dark:text-zinc-600">
             Log Aktivitas

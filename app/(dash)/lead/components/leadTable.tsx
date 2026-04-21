@@ -74,7 +74,6 @@ function PerPageDropdown({ value, onChange }: { value: number; onChange: (v: num
   );
 }
 
-/* ─── Mobile card view for each lead ─── */
 function MobileLeadCard({
   item,
   index,
@@ -88,7 +87,6 @@ function MobileLeadCard({
 }) {
   return (
     <div className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-100 dark:border-zinc-800 p-4 flex flex-col gap-3">
-      {/* Top row */}
       <div className="flex items-start justify-between gap-3">
         <div className="flex flex-col gap-1 min-w-0">
           <span className="text-[10px] text-zinc-400 dark:text-zinc-600 tabular-nums font-medium">#{index}</span>
@@ -108,7 +106,6 @@ function MobileLeadCard({
         <StatusBadge status={item.status} />
       </div>
 
-      {/* Details grid */}
       <div className="grid grid-cols-2 gap-x-4 gap-y-2">
         {item.rating > 0 && (
           <div>
@@ -142,7 +139,6 @@ function MobileLeadCard({
         )}
       </div>
 
-      {/* Actions */}
       <div className="flex gap-2 pt-1 border-t border-zinc-50 dark:border-zinc-800">
         <button
           onClick={onEdit}
@@ -161,7 +157,6 @@ function MobileLeadCard({
   );
 }
 
-/* ─── Main component ─── */
 export default function LeadTable({ initialLeads }: { initialLeads: LeadData[] }) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
@@ -242,7 +237,6 @@ export default function LeadTable({ initialLeads }: { initialLeads: LeadData[] }
 
   return (
     <div className={`flex flex-col h-full min-h-0 gap-4 transition-opacity duration-200 ${isPending ? "opacity-40 pointer-events-none" : ""}`}>
-      {/* Modals */}
       {showScrapModal && (
         <ScrapingModal
           onClose={() => setShowScrapModal(false)}
@@ -264,7 +258,6 @@ export default function LeadTable({ initialLeads }: { initialLeads: LeadData[] }
         />
       )}
 
-      {/* Toolbar */}
       <div className="flex items-center justify-between gap-3 shrink-0">
         <div className="flex items-center gap-3">
           <PerPageDropdown value={perPage} onChange={handlePerPageChange} />
@@ -286,7 +279,6 @@ export default function LeadTable({ initialLeads }: { initialLeads: LeadData[] }
         </div>
       </div>
 
-      {/* ── MOBILE / TABLET: Card list (hidden on lg+) ── */}
       <div className="lg:hidden flex-1 min-h-0 flex flex-col overflow-hidden rounded-xl border border-zinc-200 dark:border-zinc-800">
         <div className="flex-1 min-h-0 overflow-y-auto p-3 sm:p-4 flex flex-col gap-3 bg-[#F5F5F3] dark:bg-[#111111]">
           {paginated.length === 0 ? (
@@ -309,9 +301,7 @@ export default function LeadTable({ initialLeads }: { initialLeads: LeadData[] }
         {paginationBar}
       </div>
 
-      {/* ── DESKTOP: Table (hidden below lg) ── */}
       <div className="hidden lg:flex flex-1 min-h-0 flex-col rounded-xl border border-zinc-200 dark:border-zinc-800 overflow-hidden bg-white dark:bg-zinc-900">
-        {/* Scrollable table — ONLY this div scrolls */}
         <div className="flex-1 min-h-0 overflow-auto">
           <table className="border-collapse w-full" style={{ minWidth: "860px" }}>
             <thead className="sticky top-0 z-10">

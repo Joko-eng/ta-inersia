@@ -28,12 +28,10 @@ export default function DeleteModal({ lead, onClose, onDeleted }: DeleteModalPro
       />
 
       <div className="relative w-full sm:max-w-xs bg-white dark:bg-zinc-900 sm:rounded-2xl rounded-t-2xl border border-zinc-200 dark:border-zinc-800 shadow-2xl overflow-hidden">
-        {/* Drag handle on mobile */}
         <div className="sm:hidden flex justify-center pt-3 pb-0">
           <div className="w-10 h-1 rounded-full bg-zinc-200 dark:bg-zinc-700" />
         </div>
 
-        {/* Header */}
         <div className="flex items-center justify-between px-6 py-5 border-b border-zinc-100 dark:border-zinc-800">
           <h2 className="text-[15px] font-semibold text-zinc-900 dark:text-white tracking-tight">Hapus Data</h2>
           <button
@@ -44,7 +42,6 @@ export default function DeleteModal({ lead, onClose, onDeleted }: DeleteModalPro
           </button>
         </div>
 
-        {/* Body */}
         <div className="px-6 py-6 flex flex-col gap-6">
           <div className="flex flex-col gap-2">
             <p className="text-[14px] font-medium text-zinc-800 dark:text-zinc-100">

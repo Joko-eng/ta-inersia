@@ -42,7 +42,6 @@ export default function EditModal({ lead, onClose, onSaved }: EditModalProps) {
       <div className="absolute inset-0 bg-black/40 dark:bg-black/60 backdrop-blur-[3px]" onClick={onClose} />
 
       <div className="relative w-full sm:max-w-sm bg-white dark:bg-zinc-900 sm:rounded-2xl rounded-t-2xl border border-zinc-200 dark:border-zinc-800 shadow-2xl flex flex-col max-h-[92vh] overflow-hidden">
-        {/* Header */}
         <div className="px-6 py-5 border-b border-zinc-100 dark:border-zinc-800 flex items-start justify-between gap-4 shrink-0">
           <div>
             <h2 className="text-[15px] font-semibold text-zinc-900 dark:text-white tracking-tight">Edit Lead</h2>
@@ -56,7 +55,6 @@ export default function EditModal({ lead, onClose, onSaved }: EditModalProps) {
           </button>
         </div>
 
-        {/* Body — scrollable */}
         <div className="px-6 py-5 flex flex-col gap-4 overflow-y-auto">
           <div>
             <label className={labelCls}>Nama</label>
@@ -176,7 +174,6 @@ export default function EditModal({ lead, onClose, onSaved }: EditModalProps) {
           </div>
         </div>
 
-        {/* Footer */}
         <div className="px-6 py-4 border-t border-zinc-100 dark:border-zinc-800 flex justify-end gap-2 shrink-0">
           <button
             onClick={onClose}
