@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/sidebar";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 
-import { MenuItem, Project, Role, getSidebarMenu } from "@/config/menu";
+import { MenuItem, Project, Role, getSidebarMenu } from "@/lib/config/menu";
 
 const ICON_SIZE = 20;
 const ICON_STYLE = { width: ICON_SIZE, height: ICON_SIZE };

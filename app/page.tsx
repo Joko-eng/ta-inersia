@@ -4,6 +4,7 @@ import Footer from "@/components/Footer";
 import Hero from "@/components/Hero";
 import Navbar from "@/components/Navbar";
 import Providers from "@/components/Provider";
+import TrackingCTA from "@/components/TrackingCTA";
 import WhyChooseUs from "@/components/WhyChooseUs";
 
 export const metadata = {
@@ -19,8 +20,8 @@ export default function Home() {
         <Navbar />
         <Hero />
         <WhyChooseUs />
-        {/* <Testimonials /> */}
         <About />
+        <TrackingCTA />
         <ContactCTA />
         <Footer />
       </main>

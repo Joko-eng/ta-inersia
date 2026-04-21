@@ -17,6 +17,11 @@ export default function Navbar() {
     en: "🇺🇸",
     id: "🇮🇩",
   };
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
   const toggleTheme = () => setTheme(isDark ? "light" : "dark");
   const toggleLang = () => setLang(lang === "en" ? "id" : "en");
 
@@ -38,8 +43,8 @@ export default function Navbar() {
     <nav
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         scrolled
-          ? "bg-white dark:bg-primary shadow-md py-3"
-          : "bg-white/90 dark:bg-primary backdrop-blur-sm py-4"
+          ? "bg-white dark:bg-primary shadow-xl py-3"
+          : "bg-white/80 dark:bg-primary backdrop-blur-sm py-4"
       }`}
     >
       <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
@@ -71,21 +76,15 @@ export default function Navbar() {
         </div>
 
         <div className="flex items-center gap-2">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={toggleTheme}
-            className="text-gray-700 dark:text-white hover:bg-gray-100 dark:hover:bg-white/10 rounded-full p-2 transition-all duration-200"
-            aria-label="Toggle theme"
-          >
-            {isDark ? (
+          <Button variant="ghost" size="icon" onClick={toggleTheme}>
+            {!mounted ? (
+              <span className="h-5 w-5" /> // placeholder, ukuran sama
+            ) : isDark ? (
               <Sun className="h-5 w-5" />
             ) : (
               <Moon className="h-5 w-5" />
             )}
           </Button>
-
-          {/* Language toggle button */}
 
           <div className="hidden md:block ml-1">
             <a

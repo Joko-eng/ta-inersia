@@ -8,8 +8,8 @@ export default function About() {
   const { t } = useLang();
 
   return (
-    <section className="bg-white dark:bg-primary pt-5">
-      <div className="max-w-7xl mx-auto px-6">
+    <section id="about" className="bg-white dark:bg-primary pt-8 py-25">
+      <div className="max-w-7xl mx-auto px-6 pt-12">
         <div className="mb-16">
           <h2 className="text-4xl font-extrabold text-gray-900 dark:text-white tracking-tight">
             {t("about.title1")}
@@ -20,9 +20,9 @@ export default function About() {
         </div>
 
         <div className="grid lg:grid-cols-2 gap-16 items-center">
-          <div className="relative w-full h-[400px] rounded-3xl overflow-hidden shadow-lg">
+          <div className="relative w-full h-[300px] rounded-3xl overflow-hidden shadow-lg">
             <Image
-              src="/about.jpg"
+              src="/"
               alt="InersiaDev Team"
               fill
               className="object-cover"
@@ -56,7 +56,7 @@ export default function About() {
 
             <a
               href="#contact"
-              className="inline-flex items-center gap-2 bg-primary text-white font-semibold px-6 py-3 rounded-2xl hover:bg-blue-700 transition-all hover:shadow-lg hover:shadow-blue-200 hover:-translate-y-0.5 text-sm mt-2"
+              className="inline-flex items-center gap-2 bg-primary text-white font-semibold px-6 py-3 rounded-full hover:bg-blue-700 transition-all hover:shadow-lg hover:shadow-blue-200 hover:-translate-y-0.5 text-sm mt-2"
             >
               {t("about.cta")}
             </a>

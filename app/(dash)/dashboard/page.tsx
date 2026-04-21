@@ -144,12 +144,12 @@ export default function Page() {
   const months = ["Des", "Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul"];
 
   return (
-    <div className="flex-1 p-6 bg-gray-50 min-h-screen">
+    <div className="flex-1 p-6 bg-gray-50 min-h-screen dark:bg-black">
       <div className="max-w-6xl mx-auto space-y-6">
         {/* Page Header */}
         <div>
           <h1 className="text-xl font-semibold text-gray-800">Dashboard</h1>
-          <p className="text-sm text-gray-500">Selamat datang kembali,  </p>
+          <p className="text-sm text-gray-500">Selamat datang kembali, </p>
         </div>
 
         {/* Stat Cards */}
