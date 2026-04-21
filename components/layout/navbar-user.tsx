@@ -39,7 +39,7 @@ export function NavbarUserMenu({ name, role }: NavbarUserMenuProps) {
         <DropdownMenuLabel>Akun Saya</DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem
-          onClick={() => router.push("/profile")}
+          onClick={() => router.push("/dashboard/profile")}
           className="gap-2 cursor-pointer"
         >
           <User size={16} />

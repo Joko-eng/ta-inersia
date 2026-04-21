@@ -16,10 +16,7 @@ export default async function DashboardLayout({
 
   if (!session || !session.user) redirect("/login");
 
-  const role = (session.user as any).role as
-    | "admin"
-    | "project_manager"
-    | "member";
+  const role = (session.user as any).role as "admin" | "project_manager";
   const name = session.user.name ?? "";
 
   await connectDB();

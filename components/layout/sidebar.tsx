@@ -96,16 +96,10 @@ function SidebarHeader() {
   );
 }
 
-export function AppSidebar({
-  role,
-  projects,
-}: {
-  role: Role;
-  projects?: Project[];
-}) {
+export function AppSidebar({ role }: { role: Role; projects?: Project[] }) {
   const pathname = usePathname();
 
-  const menus = getSidebarMenu(role, role === "member" ? projects : []) ?? [];
+  const menus = getSidebarMenu(role) ?? [];
   return (
     <Sidebar>
       <SidebarContent className="flex flex-col">

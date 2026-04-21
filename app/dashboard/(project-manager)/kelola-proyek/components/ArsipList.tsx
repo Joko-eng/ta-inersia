@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { archiveProject } from "../actions";
+import { restoreProject } from "../actions";
 
 type Project = {
   _id: string;
@@ -11,19 +11,19 @@ type Project = {
   createdAt: string;
 };
 
-export default function ProjectList({ projects }: { projects: Project[] }) {
+export default function ArsipList({ projects }: { projects: Project[] }) {
   const router = useRouter();
-  const [archiveTarget, setArchiveTarget] = useState<string | null>(null);
+  const [restoreTarget, setRestoreTarget] = useState<string | null>(null);
 
   return (
     <div className="flex-1 p-8 space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-xl font-semibold">Daftar Proyek</h1>
+        <h1 className="text-xl font-semibold">Proyek Diarsipkan</h1>
         <Link
-          href="/kelola-proyek/arsip"
-          className="px-4 py-2 text-xs font-semibold rounded-md bg-primary dark:bg-white text-primary-foreground shadow-sm hover:shadow hover:opacity-90 transition"
+          href="/dashboard/kelola-proyek"
+          className="px-4 py-2 text-xs font-semibold rounded-md bg-primary text-primary-foreground shadow-sm hover:shadow hover:opacity-90 transition"
         >
-          Lihat Proyek Diarsipkan
+          Kembali ke Daftar Proyek
         </Link>
       </div>
 
@@ -50,17 +50,11 @@ export default function ProjectList({ projects }: { projects: Project[] }) {
               })}
             </div>
             <div className="col-span-4 flex justify-end gap-3">
-              <Link
-                href={`/proyek/${p._id}`}
-                className="px-4 py-1.5 text-xs font-semibold rounded-md bg-primary dark:bg-white text-primary-foreground hover:opacity-90 transition"
-              >
-                Detail
-              </Link>
               <button
-                onClick={() => setArchiveTarget(p._id)}
-                className="px-4 py-1.5 text-xs font-semibold rounded-md border border-zinc-300 text-zinc-600 hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800 transition"
+                onClick={() => setRestoreTarget(p._id)}
+                className="px-4 py-1.5 text-xs font-semibold rounded-md border border-blue-300 text-blue-600 hover:bg-blue-50 dark:border-blue-700 dark:text-blue-400 dark:hover:bg-blue-900/30 transition"
               >
-                Arsipkan
+                Pulihkan
               </button>
             </div>
           </div>
@@ -68,39 +62,39 @@ export default function ProjectList({ projects }: { projects: Project[] }) {
 
         {projects.length === 0 && (
           <div className="px-8 py-10 text-center text-sm text-zinc-500">
-            Belum ada proyek.
+            Tidak ada proyek yang diarsipkan.
           </div>
         )}
       </div>
 
-      {archiveTarget && (
+      {restoreTarget && (
         <div className="fixed inset-0 bg-black/40 dark:bg-black/70 flex items-center justify-center z-50">
           <div className="bg-white dark:bg-zinc-900 rounded-xl w-full max-w-sm p-6 space-y-4 border dark:border-zinc-800">
             <h3 className="font-semibold text-lg text-zinc-900 dark:text-zinc-100">
-              Arsipkan Proyek
+              Pulihkan Proyek
             </h3>
             <p className="text-sm text-zinc-500 dark:text-zinc-400">
-              Yakin ingin mengarsipkan proyek ini?
+              Yakin ingin memulihkan proyek ini dari arsip?
             </p>
             <div className="flex justify-end gap-3 pt-2">
               <button
-                onClick={() => setArchiveTarget(null)}
+                onClick={() => setRestoreTarget(null)}
                 className="px-4 py-2 text-sm text-zinc-600 dark:text-zinc-400"
               >
                 Batal
               </button>
               <form
                 action={async () => {
-                  await archiveProject(archiveTarget);
-                  setArchiveTarget(null);
+                  await restoreProject(restoreTarget);
+                  setRestoreTarget(null);
                   router.refresh();
                 }}
               >
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-zinc-700 text-white text-sm rounded-lg hover:bg-zinc-800 transition"
+                  className="px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition"
                 >
-                  Arsipkan
+                  Pulihkan
                 </button>
               </form>
             </div>
