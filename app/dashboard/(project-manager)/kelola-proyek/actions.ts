@@ -2,7 +2,7 @@
 import {
   archiveProjectById,
   restoreProjectById,
-} from "@/services/ProjectMService";
+} from "@/services/projectMService";
 
 export async function archiveProject(projectId: string) {
   await archiveProjectById(projectId);
