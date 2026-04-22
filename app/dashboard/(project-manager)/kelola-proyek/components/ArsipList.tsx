@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { toast } from "sonner";
 import { restoreProject } from "../actions";
 
 type Project = {
@@ -83,20 +84,23 @@ export default function ArsipList({ projects }: { projects: Project[] }) {
               >
                 Batal
               </button>
-              <form
-                action={async () => {
-                  await restoreProject(restoreTarget);
-                  setRestoreTarget(null);
-                  router.refresh();
+              <button
+                onClick={async () => {
+                  try {
+                    await restoreProject(restoreTarget);
+
+                    setRestoreTarget(null);
+                    toast.success("Proyek berhasil dipulihkan");
+
+                    router.refresh();
+                  } catch {
+                    toast.error("Gagal memulihkan proyek");
+                  }
                 }}
+                className="px-4 py-2 text-sm font-semibold rounded-md bg-blue-600 text-white hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800 transition"
               >
-                <button
-                  type="submit"
-                  className="px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition"
-                >
-                  Pulihkan
-                </button>
-              </form>
+                Pulihkan
+              </button>
             </div>
           </div>
         </div>

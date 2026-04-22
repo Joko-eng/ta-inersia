@@ -1,14 +1,13 @@
 "use server";
-
-import { connectDB } from "@/lib/mongodb";
-import Project from "@/models/Project";
+import {
+  archiveProjectById,
+  restoreProjectById,
+} from "@/services/ProjectMService";
 
 export async function archiveProject(projectId: string) {
-  await connectDB();
-  await Project.findByIdAndUpdate(projectId, { isArchived: true });
+  await archiveProjectById(projectId);
 }
 
 export async function restoreProject(projectId: string) {
-  await connectDB();
-  await Project.findByIdAndUpdate(projectId, { isArchived: false });
+  await restoreProjectById(projectId);
 }

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { toast } from "sonner";
 import { archiveProject } from "../actions";
 
 type Project = {
@@ -91,14 +92,21 @@ export default function ProjectList({ projects }: { projects: Project[] }) {
               </button>
               <form
                 action={async () => {
-                  await archiveProject(archiveTarget);
-                  setArchiveTarget(null);
-                  router.refresh();
+                  try {
+                    await archiveProject(archiveTarget);
+
+                    setArchiveTarget(null);
+                    toast.success("Proyek berhasil diarsipkan");
+
+                    router.refresh();
+                  } catch {
+                    toast.error("Gagal mengarsipkan proyek");
+                  }
                 }}
               >
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-zinc-700 text-white text-sm rounded-lg hover:bg-zinc-800 transition"
+                  className="px-4 py-2 text-sm font-semibold rounded-md bg-red-600 text-white hover:bg-red-700 transition"
                 >
                   Arsipkan
                 </button>
