@@ -7,17 +7,16 @@ type Lang = "en" | "id";
 interface LanguageContextType {
   lang: Lang;
   setLang: (lang: Lang) => void;
-  t: (key: string) => string;
+  t: (key: string) => string | string[];
 }
 
 const translations: Record<string, Record<Lang, string>> = {
-  // Navbar
   "nav.services": { en: "Services", id: "Layanan" },
   "nav.pricing": { en: "Pricing", id: "Harga" },
   "nav.portfolio": { en: "Portfolio", id: "Portofolio" },
   "nav.about": { en: "About Us", id: "Tentang Kami" },
   "nav.contact": { en: "Contact Us", id: "Hubungi Kami" },
-  "nav.tracking": { en: "Tracking", id: "Pelacakan" },
+  "nav.monitoring": { en: "Monitoring", id: "Pemantauan" },
 
   // Hero
   "hero.badge": {
@@ -42,7 +41,6 @@ const translations: Record<string, Record<Lang, string>> = {
   "hero.card1.sub": { en: "Consistent & scalable", id: "Konsisten & skalabel" },
   "hero.card2.title": { en: "Product Strategy", id: "Strategi Produk" },
 
-  // WhyChooseUs
   "why.title": {
     en: "Why Businesses Choose InersiaDev",
     id: "Mengapa Bisnis Memilih InersiaDev",
@@ -72,7 +70,6 @@ const translations: Record<string, Record<Lang, string>> = {
     id: "Pengembangan firmware, integrasi hardware, dan dashboard monitoring berbasis internet.",
   },
 
-  // Testimonials
   "testi.title": { en: "What Our Clients Say", id: "Apa Kata Klien Kami" },
   "testi.sub": {
     en: "Real stories from businesses we've helped grow.",
@@ -121,7 +118,7 @@ const translations: Record<string, Record<Lang, string>> = {
   },
   "about.cta": { en: "Start a Project", id: "Mulai Proyek" },
 
-  // ContactCTA
+  
   "cta.title1": {
     en: "Turn Ideas Into Scalable",
     id: "Ubah Ide Menjadi Skalabilitas",
@@ -131,10 +128,28 @@ const translations: Record<string, Record<Lang, string>> = {
     en: "Let's talk about your project. Our team is ready to help you design, build, and launch your next digital product.",
     id: "Mari diskusikan proyek Anda. Tim kami siap membantu Anda merancang, membangun, dan meluncurkan produk digital berikutnya.",
   },
-  "cta.btn1": { en: "Start Your Project", id: "Mulai Proyek Anda" },
-  "cta.btn2": { en: "View Our Services", id: "Lihat Layanan Kami" },
+  "cta.email.desc": {
+    en: "Let's build something great together — send us your ideas.",
+    id: "Mari bangun sesuatu yang luar biasa bersama — kirimkan ide Anda.",
+  },
+  "cta.whatsapp.desc": {
+    en: "Need a quick answer? We're always here to help.",
+    id: "Butuh jawaban cepat? Kami selalu siap membantu.",
+  },
 
-  // Footer
+  "tracking.badge": { en: "Project Monitoring", id: "Pemantauan Proyek" },
+  "tracking.title1": { en: "Stay on top of every", id: "Pantau setiap" },
+  "tracking.title2": { en: "project milestone", id: "pencapaian proyek" },
+  "tracking.desc": {
+    en: "Get a clear view of your project's progress, updates, and delivery timeline — all in one dedicated page.",
+    id: "Dapatkan gambaran jelas tentang progres, pembaruan, dan jadwal pengiriman proyek Anda — semua dalam satu halaman.",
+  },
+  "tracking.btn": { en: "Open Monitoring Page", id: "Buka Halaman Pemantauan" },
+  "tracking.feature1": { en: "Progress updates", id: "Pembaruan progres" },
+  "tracking.feature2": { en: "Delivery timeline", id: "Jadwal pengiriman" },
+  "tracking.feature3": { en: "Development status", id: "Status pengembangan" },
+
+
   "footer.desc": {
     en: "We develop websites, design, and digital systems that enhance credibility, attract customers, and drive business growth.",
     id: "Kami mengembangkan website, desain, dan sistem digital yang meningkatkan kredibilitas, menarik pelanggan, dan mendorong pertumbuhan bisnis.",

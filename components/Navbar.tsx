@@ -36,7 +36,7 @@ export default function Navbar() {
     { label: t("nav.pricing"), href: "#pricing" },
     { label: t("nav.portfolio"), href: "#portfolio" },
     { label: t("nav.about"), href: "#about" },
-    { label: t("nav.tracking"), href: "#tracking" },
+    { label: t("nav.monitoring"), href: "#monitoring" },
   ];
 
   return (

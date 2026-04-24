@@ -67,7 +67,6 @@ export default function TrackingResult({ result }: { result: TrackResult }) {
 
   return (
     <div className="mt-6 space-y-3">
-      {/* HEADER */}
       <Card>
         <CardContent className="p-5 space-y-4">
           <div>
@@ -82,7 +81,6 @@ export default function TrackingResult({ result }: { result: TrackResult }) {
             </p>
           </div>
 
-          {/* PROGRESS */}
           <div className="flex items-center gap-3">
             <span className="text-xs text-slate-400 whitespace-nowrap">
               Overall Progress
@@ -98,18 +96,17 @@ export default function TrackingResult({ result }: { result: TrackResult }) {
             <span className="text-sm font-bold text-blue-700">{progress}%</span>
           </div>
 
-          {/* META */}
           <div className="grid grid-cols-3 divide-x border-t border-slate-100 pt-4">
             {[
-              ["Start Date", format(project.createdAt)],
+              ["Tanggal Di Mulai", format(project.createdAt)],
               [
-                "Estimated Completion",
+                "Estimasi Selesai",
                 milestones.at(-1)?.dueDate
                   ? format(milestones.at(-1)!.dueDate)
                   : "-",
               ],
               [
-                "Last Update",
+                "Terakhir Diperbarui",
                 format(
                   milestones
                     .filter((m) => m.completedAt)
@@ -133,7 +130,6 @@ export default function TrackingResult({ result }: { result: TrackResult }) {
         </CardContent>
       </Card>
 
-      {/* CURRENT */}
       {current && (
         <Card className="bg-blue-600 text-white">
           <CardContent className="p-5">
@@ -165,7 +161,6 @@ export default function TrackingResult({ result }: { result: TrackResult }) {
                   i !== milestones.length - 1 ? "border-b border-slate-100" : ""
                 }`}
               >
-                {/* ROW */}
                 <div className="flex items-center gap-3 py-3">
                   <Dot status={m.status} />
 
