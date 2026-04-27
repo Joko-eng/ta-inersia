@@ -41,9 +41,9 @@ export default function About() {
                 t("about.li2"),
                 t("about.li3"),
                 t("about.li4"),
-              ].map((item) => (
+              ].map((item, index) => (
                 <li
-                  key={item}
+                  key={index}
                   className="flex items-center gap-3 text-sm text-gray-700 dark:text-gray-300"
                 >
                   <span className="w-5 h-5 rounded-full bg-blue-100 dark:bg-white/10 flex items-center justify-center shrink-0">
@@ -56,7 +56,7 @@ export default function About() {
 
             <a
               href="#contact"
-              className="inline-flex items-center gap-2 bg-primary text-white font-semibold px-6 py-3 rounded-full hover:bg-blue-700 transition-all hover:shadow-lg hover:shadow-blue-200 hover:-translate-y-0.5 text-sm mt-2"
+              className="inline-flex items-center gap-2 bg-primary dark:bg-white dark:text-black text-white font-semibold px-6 py-3 rounded-full hover:bg-blue-700 transition-all hover:shadow-lg hover:shadow-blue-200 hover:-translate-y-0.5 text-sm mt-2"
             >
               {t("about.cta")}
             </a>

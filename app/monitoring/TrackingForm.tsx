@@ -22,24 +22,26 @@ export default function TrackingForm() {
 
   return (
     <div>
-      <p className="mb-3 text-xl font-semibold text-slate-400">Cari Proyek</p>
+      <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-4">
+        Cari Proyek
+      </p>
 
       <form action={formAction} className="flex items-center gap-3">
-        <div className="flex flex-1 items-center gap-2.5 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 shadow-sm focus-within:border-blue-400 focus-within:bg-white focus-within:ring-2 focus-within:ring-blue-500/30">
-          <Search className="h-4 w-4 text-slate-400" />
+        <div className="flex flex-1 items-center gap-3 rounded-xl border border-gray-200 dark:border-neutral-700 bg-gray-50 dark:bg-neutral-800 px-5 py-4 transition-all focus-within:border-primary focus-within:bg-white dark:focus-within:bg-neutral-900 focus-within:ring-2 focus-within:ring-primary/20">
+          <Search className="h-4 w-4 text-gray-400 dark:text-gray-500 flex-shrink-0" />
           <Input
             name="code"
             required
             autoComplete="off"
             placeholder="Masukkan kode tracking proyek Anda…"
-            className="border-0 bg-transparent shadow-none focus-visible:ring-0"
+            className="border-0 bg-transparent shadow-none focus-visible:ring-0 text-sm text-gray-800 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-600"
           />
         </div>
 
         <Button
           type="submit"
           disabled={isPending}
-          className="gap-2 rounded-xl bg-gradient-to-br from-[#1a3fa8] to-[#2563eb] px-6 py-3 text-sm font-semibold text-white hover:opacity-90"
+          className="gap-2 rounded-xl bg-primary hover:bg-primary/90 px-8 py-4 h-auto text-sm font-semibold text-white transition-all hover:-translate-y-0.5"
         >
           {isPending ? (
             <>
@@ -49,32 +51,39 @@ export default function TrackingForm() {
           ) : (
             <>
               <Search className="h-3.5 w-3.5" />
-              Cari Proyek
+              Cari
             </>
           )}
         </Button>
       </form>
 
       {!state.searched && (
-        <div className="mt-10 flex flex-col items-center gap-3 py-8 text-center">
-          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-500/10">
-            <Search className="h-5 w-5 text-blue-400" />
+        <div className="mt-10 flex flex-col items-center gap-4 py-16 text-center">
+          <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/8 dark:bg-primary/10 border border-primary/15 dark:border-primary/20">
+            <Search className="h-7 w-7 text-primary/60 dark:text-primary/50" />
           </div>
-          <p className="text-sm text-slate-400">
-            Masukkan kode tracking untuk melihat status proyek Anda.
-          </p>
+          <div>
+            <p className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
+              Belum ada pencarian
+            </p>
+            <p className="text-xs text-gray-400 dark:text-gray-600">
+              Masukkan kode tracking untuk melihat status proyek Anda.
+            </p>
+          </div>
         </div>
       )}
 
       {state.searched && state.error && (
-        <div className="mt-6 flex items-center gap-3 rounded-xl border border-red-100 bg-red-50 px-4 py-3.5 text-sm text-red-600">
-          <div className="flex h-7 w-7 items-center justify-center rounded-full bg-red-100">
-            <AlertTriangle className="h-3.5 w-3.5 text-red-500" />
+        <div className="mt-6 flex items-start gap-3 rounded-xl border border-red-100 dark:border-red-900/40 bg-red-50 dark:bg-red-950/20 px-5 py-5">
+          <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-xl bg-red-100 dark:bg-red-900/40">
+            <AlertTriangle className="h-4 w-4 text-red-500" />
           </div>
           <div>
-            <p className="font-semibold text-red-700">Proyek tidak ditemukan</p>
-            <p className="text-xs text-red-500">
-              Periksa kembali kode tracking Anda.
+            <p className="text-sm font-semibold text-red-700 dark:text-red-400">
+              Proyek tidak ditemukan
+            </p>
+            <p className="text-xs text-red-500 dark:text-red-500/70 mt-0.5">
+              Periksa kembali kode tracking Anda dan coba lagi.
             </p>
           </div>
         </div>

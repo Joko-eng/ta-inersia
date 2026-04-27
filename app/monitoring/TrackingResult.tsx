@@ -2,8 +2,6 @@ import { Check, ChevronDown, Loader2 } from "lucide-react";
 import { useState } from "react";
 import { IMilestone, TrackResult } from "./Types";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-
 type Status = "menunggu" | "sedang_dikerjakan" | "selesai";
 
 const format = (d?: string | null) =>
@@ -28,194 +26,183 @@ const getDone = (m: IMilestone[]) =>
 const getCurrent = (m: IMilestone[]) =>
   m.find((x) => x.status === "sedang_dikerjakan");
 
-/* ── milestone icon ── */
-function Dot({ status }: { status: Status }) {
-  const base = "flex h-5 w-5 items-center justify-center rounded-full shrink-0";
-
+function StatusDot({ status }: { status: Status }) {
   if (status === "selesai") {
     return (
-      <span className={`${base} bg-green-100`}>
-        <Check className="h-3 w-3 text-green-600" strokeWidth={3} />
+      <span className="flex h-6 w-6 items-center justify-center rounded-full bg-emerald-100 dark:bg-emerald-900/40 shrink-0">
+        <Check
+          className="h-3 w-3 text-emerald-600 dark:text-emerald-400"
+          strokeWidth={3}
+        />
       </span>
     );
   }
-
   if (status === "sedang_dikerjakan") {
     return (
-      <span className={`${base} bg-orange-50 border border-orange-300`}>
-        <Loader2 className="h-3 w-3 animate-spin text-orange-500" />
+      <span className="flex h-6 w-6 items-center justify-center rounded-full bg-amber-50 dark:bg-amber-900/30 border border-amber-300 dark:border-amber-600 shrink-0">
+        <Loader2 className="h-3 w-3 animate-spin text-amber-500" />
       </span>
     );
   }
-
   return (
-    <span className={`${base} border border-slate-200`}>
-      <span className="h-1.5 w-1.5 rounded-full bg-slate-300" />
+    <span className="flex h-6 w-6 items-center justify-center rounded-full border border-gray-200 dark:border-neutral-700 shrink-0">
+      <span className="h-1.5 w-1.5 rounded-full bg-gray-300 dark:bg-neutral-600" />
     </span>
   );
 }
 
-/* ── main ── */
 export default function TrackingResult({ result }: { result: TrackResult }) {
   const { project, milestones } = result;
-
   const progress = calcProgress(milestones);
   const done = getDone(milestones);
   const current = getCurrent(milestones);
-
   const [openId, setOpenId] = useState<string | null>(null);
 
   return (
-    <div className="mt-6 space-y-3">
-      <Card>
-        <CardContent className="p-5 space-y-4">
-          <div>
-            <p className="text-xs text-slate-400 uppercase tracking-wide">
-              {project.trackerCode}
-            </p>
+    <div className="mt-6 space-y-4">
+      <div className="bg-gray-50 dark:bg-neutral-800/50 rounded-2xl border border-gray-100 dark:border-neutral-700 p-6">
+        <p className="text-xs font-semibold text-primary dark:text-white tracking-widest uppercase mb-1">
+          {project.trackerCode}
+        </p>
+        <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-1">
+          {project.name}
+        </h2>
+        <p className="text-xs text-gray-400 dark:text-gray-500 mb-5">
+          Dibuat · {format(project.createdAt)}
+        </p>
 
-            <h2 className="text-lg font-bold text-slate-900">{project.name}</h2>
+        <div className="mb-2 flex items-center justify-between">
+          <span className="text-xs text-gray-400 dark:text-gray-500 font-medium">
+            Progress Keseluruhan
+          </span>
+          <span className="text-sm font-bold text-primary dark:text-white">
+            {progress}%
+          </span>
+        </div>
+        <div className="h-2 bg-gray-200 dark:bg-neutral-700 rounded-full overflow-hidden mb-6">
+          <div
+            className="h-full bg-primary dark:bg-white/90 rounded-full transition-all duration-700"
+            style={{ width: `${progress}%` }}
+          />
+        </div>
 
-            <p className="text-xs text-slate-400">
-              Dibuat · {format(project.createdAt)}
-            </p>
-          </div>
-
-          <div className="flex items-center gap-3">
-            <span className="text-xs text-slate-400 whitespace-nowrap">
-              Overall Progress
-            </span>
-
-            <div className="flex-1 h-1.5 bg-slate-100 rounded-full overflow-hidden">
-              <div
-                className="h-full bg-blue-600 transition-all duration-700"
-                style={{ width: `${progress}%` }}
-              />
+        <div className="grid grid-cols-3 gap-3">
+          {[
+            { label: "Tanggal Dimulai", value: format(project.createdAt) },
+            {
+              label: "Estimasi Selesai",
+              value: milestones.at(-1)?.dueDate
+                ? format(milestones.at(-1)!.dueDate)
+                : "-",
+            },
+            {
+              label: "Terakhir Diperbarui",
+              value: format(
+                milestones
+                  .filter((m) => m.completedAt)
+                  .sort(
+                    (a, b) =>
+                      new Date(b.completedAt!).getTime() -
+                      new Date(a.completedAt!).getTime(),
+                  )
+                  .at(0)?.completedAt ?? project.createdAt,
+              ),
+            },
+          ].map(({ label, value }) => (
+            <div
+              key={label}
+              className="bg-white dark:bg-neutral-800 rounded-xl px-4 py-3 border border-gray-100 dark:border-neutral-700"
+            >
+              <p className="text-[10px] text-gray-400 dark:text-gray-500 mb-1 uppercase tracking-wide">
+                {label}
+              </p>
+              <p className="text-xs font-semibold text-gray-800 dark:text-gray-200 leading-snug">
+                {value}
+              </p>
             </div>
+          ))}
+        </div>
+      </div>
 
-            <span className="text-sm font-bold text-blue-700">{progress}%</span>
-          </div>
-
-          <div className="grid grid-cols-3 divide-x border-t border-slate-100 pt-4">
-            {[
-              ["Tanggal Di Mulai", format(project.createdAt)],
-              [
-                "Estimasi Selesai",
-                milestones.at(-1)?.dueDate
-                  ? format(milestones.at(-1)!.dueDate)
-                  : "-",
-              ],
-              [
-                "Terakhir Diperbarui",
-                format(
-                  milestones
-                    .filter((m) => m.completedAt)
-                    .sort(
-                      (a, b) =>
-                        new Date(b.completedAt!).getTime() -
-                        new Date(a.completedAt!).getTime(),
-                    )
-                    .at(0)?.completedAt ?? project.createdAt,
-                ),
-              ],
-            ].map(([label, value]) => (
-              <div key={label} className="px-4 first:pl-0 last:pr-0">
-                <p className="text-[10px] text-slate-400 mb-1">{label}</p>
-                <p className="text-[12px] font-medium text-slate-700">
-                  {value}
-                </p>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
-
+      {/* Current Phase */}
       {current && (
-        <Card className="bg-blue-600 text-white">
-          <CardContent className="p-5">
-            <p className="text-xs text-white/60">Current Phase</p>
-            <p className="font-bold">{current.name}</p>
-          </CardContent>
-        </Card>
+        <div className="bg-primary dark:bg-primary/90 rounded-2xl px-6 py-4 flex items-center gap-4">
+          <div className="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center flex-shrink-0">
+            <Loader2 className="h-4 w-4 animate-spin text-white" />
+          </div>
+          <div>
+            <p className="text-xs text-white/60 font-medium uppercase tracking-wide">
+              Fase Saat Ini
+            </p>
+            <p className="text-sm font-bold text-white">{current.name}</p>
+          </div>
+        </div>
       )}
 
-      <Card className="rounded-xl border border-slate-200 shadow-sm">
-        <CardHeader className="flex flex-row items-center justify-between pb-2 border-b border-slate-200">
-          <CardTitle className="text-base font-semibold text-slate-800">
-            Project Milestones
-          </CardTitle>
-
-          <span className="text-xs font-semibold text-blue-600 bg-blue-50 px-2 py-1 rounded-md">
-            {done} out of {milestones.length}
+      {/* Milestones */}
+      <div className="bg-gray-50 dark:bg-neutral-800/50 rounded-2xl border border-gray-100 dark:border-neutral-700 overflow-hidden">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-neutral-700">
+          <h3 className="text-sm font-bold text-gray-900 dark:text-white">
+            Tahapan Proyek
+          </h3>
+          <span className="text-xs font-semibold text-primary bg-primary/10 dark:bg-primary/20 px-3 py-1 rounded-full">
+            {done} / {milestones.length} selesai
           </span>
-        </CardHeader>
+        </div>
 
-        <CardContent className="p-0">
-          {milestones.map((m, i) => {
+        <div className="divide-y divide-gray-100 dark:divide-neutral-700">
+          {milestones.map((m) => {
             const isOpen = openId === m._id;
-
             return (
-              <div
-                key={m._id}
-                className={`px-5 ${
-                  i !== milestones.length - 1 ? "border-b border-slate-100" : ""
-                }`}
-              >
-                <div className="flex items-center gap-3 py-3">
-                  <Dot status={m.status} />
-
+              <div key={m._id}>
+                <div className="flex items-center gap-3 px-6 py-4">
+                  <StatusDot status={m.status} />
                   <div className="flex-1 min-w-0">
                     <p
                       className={`text-sm font-medium truncate ${
                         m.status === "menunggu"
-                          ? "text-slate-400"
-                          : "text-slate-800"
+                          ? "text-gray-400 dark:text-neutral-600"
+                          : "text-gray-800 dark:text-gray-200"
                       }`}
                     >
                       {m.name}
                     </p>
-
                     {m.status === "sedang_dikerjakan" && (
-                      <p className="text-[11px] text-orange-500 mt-0.5">
-                        Currently in progress
+                      <p className="text-[11px] text-amber-500 mt-0.5 font-medium">
+                        Sedang dikerjakan
                       </p>
                     )}
                   </div>
-
                   <span
                     className={`text-xs whitespace-nowrap ${
                       m.status === "menunggu"
-                        ? "text-slate-300"
-                        : "text-slate-400"
+                        ? "text-gray-300 dark:text-neutral-700"
+                        : "text-gray-400 dark:text-gray-500"
                     }`}
                   >
                     {format(m.completedAt || m.dueDate)}
                   </span>
-
                   <button
                     onClick={() => setOpenId(isOpen ? null : m._id)}
-                    className="ml-2 p-1 rounded-md hover:bg-slate-100"
+                    className="ml-1 p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-neutral-700 transition-colors"
                   >
                     <ChevronDown
-                      className={`h-4 w-4 text-slate-500 transition-transform ${
-                        isOpen ? "rotate-180" : ""
-                      }`}
+                      className={`h-4 w-4 text-gray-400 dark:text-gray-500 transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`}
                     />
                   </button>
                 </div>
-
                 {isOpen && (
-                  <div className="pb-3 pl-7 pr-2">
-                    <p className="text-xs text-slate-500 leading-relaxed">
-                      {m.description || "No description available."}
+                  <div className="px-6 pb-4 pl-[60px]">
+                    <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed bg-white dark:bg-neutral-800 border border-gray-100 dark:border-neutral-700 rounded-xl px-4 py-3">
+                      {m.description || "Tidak ada deskripsi tersedia."}
                     </p>
                   </div>
                 )}
               </div>
             );
           })}
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </div>
   );
 }
