@@ -1,7 +1,6 @@
 "use client";
 
 import { Check } from "lucide-react";
-import Image from "next/image";
 import { useLang } from "./LanguageContext";
 
 export default function About() {
@@ -20,7 +19,7 @@ export default function About() {
         </div>
 
         <div className="grid lg:grid-cols-2 gap-16 items-center">
-          <div className="relative w-full h-[300px] rounded-3xl overflow-hidden shadow-lg">
+          {/* <div className="relative w-full h-[300px] rounded-3xl overflow-hidden shadow-lg">
             <Image
               src="/"
               alt="InersiaDev Team"
@@ -28,7 +27,7 @@ export default function About() {
               className="object-cover"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
-          </div>
+          </div> */}
 
           <div className="space-y-6">
             <p className="text-gray-600 dark:text-gray-300 leading-relaxed text-base">
