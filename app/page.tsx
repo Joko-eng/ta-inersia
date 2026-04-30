@@ -8,16 +8,10 @@ import Providers from "@/components/Provider";
 import TrackingCTA from "@/components/TrackingCTA";
 import WhyChooseUs from "@/components/WhyChooseUs";
 
-export const metadata = {
-  title: "Inersia Dev — Digital Solutions for Growing Businesses.",
-  description:
-    "We build scalable digital products and technology solutions tailored to your business needs — from strategy, design, to development.",
-};
-
 export default function Home() {
   return (
     <Providers>
-      <main className="min-h-screen font-sans antialiased">
+      <main className="min-h-screen font-sans">
         <Navbar />
         <Hero />
         <WhyChooseUs />

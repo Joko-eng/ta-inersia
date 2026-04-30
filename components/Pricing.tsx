@@ -166,8 +166,8 @@ export default function Pricing() {
                 <Button
                   className={`w-full font-semibold ${
                     pkg.highlight
-                      ? "bg-white text-primary dark:bg-primary dark:text-white hover:bg-primary/90"
-                      : "bg-primary text-primary-foreground hover:bg-primary/10 border-white/30 dark:bg-white dark:border-zinc-700/30 dark:hover:bg-white/80 dark:hover:text-primary"
+                      ? "bg-white text-primary dark:bg-primary dark:text-white hover:bg-white/90"
+                      : "bg-primary text-primary-foreground hover:bg-primary/90 hover:text-white/90 border-white/30 dark:bg-white dark:border-zinc-700/30 dark:hover:bg-white/80 dark:hover:text-primary"
                   }`}
                   variant={pkg.highlight ? "default" : "outline"}
                 >
