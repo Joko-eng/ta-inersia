@@ -124,7 +124,6 @@ export default function TrackingResult({ result }: { result: TrackResult }) {
         </div>
       </div>
 
-      {/* Current Phase */}
       {current && (
         <div className="bg-primary dark:bg-primary/90 rounded-2xl px-6 py-4 flex items-center gap-4">
           <div className="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center flex-shrink-0">
@@ -139,13 +138,12 @@ export default function TrackingResult({ result }: { result: TrackResult }) {
         </div>
       )}
 
-      {/* Milestones */}
       <div className="bg-gray-50 dark:bg-neutral-800/50 rounded-2xl border border-gray-100 dark:border-neutral-700 overflow-hidden">
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-neutral-700">
           <h3 className="text-sm font-bold text-gray-900 dark:text-white">
             Tahapan Proyek
           </h3>
-          <span className="text-xs font-semibold text-primary bg-primary/10 dark:bg-primary/20 px-3 py-1 rounded-full">
+          <span className="text-xs font-semibold text-primary bg-primary/10 dark:bg-white px-3 py-1 rounded-full">
             {done} / {milestones.length} selesai
           </span>
         </div>

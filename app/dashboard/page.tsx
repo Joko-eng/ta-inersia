@@ -102,7 +102,6 @@ export default function Page() {
     const getY = (v: number) =>
       padY + ((max - v) / (max - min)) * (h - padY * 2);
 
-    // Draw previous line (gray)
     ctx.beginPath();
     ctx.strokeStyle = "#d1d5db";
     ctx.lineWidth = 1.5;
@@ -124,7 +123,6 @@ export default function Page() {
     });
     ctx.stroke();
 
-    // Fill area under current line
     ctx.lineTo(padX + (data.length - 1) * stepX, h - padY);
     ctx.lineTo(padX, h - padY);
     ctx.closePath();

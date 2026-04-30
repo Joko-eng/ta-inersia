@@ -30,13 +30,13 @@ export default async function DashboardLayout({
 
   return (
     <SidebarProvider>
-      <div className="flex min-h-screen w-full">
+      <div className="flex min-h-screen font-sans w-full">
         <AppSidebar role={role} projects={mappedProjects} />
 
         <div className="flex-1 flex flex-col">
           <AppNavbar name={name} role={role} />
 
-          <main className="flex-1 overflow-auto">{children}</main>
+          <main className="flex-1 overflow-auto font-sans">{children}</main>
         </div>
       </div>
       <Toaster position="top-right" />

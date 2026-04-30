@@ -25,7 +25,7 @@ export default function Navbar() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const navLinks = [{ label: "Home", href: "/" }];
+  const navLinks = [{ label: "Beranda", href: "/" }];
 
   return (
     <nav
@@ -79,7 +79,7 @@ export default function Navbar() {
               href="/#contact"
               className="bg-primary dark:bg-white text-white dark:text-black text-sm font-semibold px-5 py-2.5 rounded-full hover:bg-blue-700 transition-colors"
             >
-              Contact Us
+              Hubungi Kami{" "}
             </a>
           </div>
         </div>

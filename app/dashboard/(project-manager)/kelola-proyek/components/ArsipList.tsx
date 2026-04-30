@@ -21,7 +21,7 @@ export default function ArsipList({ projects }: { projects: Project[] }) {
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-semibold">Proyek Diarsipkan</h1>
         <Link
-          href="/dashboard/kelola-proyek"
+          href="dashboard/kelola-proyek"
           className="px-4 py-2 text-xs font-semibold rounded-md bg-primary text-primary-foreground shadow-sm hover:shadow hover:opacity-90 transition"
         >
           Kembali ke Daftar Proyek
