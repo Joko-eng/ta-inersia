@@ -118,7 +118,6 @@ const translations: Record<string, Record<Lang, string>> = {
   },
   "about.cta": { en: "Start a Project", id: "Mulai Proyek" },
 
-  
   "cta.title1": {
     en: "Turn Ideas Into Scalable",
     id: "Ubah Ide Menjadi Skalabilitas",
@@ -145,10 +144,9 @@ const translations: Record<string, Record<Lang, string>> = {
     id: "Dapatkan gambaran jelas tentang progres, pembaruan, dan jadwal pengiriman proyek Anda — semua dalam satu halaman.",
   },
   "tracking.btn": { en: "Open Monitoring Page", id: "Buka Halaman Pemantauan" },
-  "tracking.feature1": { en: "Progress updates", id: "Pembaruan progres" },
-  "tracking.feature2": { en: "Delivery timeline", id: "Jadwal pengiriman" },
-  "tracking.feature3": { en: "Development status", id: "Status pengembangan" },
-
+  "tracking.feature1": { en: "Progress updates", id: "Pembaruan Progres" },
+  "tracking.feature2": { en: "Project timeline", id: "Jadwal Proyek" },
+  "tracking.feature3": { en: "Development status", id: "Status Pengembangan" },
 
   "footer.desc": {
     en: "We develop websites, design, and digital systems that enhance credibility, attract customers, and drive business growth.",
