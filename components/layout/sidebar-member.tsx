@@ -37,7 +37,6 @@ export default function ProjectSidebar({
 
         <p className="text-xs text-muted-foreground leading-relaxed">
           Tampilan ini digunakan untuk memantau perkembangan tugas dalam proyek
-          secara real-time.
         </p>
       </div>
 

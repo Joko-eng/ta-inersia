@@ -43,15 +43,14 @@ export function LoginForm({
       return;
     }
 
-    // Ambil session untuk cek role
     const res = await fetch("/api/auth/session");
     const session = await res.json();
     const role = session?.user?.role;
+    console.log("Role:", role);
 
-    // Semua role mengarah ke /dashboard karena folder kamu (dash)
-    if (role === "admin") router.push("/dashboard");
-    else if (role === "projectmanager") router.push("/dashboard");
-    else router.push("/dashboard");
+    if (role === "admin" || role === "project_manager")
+      router.push("/dashboard");
+    else router.push("/unauthorized");
   };
 
   return (
@@ -68,7 +67,6 @@ export function LoginForm({
             <FieldGroup>
               <Field>
                 <FieldLabel htmlFor="email">Email</FieldLabel>
-                {/* Tambahkan name="email" */}
                 <Input id="email" name="email" type="email" required />
               </Field>
               <Field>
@@ -81,11 +79,8 @@ export function LoginForm({
                     Lupa Password?
                   </a>
                 </div>
-                {/* Tambahkan name="password" */}
                 <Input id="password" name="password" type="password" required />
               </Field>
-
-              {/* Tampilkan error jika ada */}
               {error && <p className="text-sm text-red-500">{error}</p>}
 
               <Field>
