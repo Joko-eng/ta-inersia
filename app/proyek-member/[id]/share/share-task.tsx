@@ -1,24 +1,34 @@
 "use client";
 
 import ProjectSidebar from "@/components/layout/sidebar-member";
+import { Milestone } from "@/types/IMilestone";
+import { Task } from "@/types/ITask";
 import { KanbanSquare } from "lucide-react";
 
-interface Task {
-  id: string;
-  title: string;
-  description: string;
-  milestoneId: string;
-  assigneeName: string | null;
-  dueDate: string;
-  priority: "rendah" | "sedang" | "tinggi";
-  status: "todo" | "inprogress" | "done";
-  statusUpdatedAt?: string;
-}
+const COLUMNS = [
+  { id: "todo", title: "Daftar Tugas", color: "bg-blue-500" },
+  { id: "inprogress", title: "Sedang Dikerjakan", color: "bg-orange-400" },
+  { id: "done", title: "Selesai", color: "bg-green-500" },
+];
 
-interface Milestone {
-  id: string;
-  title: string;
-}
+const formatTanggalID = (date?: string) => {
+  if (!date) return "-";
+  const d = new Date(date);
+  if (isNaN(d.getTime())) return "-";
+  return d.toLocaleDateString("id-ID", {
+    day: "2-digit",
+    month: "long",
+    year: "numeric",
+  });
+};
+
+const priorityStyle = (priority: Task["priority"]) => {
+  if (priority === "tinggi")
+    return "bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300";
+  if (priority === "sedang")
+    return "bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300";
+  return "bg-gray-100 text-gray-700 dark:bg-zinc-800 dark:text-zinc-300";
+};
 
 export default function ShareTaskView({
   projectName,
@@ -29,31 +39,6 @@ export default function ShareTaskView({
   tasks: Task[];
   milestones: Milestone[];
 }) {
-  const COLUMNS = [
-    { id: "todo", title: "Daftar Tugas", color: "bg-blue-500" },
-    { id: "inprogress", title: "Sedang Dikerjakan", color: "bg-orange-400" },
-    { id: "done", title: "Selesai", color: "bg-green-500" },
-  ];
-
-  const formatTanggalID = (date?: string) => {
-    if (!date) return "-";
-    const d = new Date(date);
-    if (isNaN(d.getTime())) return "-";
-    return d.toLocaleDateString("id-ID", {
-      day: "2-digit",
-      month: "long",
-      year: "numeric",
-    });
-  };
-
-  const priorityStyle = (priority: Task["priority"]) => {
-    if (priority === "tinggi")
-      return "bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300";
-    if (priority === "sedang")
-      return "bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300";
-    return "bg-gray-100 text-gray-700 dark:bg-zinc-800 dark:text-zinc-300";
-  };
-
   return (
     <div className="flex h-screen bg-background">
       <ProjectSidebar projectName={projectName} />

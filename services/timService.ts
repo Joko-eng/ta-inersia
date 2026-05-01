@@ -2,6 +2,9 @@ import { connectDB } from "@/lib/mongodb";
 import Milestone from "@/models/Milestone";
 import Project from "@/models/Project";
 import Task from "@/models/Task";
+import "@/models/TeamMember";
+import { Task as TaskDTO } from "@/types/ITask";
+import { Milestone as MilestoneDTO } from "@/types/Milestone";
 
 export async function getSharePageData(id: string) {
   await connectDB();
@@ -19,21 +22,21 @@ export async function getSharePageData(id: string) {
     })
     .lean();
 
-  const mappedTasks = tasks.map((t: any) => ({
+  const mappedTasks: TaskDTO[] = tasks.map((t: any) => ({
     id: t._id.toString(),
     title: t.title,
     description: t.description || "",
     milestoneId: t.milestoneId?.toString() || "",
-    assigneeName: (t.assignee as any)?.userId?.name || null,
+    assigneeName: t.assignee?.userId?.name || null,
     dueDate: t.dueDate ? new Date(t.dueDate).toISOString() : "",
-    priority: t.priority as "rendah" | "sedang" | "tinggi",
-    status: t.status as "todo" | "inprogress" | "done",
+    priority: t.priority,
+    status: t.status,
     statusUpdatedAt: t.statusUpdatedAt
       ? new Date(t.statusUpdatedAt).toISOString()
-      : "",
+      : undefined,
   }));
 
-  const mappedMilestones = milestones.map((m: any) => ({
+  const mappedMilestones: MilestoneDTO[] = milestones.map((m: any) => ({
     id: m._id.toString(),
     title: m.name,
   }));

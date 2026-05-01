@@ -1,19 +1,20 @@
-import { IMilestone } from "@/types/IMilestone";
-import mongoose, { Schema } from "mongoose";
+import mongoose, { Document, Schema } from "mongoose";
+
+export interface IMilestone extends Document {
+  id: string;
+  name: string;
+  description?: string;
+  projectId: mongoose.Types.ObjectId;
+  dueDate?: Date | null;
+  status: "menunggu" | "sedang_dikerjakan" | "selesai";
+  completedAt?: Date | null;
+}
 
 const MilestoneSchema = new Schema<IMilestone>(
   {
     name: { type: String, required: true },
-    description: {
-      type: String,
-      default: "",
-      trim: true,
-    },
-    projectId: {
-      type: Schema.Types.ObjectId,
-      ref: "Project",
-      required: true,
-    },
+    description: { type: String, default: "", trim: true },
+    projectId: { type: Schema.Types.ObjectId, ref: "Project", required: true },
     dueDate: { type: Date, default: null },
     status: {
       type: String,
