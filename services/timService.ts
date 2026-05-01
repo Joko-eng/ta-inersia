@@ -3,8 +3,8 @@ import Milestone from "@/models/Milestone";
 import Project from "@/models/Project";
 import Task from "@/models/Task";
 import "@/models/TeamMember";
+import { Milestone as MilestoneDTO } from "@/types/IMilestone";
 import { Task as TaskDTO } from "@/types/ITask";
-import { Milestone as MilestoneDTO } from "@/types/Milestone";
 
 export async function getSharePageData(id: string) {
   await connectDB();
