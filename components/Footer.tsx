@@ -8,10 +8,10 @@ export default function Footer() {
   const { t } = useLang();
 
   const navLinks = [
-    t("footer.nav.about"),
-    t("footer.nav.services"),
-    t("footer.nav.pricing"),
-    t("footer.nav.portfolio"),
+    { id: "about", label: t("footer.nav.about") },
+    { id: "services", label: t("footer.nav.services") },
+    { id: "pricing", label: t("footer.nav.pricing") },
+    { id: "portfolio", label: t("footer.nav.portfolio") },
   ];
 
   return (
@@ -52,13 +52,13 @@ export default function Footer() {
               {t("footer.nav")}
             </h4>
             <ul className="space-y-2.5">
-              {navLinks.map((link) => (
-                <li key={link}>
+              {navLinks.map(({ id, label }) => (
+                <li key={id}>
                   <a
                     href="#"
                     className="text-sm hover:text-white transition-colors"
                   >
-                    {link}
+                    {label}
                   </a>
                 </li>
               ))}
@@ -88,17 +88,19 @@ export default function Footer() {
             © {year} InersiaDev. {t("footer.rights")}
           </p>
           <div className="flex gap-6">
-            {[t("footer.privacy"), t("footer.terms"), t("footer.cookie")].map(
-              (item) => (
-                <a
-                  key={item}
-                  href="#"
-                  className="hover:text-white transition-colors"
-                >
-                  {item}
-                </a>
-              ),
-            )}
+            {[
+              { id: "privacy", label: t("footer.privacy") },
+              { id: "terms", label: t("footer.terms") },
+              { id: "cookie", label: t("footer.cookie") },
+            ].map(({ id, label }) => (
+              <a
+                key={id}
+                href="#"
+                className="hover:text-white transition-colors"
+              >
+                {label}
+              </a>
+            ))}
           </div>
         </div>
       </div>

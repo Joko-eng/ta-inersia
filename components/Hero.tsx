@@ -6,13 +6,15 @@ import { useLang } from "./LanguageContext";
 export default function Hero() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const sectionRef = useRef<HTMLElement>(null);
+  // Ref untuk menyimpan posisi agar tidak memicu Reflow
+  const rectRef = useRef({ left: 0, top: 0 });
   const { t } = useLang();
 
   useEffect(() => {
     const canvas = canvasRef.current;
     const section = sectionRef.current;
     if (!canvas || !section) return;
-    const ctx = canvas.getContext("2d");
+    const ctx = canvas.getContext("2d", { alpha: false }); // Optimasi render
     if (!ctx) return;
 
     let mx = -999,
@@ -25,89 +27,114 @@ export default function Hero() {
       MAX_BULGE = 22;
 
     const resize = () => {
+      const r = section.getBoundingClientRect();
+      rectRef.current = { left: r.left, top: r.top };
       canvas.width = section.offsetWidth;
       canvas.height = section.offsetHeight;
     };
+
     resize();
     window.addEventListener("resize", resize);
 
+    // OPTIMASI: Mouse events tidak lagi memanggil getBoundingClientRect()
     const onMove = (e: MouseEvent) => {
-      const r = section.getBoundingClientRect();
-      mx = e.clientX - r.left;
-      my = e.clientY - r.top;
+      mx = e.clientX - rectRef.current.left;
+      my = e.clientY - rectRef.current.top;
     };
     const onLeave = () => {
       mx = -999;
       my = -999;
     };
     const onClick = (e: MouseEvent) => {
-      const r = section.getBoundingClientRect();
-      ripples.push({ x: e.clientX - r.left, y: e.clientY - r.top, t: 0 });
+      // Batasi jumlah ripple agar tidak membebani CPU
+      if (ripples.length > 8) ripples.shift();
+      ripples.push({
+        x: e.clientX - rectRef.current.left,
+        y: e.clientY - rectRef.current.top,
+        t: 0,
+      });
     };
 
     section.addEventListener("mousemove", onMove);
     section.addEventListener("mouseleave", onLeave);
     section.addEventListener("click", onClick);
 
+    // Fungsi kalkulasi yang lebih efisien
     function getDisplace(baseX: number, baseY: number) {
       let ox = 0,
         oy = 0;
       const dx = baseX - mx,
         dy = baseY - my;
-      const dist = Math.sqrt(dx * dx + dy * dy);
-      if (dist < RADIUS && dist > 0) {
+      const distSq = dx * dx + dy * dy;
+
+      if (distSq < RADIUS * RADIUS) {
+        const dist = Math.sqrt(distSq);
         const force = (1 - dist / RADIUS) * MAX_BULGE;
         const angle = Math.atan2(dy, dx);
         ox += Math.cos(angle) * force;
         oy += Math.sin(angle) * force;
       }
-      ripples.forEach((rp) => {
+
+      for (let i = 0; i < ripples.length; i++) {
+        const rp = ripples[i];
         const rdx = baseX - rp.x,
           rdy = baseY - rp.y;
         const rdist = Math.sqrt(rdx * rdx + rdy * rdy);
         const waveFront = rp.t * 380;
-        const waveWidth = 60;
         const diff = Math.abs(rdist - waveFront);
-        if (diff < waveWidth && rdist > 0) {
-          const strength = (1 - diff / waveWidth) * 12 * (1 - rp.t);
+        if (diff < 60 && rdist > 0) {
+          const strength = (1 - diff / 60) * 12 * (1 - rp.t);
           const a = Math.atan2(rdy, rdx);
           ox += Math.cos(a) * strength;
           oy += Math.sin(a) * strength;
         }
-      });
+      }
       return { ox, oy };
     }
 
     const draw = () => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      // Menggunakan fillRect putih lebih cepat daripada clearRect transparan
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
       ripples = ripples.filter((rp) => rp.t < 1);
       ripples.forEach((rp) => (rp.t += 0.018));
+
       const cols = Math.ceil(canvas.width / GRID) + 2;
       const rows = Math.ceil(canvas.height / GRID) + 2;
+
       ctx.strokeStyle = "rgba(0,0,0,0.1)";
       ctx.lineWidth = 1;
+
+      // OPTIMASI: Pre-calculating points agar tidak hitung ulang saat gambar garis vertikal
+      const gridPoints: { x: number; y: number }[][] = [];
       for (let r = 0; r < rows; r++) {
-        ctx.beginPath();
+        gridPoints[r] = [];
         for (let c = 0; c < cols; c++) {
           const bx = c * GRID - GRID,
             by = r * GRID - GRID;
           const { ox, oy } = getDisplace(bx, by);
-          if (c === 0) ctx.moveTo(bx + ox, by + oy);
-          else ctx.lineTo(bx + ox, by + oy);
+          gridPoints[r][c] = { x: bx + ox, y: by + oy };
         }
-        ctx.stroke();
       }
+
+      // Gambar Horizontal
+      ctx.beginPath();
+      for (let r = 0; r < rows; r++) {
+        ctx.moveTo(gridPoints[r][0].x, gridPoints[r][0].y);
+        for (let c = 1; c < cols; c++) {
+          ctx.lineTo(gridPoints[r][c].x, gridPoints[r][c].y);
+        }
+      }
+      // Gambar Vertikal
       for (let c = 0; c < cols; c++) {
-        ctx.beginPath();
-        for (let r = 0; r < rows; r++) {
-          const bx = c * GRID - GRID,
-            by = r * GRID - GRID;
-          const { ox, oy } = getDisplace(bx, by);
-          if (r === 0) ctx.moveTo(bx + ox, by + oy);
-          else ctx.lineTo(bx + ox, by + oy);
+        ctx.moveTo(gridPoints[0][c].x, gridPoints[0][c].y);
+        for (let r = 1; r < rows; r++) {
+          ctx.lineTo(gridPoints[r][c].x, gridPoints[r][c].y);
         }
-        ctx.stroke();
       }
+      ctx.stroke();
+
       animId = requestAnimationFrame(draw);
     };
 
@@ -165,12 +192,13 @@ export default function Hero() {
         <div className="relative w-full max-w-[320px] mx-auto lg:ml-auto h-[280px] lg:h-[460px] mt-8 lg:mt-0">
           <div className="relative w-full h-full rounded-3xl overflow-hidden ring-1 ring-blue-800/20 shadow-lg shadow-blue-200">
             <Image
-              src="/bg.jpg"
+              src="/bg.webp" // ganti ke webp
               alt="InersiaDev Work"
               fill
-              sizes="(max-width: 1024px) 100vw, 50vw"
+              sizes="(max-width: 1024px) 320px, 460px"
               className="object-cover"
               priority
+              quality={75}
             />
             <div className="absolute inset-0 bg-gradient-to-t from-transparent via-transparent to-black/20" />
           </div>

@@ -1,12 +1,11 @@
-import "@/models/TeamMember";
-import { fetchSharePageData } from "./action";
+import { getSharePageData } from "@/services/timService";
 import ShareTaskView from "./share-task";
 
 export default async function SharePage(props: {
   params: Promise<{ id: string }>;
 }) {
   const { id } = await props.params;
-  const data = await fetchSharePageData(id);
+  const data = await getSharePageData(id);
 
   if (!data) {
     return (
