@@ -67,17 +67,17 @@ const packages = [
 const infraServices = [
   {
     name: "Inersia Hosting",
-    price: "150k/bln",
+    price: "150k/bulan",
     desc: "Hosting stabil dan cepat",
   },
   {
     name: "Maintenance Basic",
-    price: "75k/bln",
+    price: "75k/bulan",
     desc: "Bug fix & uptime monitoring",
   },
   {
     name: "Maintenance Pro",
-    price: "150k/bln",
+    price: "150k/bulan",
     desc: "Update konten, bug fix, konsultasi bulanan",
   },
 ];
