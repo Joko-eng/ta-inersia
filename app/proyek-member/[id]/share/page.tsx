@@ -1,4 +1,4 @@
-import { getSharePageData } from "@/services/timService";
+import { getSharePageData } from "@/lib/services/timService";
 import ShareTaskView from "./share-task";
 
 export default async function SharePage(props: {

@@ -5,7 +5,7 @@ import {
   deleteMilestoneById,
   updateMilestoneById,
   validateDueDate,
-} from "@/services/milestoneService";
+} from "@/lib/services/milestoneService";
 import { milestoneSchema } from "@/validations/milestoneValidator";
 import { revalidatePath } from "next/cache";
 
