@@ -1,15 +1,32 @@
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
+import About from "@/components/About";
+import ContactCTA from "@/components/ContactCTA";
+import Footer from "@/components/Footer";
+import Hero from "@/components/Hero";
+import Navbar from "@/components/Navbar";
+import Pricing from "@/components/Pricing";
+import Providers from "@/components/Provider";
+import TrackingCTA from "@/components/TrackingCTA";
+import WhyChooseUs from "@/components/WhyChooseUs";
+
+export const metadata = {
+  title: "Inersia Dev — Digital Solutions for Growing Businesses.",
+  description:
+    "We build scalable digital products and technology solutions tailored to your business needs — from strategy, design, to development.",
+};
 
 export default function Home() {
   return (
-    <div>
-      <h1>Welcome to Next.js!</h1>
-      <div className="allign-center mt-4">
-        <Link href="/tracking">
-          <Button>Tracking Proyek</Button>
-        </Link>
-      </div>
-    </div>
+    <Providers>
+      <main className="min-h-screen font-sans antialiased">
+        <Navbar />
+        <Hero />
+        <WhyChooseUs />
+        <About />
+        <Pricing />
+        <TrackingCTA />
+        <ContactCTA />
+        <Footer />
+      </main>
+    </Providers>
   );
 }

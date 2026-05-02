@@ -41,7 +41,7 @@ export default function DeadlinePopup({
         onClick={() => setOpen(!open)}
         className="relative p-2 rounded-lg hover:bg-zinc-100"
       >
-        <Bell size={20} className="text-blue-500" />
+        <Bell size={20} className="text-blue-500 dark:text-white" />
 
         {unreadCount > 0 && (
           <span className="absolute -top-1 -right-1 text-xs bg-red-600 text-white px-1.5 rounded-full">
@@ -51,9 +51,9 @@ export default function DeadlinePopup({
       </button>
 
       {open && (
-        <div className="absolute right-0 mt-2 w-80 bg-white border rounded-lg shadow-lg z-50">
-          <div className="flex items-center justify-between p-3 border-b">
-            <span className="font-semibold">Pemberitahuan</span>
+        <div className="absolute right-0 mt-2 w-80 bg-white dark:bg-zinc-900 border dark:border-zinc-700 rounded-lg shadow-lg z-50">
+          <div className="flex items-center justify-between p-3 border-b dark:border-zinc-700">
+            <span className="font-semibold dark:text-white">Pemberitahuan</span>
 
             {items.length > 0 && (
               <button

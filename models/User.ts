@@ -23,7 +23,7 @@ const UserSchema = new Schema<IUser>(
       trim: true,
     },
     username: { type: String, required: true, unique: true, trim: true },
-    password: { type: String, required: true },
+    password: { type: String, required: false },
     role: {
       type: String,
       enum: ["admin", "project_manager", "member"],
@@ -34,13 +34,12 @@ const UserSchema = new Schema<IUser>(
   { timestamps: true },
 );
 
-// Hash password sebelum disimpan
-UserSchema.pre("save", async function (next) {
+UserSchema.pre("save", async function () {
   if (!this.isModified("password")) return;
+  if (!this.password) return;
   this.password = await bcrypt.hash(this.password, 10);
 });
 
-// Method untuk cek password
 UserSchema.methods.comparePassword = async function (candidate: string) {
   return bcrypt.compare(candidate, this.password);
 };
