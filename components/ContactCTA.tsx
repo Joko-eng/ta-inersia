@@ -21,8 +21,8 @@ export default function ContactCTA() {
         }}
       />
 
-      <div className="absolute -top-24 -right-24 h-96 w-96 rounded-full bg-blue-400 opacity-30 blur-3xl" />
-      <div className="absolute -bottom-24 -left-24 h-96 w-96 rounded-full bg-blue-800 opacity-30 blur-3xl" />
+      <div className="absolute -top-24 -right-24 h-96 w-96 rounded-full bg-blue-400 opacity-20 blur-xl" />
+      <div className="absolute -bottom-24 -left-24 h-96 w-96 rounded-full bg-blue-800 opacity-20 blur-xl" />
 
       <div className="relative mx-auto max-w-4xl px-6 text-center">
         <h2 className="mb-6 text-4xl font-extrabold tracking-tight text-gray-900 dark:text-white lg:text-5xl">
