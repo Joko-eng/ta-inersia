@@ -21,7 +21,7 @@ const translations: Record<string, Record<Lang, string>> = {
   // Hero
   "hero.badge": {
     en: "InersiaDev — Digital Solutions for Growing Businesses",
-    id: "InersiaDev — Solusi Digital untuk Bisnis yang Berkembang",
+    id: "InersiaDev — Solusi Digital Untuk Pertumbuhan Bisnis",
   },
   "hero.title1": {
     en: "Build Strong Digital Presence",

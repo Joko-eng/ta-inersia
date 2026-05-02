@@ -23,7 +23,7 @@ export default function Footer() {
               <div className="w-10 h-10 rounded-lg overflow-hidden">
                 <Image
                   src="/logo.png"
-                  alt="logo"
+                  alt="InersiaDev logo"
                   width={40}
                   height={40}
                   className="object-cover"
@@ -33,30 +33,33 @@ export default function Footer() {
                 InersiaDev
               </span>
             </div>
-            <p className="text-sm leading-relaxed max-w-xs">
+            <p className="text-sm leading-relaxed max-w-xs text-gray-300">
               {t("footer.desc")}
             </p>
             <p className="text-sm">
               <a
                 href="mailto:inersiadevindonesia@gmail.com"
-                className="hover:text-white transition-colors"
+                className="text-gray-300 hover:text-white transition-colors"
               >
                 inersiadevindonesia@gmail.com
               </a>
             </p>
-            <p className="text-sm">📍 Banyuwangi, Indonesia</p>
+            <p className="text-sm text-gray-300">
+              <span aria-hidden="true">📍</span>
+              <span className="sr-only">Lokasi:</span> Banyuwangi, Indonesia
+            </p>
           </div>
 
           <div>
-            <h4 className="text-white font-semibold mb-4 text-sm">
+            <h3 className="text-white font-semibold mb-4 text-sm">
               {t("footer.nav")}
-            </h4>
+            </h3>
             <ul className="space-y-2.5">
               {navLinks.map(({ id, label }) => (
                 <li key={id}>
                   <a
-                    href="#"
-                    className="text-sm hover:text-white transition-colors"
+                    href={`#${id}`}
+                    className="text-sm text-gray-300 hover:text-white transition-colors"
                   >
                     {label}
                   </a>
@@ -66,24 +69,29 @@ export default function Footer() {
           </div>
 
           <div>
-            <h4 className="text-white font-semibold mb-4 text-sm">
+            <h3 className="text-white font-semibold mb-4 text-sm">
               {t("footer.contact")}
-            </h4>
-            <ul className="space-y-2.5 text-sm">
+            </h3>
+            <ul className="space-y-2.5 text-sm text-gray-300">
               <li>
                 <a
                   href="mailto:inersiadevindonesia@gmail.com"
                   className="hover:text-white transition-colors"
                 >
-                  ✉ inersiadevindonesia@gmail.com
+                  <span aria-hidden="true">✉ </span>
+                  inersiadevindonesia@gmail.com
                 </a>
               </li>
-              <li>📍 Banyuwangi, Indonesia</li>
+              <li>
+                <span aria-hidden="true">📍 </span>
+                <span className="sr-only">Lokasi: </span>
+                Banyuwangi, Indonesia
+              </li>
             </ul>
           </div>
         </div>
 
-        <div className="border-t border-gray-800 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs">
+        <div className="border-t border-gray-800 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-gray-400">
           <p>
             © {year} InersiaDev. {t("footer.rights")}
           </p>
