@@ -24,11 +24,18 @@ const LOG_TEXT: Record<LogType, string> = {
   info:    "text-zinc-400",
 };
 
+const INPUT_CLS =
+  "w-full h-9 px-3 text-[13px] rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-800 dark:text-zinc-100 placeholder-zinc-300 dark:placeholder-zinc-600 focus:outline-none focus:border-zinc-400 dark:focus:border-zinc-500 transition-colors disabled:opacity-40 disabled:cursor-not-allowed";
+
+const LABEL_CLS =
+  "block text-[10px] font-semibold uppercase tracking-[0.15em] text-zinc-400 dark:text-zinc-600 mb-1.5";
+
 export default function ScrapingModal({ onClose, onScrapingDone }: ScrapingModalProps) {
   const [location,  setLocation]  = useState("");
   const [category,  setCategory]  = useState("");
   const [dataCount, setDataCount] = useState("");
   const [isRunning, setIsRunning] = useState(false);
+  const [isDone,    setIsDone]    = useState(false);
 
   const logRef   = useRef<HTMLDivElement>(null);
   const emptyRef = useRef<HTMLParagraphElement>(null);
@@ -37,6 +44,7 @@ export default function ScrapingModal({ onClose, onScrapingDone }: ScrapingModal
   const appendLog = useCallback((type: LogType, message: string) => {
     const container = logRef.current;
     if (!container) return;
+
     if (emptyRef.current) emptyRef.current.style.display = "none";
 
     const time = new Date().toLocaleTimeString("id-ID", {
@@ -57,7 +65,9 @@ export default function ScrapingModal({ onClose, onScrapingDone }: ScrapingModal
   const clearLog = useCallback(() => {
     const container = logRef.current;
     if (!container) return;
+
     container.innerHTML = "";
+
     if (emptyRef.current) {
       container.appendChild(emptyRef.current);
       emptyRef.current.style.display = "";
@@ -66,12 +76,15 @@ export default function ScrapingModal({ onClose, onScrapingDone }: ScrapingModal
 
   const runMLClassification = useCallback(async () => {
     appendLog("info", "Memulai klasifikasi Machine Learning...");
+
     try {
       const { data, status } = await axios.post("/api/ml");
+
       if (status !== 200 || data.error) {
         appendLog("error", `Klasifikasi gagal: ${data.error ?? status}`);
         return;
       }
+
       appendLog("success", `Klasifikasi selesai — ${data.prospek} Prospek, ${data.belum_prospek} Belum Prospek`);
       appendLog("info", "Data siap ditampilkan di tabel.");
       onScrapingDone?.();
@@ -80,6 +93,8 @@ export default function ScrapingModal({ onClose, onScrapingDone }: ScrapingModal
         ? (err.response?.data?.error ?? err.message)
         : String(err);
       appendLog("error", `Gagal menghubungi API ML: ${message}`);
+    } finally {
+      setIsDone(true);
     }
   }, [appendLog, onScrapingDone]);
 
@@ -89,6 +104,7 @@ export default function ScrapingModal({ onClose, onScrapingDone }: ScrapingModal
     if (!trimmedLocation || !trimmedCategory) return;
 
     setIsRunning(true);
+    setIsDone(false);
     clearLog();
 
     const controller = new AbortController();
@@ -96,9 +112,9 @@ export default function ScrapingModal({ onClose, onScrapingDone }: ScrapingModal
 
     try {
       const response = await fetch("/api/scraping", {
-        method: "POST",
+        method:  "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
+        body:    JSON.stringify({
           lokasi:     trimmedLocation,
           kategori:   trimmedCategory,
           jumlahData: dataCount ? parseInt(dataCount) : null,
@@ -108,6 +124,7 @@ export default function ScrapingModal({ onClose, onScrapingDone }: ScrapingModal
 
       if (!response.ok || !response.body) {
         appendLog("error", `Server error: ${response.status}`);
+        setIsDone(true);
         return;
       }
 
@@ -125,20 +142,27 @@ export default function ScrapingModal({ onClose, onScrapingDone }: ScrapingModal
         while ((newlineIndex = buffer.indexOf("\n")) !== -1) {
           const line = buffer.slice(0, newlineIndex);
           buffer     = buffer.slice(newlineIndex + 1);
+
           if (!line.startsWith("data: ")) continue;
+
           try {
             const json = JSON.parse(line.slice(6)) as { type: string; message: string };
+
             if (json.type === "done") {
               await runMLClassification();
               break outer;
             }
-            appendLog(json.type as LogType, json.message);
-          } catch {}
+
+            if (json.type !== "connected" && json.type !== "ping") {
+              appendLog(json.type as LogType, json.message);
+            }
+          } catch { /* baris tidak valid, skip */ }
         }
       }
     } catch (err) {
       if ((err as Error).name !== "AbortError") {
         appendLog("error", `Gagal terhubung ke server: ${String(err)}`);
+        setIsDone(true);
       }
     } finally {
       abortRef.current = null;
@@ -151,15 +175,12 @@ export default function ScrapingModal({ onClose, onScrapingDone }: ScrapingModal
     onClose();
   }, [onClose]);
 
-  const inputCls =
-    "w-full h-9 px-3 text-[13px] rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-800 dark:text-zinc-100 placeholder-zinc-300 dark:placeholder-zinc-600 focus:outline-none focus:border-zinc-400 dark:focus:border-zinc-500 transition-colors disabled:opacity-40 disabled:cursor-not-allowed";
-
-  const labelCls =
-    "block text-[10px] font-semibold uppercase tracking-[0.15em] text-zinc-400 dark:text-zinc-600 mb-1.5";
-
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-black/40 dark:bg-black/60 backdrop-blur-[3px]" onClick={handleClose} />
+      <div
+        className="absolute inset-0 bg-black/40 dark:bg-black/60 backdrop-blur-[3px]"
+        onClick={!isRunning ? handleClose : undefined}
+      />
 
       <div className="relative w-full max-w-md bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-2xl flex flex-col overflow-hidden">
         <div className="px-6 py-5 border-b border-zinc-100 dark:border-zinc-800 flex items-start justify-between">
@@ -173,42 +194,44 @@ export default function ScrapingModal({ onClose, onScrapingDone }: ScrapingModal
           </div>
           <button
             onClick={handleClose}
-            className="ml-4 h-8 w-8 flex items-center justify-center rounded-lg text-[12px] text-zinc-400 dark:text-zinc-600 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors font-medium"
+            disabled={isRunning}
+            className="ml-4 h-8 w-8 flex items-center justify-center rounded-lg text-[12px] text-zinc-400 dark:text-zinc-600 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors font-medium disabled:opacity-30 disabled:cursor-not-allowed"
           >
             x
           </button>
         </div>
 
-        {/* Form */}
         <div className="px-6 py-5 flex flex-col gap-4">
           <div>
-            <label className={labelCls}>Lokasi</label>
+            <label className={LABEL_CLS}>Lokasi</label>
             <input
               type="text"
               value={location}
               onChange={(e) => setLocation(e.target.value)}
               placeholder="contoh: Surabaya, Banyuwangi..."
               disabled={isRunning}
-              className={inputCls}
+              className={INPUT_CLS}
             />
           </div>
 
           <div>
-            <label className={labelCls}>Kategori atau Nama Bisnis</label>
+            <label className={LABEL_CLS}>Kategori atau Nama Bisnis</label>
             <input
               type="text"
               value={category}
               onChange={(e) => setCategory(e.target.value)}
               placeholder="contoh: Restoran, Bengkel, Apotek..."
               disabled={isRunning}
-              className={inputCls}
+              className={INPUT_CLS}
             />
           </div>
 
           <div>
-            <label className={labelCls}>
+            <label className={LABEL_CLS}>
               Jumlah Data
-              <span className="ml-1.5 font-normal normal-case tracking-normal text-zinc-300 dark:text-zinc-700">— opsional</span>
+              <span className="ml-1.5 font-normal normal-case tracking-normal text-zinc-300 dark:text-zinc-700">
+                — opsional
+              </span>
             </label>
             <input
               type="number"
@@ -217,17 +240,26 @@ export default function ScrapingModal({ onClose, onScrapingDone }: ScrapingModal
               min={1}
               placeholder="Kosongkan untuk ambil semua data"
               disabled={isRunning}
-              className={inputCls}
+              className={INPUT_CLS}
             />
           </div>
 
-          <button
-            onClick={handleScrape}
-            disabled={isRunning || !location.trim() || !category.trim()}
-            className="w-full h-10 rounded-lg bg-zinc-900 dark:bg-white hover:bg-zinc-700 dark:hover:bg-zinc-100 disabled:opacity-40 disabled:cursor-not-allowed text-white dark:text-zinc-900 text-[13px] font-semibold transition-colors"
-          >
-            {isRunning ? "Memproses..." : "Mulai Scraping"}
-          </button>
+          {isDone ? (
+            <button
+              onClick={handleClose}
+              className="w-full h-10 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-[13px] font-semibold transition-colors"
+            >
+              Selesai — Tutup
+            </button>
+          ) : (
+            <button
+              onClick={handleScrape}
+              disabled={isRunning || !location.trim() || !category.trim()}
+              className="w-full h-10 rounded-lg bg-zinc-900 dark:bg-white hover:bg-zinc-700 dark:hover:bg-zinc-100 disabled:opacity-40 disabled:cursor-not-allowed text-white dark:text-zinc-900 text-[13px] font-semibold transition-colors"
+            >
+              {isRunning ? "Memproses..." : "Mulai Scraping"}
+            </button>
+          )}
         </div>
 
         <div className="px-6 pb-5 flex flex-col gap-2">
@@ -243,6 +275,7 @@ export default function ScrapingModal({ onClose, onScrapingDone }: ScrapingModal
             </p>
           </div>
         </div>
+
       </div>
     </div>
   );

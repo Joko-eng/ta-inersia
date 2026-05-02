@@ -16,9 +16,12 @@ export type LeadData = {
   status:       string;
 };
 
+const REVALIDATE_PATH = "/lead-generation";
+
 export async function getLeads(): Promise<LeadData[]> {
   await connectDB();
   const leads = await Lead.find().sort({ createdAt: -1 }).lean();
+
   return leads.map((item: any) => ({
     id:           item._id.toString(),
     nama:         item.nama,
@@ -26,7 +29,7 @@ export async function getLeads(): Promise<LeadData[]> {
     jumlahUlasan: item.jumlahUlasan,
     noTelp:       item.noTelp,
     alamat:       item.alamat,
-    mapsUrl:      item.mapsUrl   ?? "",
+    mapsUrl:      item.mapsUrl    ?? "",
     keterangan:   item.keterangan ?? "",
     status:       item.status,
   }));
@@ -35,7 +38,7 @@ export async function getLeads(): Promise<LeadData[]> {
 export async function deleteLead(id: string): Promise<void> {
   await connectDB();
   await Lead.findByIdAndDelete(id);
-  revalidatePath("/lead-generation");
+  revalidatePath(REVALIDATE_PATH);
 }
 
 export async function updateLead(
@@ -44,5 +47,5 @@ export async function updateLead(
 ): Promise<void> {
   await connectDB();
   await Lead.findByIdAndUpdate(id, { $set: payload });
-  revalidatePath("/lead-generation");
+  revalidatePath(REVALIDATE_PATH);
 }
