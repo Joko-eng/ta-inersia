@@ -1,7 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { deleteLead, LeadData } from "./leadAction";
+import { LeadData } from "@/types/ILead";
+import { deleteLead } from "./leadAction";
+import {
+  BottomSheetHandle,
+  ModalHeader,
+  ModalOverlay,
+} from "./components/props";
 
 interface DeleteModalProps {
   lead:      LeadData;
@@ -11,36 +17,32 @@ interface DeleteModalProps {
 
 export default function DeleteModal({ lead, onClose, onDeleted }: DeleteModalProps) {
   const [deleting, setDeleting] = useState(false);
+  const [error, setError]       = useState<string | null>(null);
 
   const handleDelete = async () => {
     setDeleting(true);
-    await deleteLead(lead.id);
-    setDeleting(false);
+    setError(null);
+
+    const result = await deleteLead(lead.id);
+
+    if (!result.ok) {
+      setError(result.error ?? "Terjadi kesalahan.");
+      setDeleting(false);
+      return;
+    }
+
     onDeleted();
     onClose();
   };
 
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:p-4">
-      <div
-        className="absolute inset-0 bg-black/40 dark:bg-black/60 backdrop-blur-[3px]"
-        onClick={onClose}
-      />
+      <ModalOverlay onClick={onClose} />
 
       <div className="relative w-full sm:max-w-xs bg-white dark:bg-zinc-900 sm:rounded-2xl rounded-t-2xl border border-zinc-200 dark:border-zinc-800 shadow-2xl overflow-hidden">
-        <div className="sm:hidden flex justify-center pt-3 pb-0">
-          <div className="w-10 h-1 rounded-full bg-zinc-200 dark:bg-zinc-700" />
-        </div>
+        <BottomSheetHandle />
 
-        <div className="flex items-center justify-between px-6 py-5 border-b border-zinc-100 dark:border-zinc-800">
-          <h2 className="text-[15px] font-semibold text-zinc-900 dark:text-white tracking-tight">Hapus Data</h2>
-          <button
-            onClick={onClose}
-            className="h-8 w-8 flex items-center justify-center rounded-lg text-[12px] text-zinc-400 dark:text-zinc-600 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
-          >
-            x
-          </button>
-        </div>
+        <ModalHeader title="Hapus Data" onClose={onClose} />
 
         <div className="px-6 py-6 flex flex-col gap-6">
           <div className="flex flex-col gap-2">
@@ -49,9 +51,17 @@ export default function DeleteModal({ lead, onClose, onDeleted }: DeleteModalPro
             </p>
             <p className="text-[13px] text-zinc-400 dark:text-zinc-600 leading-relaxed">
               Data{" "}
-              <span className="font-semibold text-zinc-700 dark:text-zinc-300">{lead.nama}</span>{" "}
+              <span className="font-semibold text-zinc-700 dark:text-zinc-300">
+                {lead.nama}
+              </span>{" "}
               akan dihapus permanen dan tidak bisa dikembalikan.
             </p>
+
+            {error && (
+              <p className="text-[12px] text-rose-500 bg-rose-50 dark:bg-rose-950/30 px-3 py-2 rounded-lg">
+                {error}
+              </p>
+            )}
           </div>
 
           <div className="flex gap-2">

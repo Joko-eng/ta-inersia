@@ -1,6 +1,6 @@
 import { Suspense } from "react";
 import { getLeads } from "./leadAction";
-import LeadTable from "./components/leadTable";
+import LeadTable from "./leadTable";
 import LeadTableSkeleton from "./components/leadTableSkeleton";
 
 async function LeadTableServer() {

@@ -1,12 +1,24 @@
 "use client";
 
 import { useState, useRef, useCallback } from "react";
-import axios from "axios";
+import {
+  ModalHeader,
+  ModalOverlay,
+  INPUT_CLS,
+  LABEL_CLS,
+} from "./components/props";
 
 type LogType = "info" | "success" | "error" | "loading";
 
+interface LogEntry {
+  id:      number;
+  type:    LogType;
+  time:    string;
+  message: string;
+}
+
 interface ScrapingModalProps {
-  onClose: () => void;
+  onClose:         () => void;
   onScrapingDone?: () => void;
 }
 
@@ -24,11 +36,18 @@ const LOG_TEXT: Record<LogType, string> = {
   info:    "text-zinc-400",
 };
 
-const INPUT_CLS =
-  "w-full h-9 px-3 text-[13px] rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-800 dark:text-zinc-100 placeholder-zinc-300 dark:placeholder-zinc-600 focus:outline-none focus:border-zinc-400 dark:focus:border-zinc-500 transition-colors disabled:opacity-40 disabled:cursor-not-allowed";
+let _logId = 0;
 
-const LABEL_CLS =
-  "block text-[10px] font-semibold uppercase tracking-[0.15em] text-zinc-400 dark:text-zinc-600 mb-1.5";
+function makeEntry(type: LogType, message: string): LogEntry {
+  return {
+    id:   ++_logId,
+    type,
+    time: new Date().toLocaleTimeString("id-ID", {
+      hour: "2-digit", minute: "2-digit", second: "2-digit",
+    }),
+    message,
+  };
+}
 
 export default function ScrapingModal({ onClose, onScrapingDone }: ScrapingModalProps) {
   const [location,  setLocation]  = useState("");
@@ -36,63 +55,44 @@ export default function ScrapingModal({ onClose, onScrapingDone }: ScrapingModal
   const [dataCount, setDataCount] = useState("");
   const [isRunning, setIsRunning] = useState(false);
   const [isDone,    setIsDone]    = useState(false);
+  const [logs,      setLogs]      = useState<LogEntry[]>([]);
 
-  const logRef   = useRef<HTMLDivElement>(null);
-  const emptyRef = useRef<HTMLParagraphElement>(null);
-  const abortRef = useRef<AbortController | null>(null);
+  const logContainerRef = useRef<HTMLDivElement>(null);
+  const abortRef        = useRef<AbortController | null>(null);
+
+  const scrollToBottom = useCallback(() => {
+    requestAnimationFrame(() => {
+      if (logContainerRef.current) {
+        logContainerRef.current.scrollTop = logContainerRef.current.scrollHeight;
+      }
+    });
+  }, []);
 
   const appendLog = useCallback((type: LogType, message: string) => {
-    const container = logRef.current;
-    if (!container) return;
-
-    if (emptyRef.current) emptyRef.current.style.display = "none";
-
-    const time = new Date().toLocaleTimeString("id-ID", {
-      hour: "2-digit", minute: "2-digit", second: "2-digit",
-    });
-
-    const row = document.createElement("div");
-    row.className = "flex items-start gap-2";
-    row.innerHTML =
-      `<div class="mt-1.5 shrink-0 w-1.5 h-1.5 rounded-full ${LOG_DOT[type]}"></div>` +
-      `<span class="text-[10px] text-zinc-600 shrink-0 tabular-nums font-mono w-16">${time}</span>` +
-      `<span class="text-[11px] leading-relaxed ${LOG_TEXT[type]}">${message}</span>`;
-
-    container.appendChild(row);
-    container.scrollTop = container.scrollHeight;
-  }, []);
-
-  const clearLog = useCallback(() => {
-    const container = logRef.current;
-    if (!container) return;
-
-    container.innerHTML = "";
-
-    if (emptyRef.current) {
-      container.appendChild(emptyRef.current);
-      emptyRef.current.style.display = "";
-    }
-  }, []);
+    setLogs((prev) => [...prev, makeEntry(type, message)]);
+    scrollToBottom();
+  }, [scrollToBottom]);
 
   const runMLClassification = useCallback(async () => {
     appendLog("info", "Memulai klasifikasi Machine Learning...");
 
     try {
-      const { data, status } = await axios.post("/api/ml");
+      const res = await fetch("/api/ml", { method: "POST" });
+      const data = await res.json();
 
-      if (status !== 200 || data.error) {
-        appendLog("error", `Klasifikasi gagal: ${data.error ?? status}`);
+      if (!res.ok || data.error) {
+        appendLog("error", `Klasifikasi gagal: ${data.error ?? res.status}`);
         return;
       }
 
-      appendLog("success", `Klasifikasi selesai — ${data.prospek} Prospek, ${data.belum_prospek} Belum Prospek`);
+      appendLog(
+        "success",
+        `Klasifikasi selesai — ${data.prospek} Prospek, ${data.belum_prospek} Belum Prospek`,
+      );
       appendLog("info", "Data siap ditampilkan di tabel.");
       onScrapingDone?.();
     } catch (err) {
-      const message = axios.isAxiosError(err)
-        ? (err.response?.data?.error ?? err.message)
-        : String(err);
-      appendLog("error", `Gagal menghubungi API ML: ${message}`);
+      appendLog("error", `Gagal menghubungi API ML: ${String(err)}`);
     } finally {
       setIsDone(true);
     }
@@ -103,12 +103,14 @@ export default function ScrapingModal({ onClose, onScrapingDone }: ScrapingModal
     const trimmedCategory = category.trim();
     if (!trimmedLocation || !trimmedCategory) return;
 
+    const parsedCount = dataCount ? Math.max(1, parseInt(dataCount)) : null;
+
     setIsRunning(true);
     setIsDone(false);
-    clearLog();
+    setLogs([]);
 
-    const controller = new AbortController();
-    abortRef.current = controller;
+    const controller  = new AbortController();
+    abortRef.current  = controller;
 
     try {
       const response = await fetch("/api/scraping", {
@@ -117,7 +119,7 @@ export default function ScrapingModal({ onClose, onScrapingDone }: ScrapingModal
         body:    JSON.stringify({
           lokasi:     trimmedLocation,
           kategori:   trimmedCategory,
-          jumlahData: dataCount ? parseInt(dataCount) : null,
+          jumlahData: parsedCount,
         }),
         signal: controller.signal,
       });
@@ -156,7 +158,7 @@ export default function ScrapingModal({ onClose, onScrapingDone }: ScrapingModal
             if (json.type !== "connected" && json.type !== "ping") {
               appendLog(json.type as LogType, json.message);
             }
-          } catch { /* baris tidak valid, skip */ }
+          } catch {  }
         }
       }
     } catch (err) {
@@ -168,7 +170,7 @@ export default function ScrapingModal({ onClose, onScrapingDone }: ScrapingModal
       abortRef.current = null;
       setIsRunning(false);
     }
-  }, [location, category, dataCount, appendLog, clearLog, runMLClassification]);
+  }, [location, category, dataCount, appendLog, runMLClassification]);
 
   const handleClose = useCallback(() => {
     abortRef.current?.abort();
@@ -177,29 +179,15 @@ export default function ScrapingModal({ onClose, onScrapingDone }: ScrapingModal
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div
-        className="absolute inset-0 bg-black/40 dark:bg-black/60 backdrop-blur-[3px]"
-        onClick={!isRunning ? handleClose : undefined}
-      />
+      <ModalOverlay onClick={!isRunning ? handleClose : undefined} />
 
       <div className="relative w-full max-w-md bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-2xl flex flex-col overflow-hidden">
-        <div className="px-6 py-5 border-b border-zinc-100 dark:border-zinc-800 flex items-start justify-between">
-          <div>
-            <h2 className="text-[15px] font-semibold text-zinc-900 dark:text-white tracking-tight">
-              Scraping Data Baru
-            </h2>
-            <p className="text-[12px] text-zinc-400 dark:text-zinc-600 mt-0.5">
-              Scraping dan klasifikasi Random Forest secara otomatis
-            </p>
-          </div>
-          <button
-            onClick={handleClose}
-            disabled={isRunning}
-            className="ml-4 h-8 w-8 flex items-center justify-center rounded-lg text-[12px] text-zinc-400 dark:text-zinc-600 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors font-medium disabled:opacity-30 disabled:cursor-not-allowed"
-          >
-            x
-          </button>
-        </div>
+        <ModalHeader
+          title="Scraping Data Baru"
+          subtitle="Scraping dan klasifikasi Random Forest secara otomatis"
+          onClose={handleClose}
+          closeDisabled={isRunning}
+        />
 
         <div className="px-6 py-5 flex flex-col gap-4">
           <div>
@@ -210,7 +198,7 @@ export default function ScrapingModal({ onClose, onScrapingDone }: ScrapingModal
               onChange={(e) => setLocation(e.target.value)}
               placeholder="contoh: Surabaya, Banyuwangi..."
               disabled={isRunning}
-              className={INPUT_CLS}
+              className={`${INPUT_CLS} disabled:opacity-40 disabled:cursor-not-allowed`}
             />
           </div>
 
@@ -222,7 +210,7 @@ export default function ScrapingModal({ onClose, onScrapingDone }: ScrapingModal
               onChange={(e) => setCategory(e.target.value)}
               placeholder="contoh: Restoran, Bengkel, Apotek..."
               disabled={isRunning}
-              className={INPUT_CLS}
+              className={`${INPUT_CLS} disabled:opacity-40 disabled:cursor-not-allowed`}
             />
           </div>
 
@@ -230,7 +218,7 @@ export default function ScrapingModal({ onClose, onScrapingDone }: ScrapingModal
             <label className={LABEL_CLS}>
               Jumlah Data
               <span className="ml-1.5 font-normal normal-case tracking-normal text-zinc-300 dark:text-zinc-700">
-                — opsional
+                opsional
               </span>
             </label>
             <input
@@ -240,7 +228,7 @@ export default function ScrapingModal({ onClose, onScrapingDone }: ScrapingModal
               min={1}
               placeholder="Kosongkan untuk ambil semua data"
               disabled={isRunning}
-              className={INPUT_CLS}
+              className={`${INPUT_CLS} disabled:opacity-40 disabled:cursor-not-allowed`}
             />
           </div>
 
@@ -249,7 +237,7 @@ export default function ScrapingModal({ onClose, onScrapingDone }: ScrapingModal
               onClick={handleClose}
               className="w-full h-10 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-[13px] font-semibold transition-colors"
             >
-              Selesai — Tutup
+              Selesai, Tutup
             </button>
           ) : (
             <button
@@ -266,16 +254,30 @@ export default function ScrapingModal({ onClose, onScrapingDone }: ScrapingModal
           <p className="text-[10px] font-semibold uppercase tracking-[0.15em] text-zinc-400 dark:text-zinc-600">
             Log Aktivitas
           </p>
+
           <div
-            ref={logRef}
+            ref={logContainerRef}
             className="h-36 bg-zinc-950 dark:bg-black rounded-xl p-3 overflow-y-auto flex flex-col gap-0.5 border border-zinc-800"
           >
-            <p ref={emptyRef} className="text-[11px] text-zinc-600 font-light">
-              Menunggu scraping dimulai...
-            </p>
+            {logs.length === 0 ? (
+              <p className="text-[11px] text-zinc-600 font-light">
+                Menunggu scraping dimulai...
+              </p>
+            ) : (
+              logs.map((entry) => (
+                <div key={entry.id} className="flex items-start gap-2">
+                  <div className={`mt-1.5 shrink-0 w-1.5 h-1.5 rounded-full ${LOG_DOT[entry.type]}`} />
+                  <span className="text-[10px] text-zinc-600 shrink-0 tabular-nums font-mono w-16">
+                    {entry.time}
+                  </span>
+                  <span className={`text-[11px] leading-relaxed ${LOG_TEXT[entry.type]}`}>
+                    {entry.message}
+                  </span>
+                </div>
+              ))
+            )}
           </div>
         </div>
-
       </div>
     </div>
   );

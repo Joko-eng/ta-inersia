@@ -1,5 +1,4 @@
 import { NextRequest } from "next/server";
-import axios from "axios";
 
 const FASTAPI_BASE = process.env.FASTAPI_URL ?? "http://localhost:8000";
 
@@ -9,12 +8,23 @@ function toSSE(type: string, message: string): Uint8Array {
   return encoder.encode(`data: ${JSON.stringify({ type, message })}\n\n`);
 }
 
-async function startScrapeJob(keyword: string, location: string, target: number | null): Promise<string> {
-  const { data } = await axios.post<{ job_id: string }>(`${FASTAPI_BASE}/scrape`, {
-    keyword,
-    location,
-    target,
+async function startScrapeJob(
+  keyword:  string,
+  location: string,
+  target:   number | null,
+): Promise<string> {
+  const res = await fetch(`${FASTAPI_BASE}/scrape`, {
+    method:  "POST",
+    headers: { "Content-Type": "application/json" },
+    body:    JSON.stringify({ keyword, location, target }),
   });
+
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}));
+    throw new Error(body?.detail ?? `FastAPI error ${res.status}`);
+  }
+
+  const data = await res.json() as { job_id: string };
   return data.job_id;
 }
 
@@ -42,9 +52,9 @@ function createProxyStream(jobId: string): ReadableStream {
           return;
         }
 
-        const reader = res.body.getReader();
+        const reader  = res.body.getReader();
         const decoder = new TextDecoder();
-        let buffer = "";
+        let buffer    = "";
 
         while (true) {
           const { done, value } = await reader.read();
@@ -55,7 +65,7 @@ function createProxyStream(jobId: string): ReadableStream {
           let idx: number;
           while ((idx = buffer.indexOf("\n")) !== -1) {
             const line = buffer.slice(0, idx).trim();
-            buffer = buffer.slice(idx + 1);
+            buffer     = buffer.slice(idx + 1);
 
             if (!line.startsWith("data: ")) continue;
 
@@ -71,9 +81,7 @@ function createProxyStream(jobId: string): ReadableStream {
               if (json.type !== "connected" && json.type !== "ping") {
                 send(json.type, json.message ?? "");
               }
-            } catch {
-              
-            }
+            } catch { }
           }
         }
       } catch (e) {
@@ -90,7 +98,7 @@ export async function POST(req: NextRequest) {
 
   if (!lokasi?.trim() || !kategori?.trim()) {
     return new Response(createErrorStream("Lokasi dan kategori wajib diisi."), {
-      status: 400,
+      status:  400,
       headers: { "Content-Type": "text/event-stream" },
     });
   }
@@ -99,20 +107,17 @@ export async function POST(req: NextRequest) {
   try {
     jobId = await startScrapeJob(kategori.trim(), lokasi.trim(), jumlahData ?? null);
   } catch (e) {
-    const message = axios.isAxiosError(e)
-      ? (e.response?.data?.detail ?? e.message)
-      : String(e);
-    return new Response(createErrorStream(`Gagal memulai job: ${message}`), {
+    return new Response(createErrorStream(`Gagal memulai job: ${String(e)}`), {
       headers: { "Content-Type": "text/event-stream" },
     });
   }
 
   return new Response(createProxyStream(jobId), {
     headers: {
-      "Content-Type": "text/event-stream",
-      "Cache-Control": "no-cache",
-      "X-Accel-Buffering": "no",
-      Connection: "keep-alive",
+      "Content-Type":              "text/event-stream",
+      "Cache-Control":             "no-cache",
+      "X-Accel-Buffering":         "no",
+      Connection:                  "keep-alive",
       "Access-Control-Allow-Origin": "*",
     },
   });
