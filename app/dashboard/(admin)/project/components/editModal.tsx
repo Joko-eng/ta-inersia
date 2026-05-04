@@ -154,7 +154,7 @@ export default function EditProjectModal({ project, onClose, onSaved }: Props) {
                 onChange={(e) => setManagerId(e.target.value)}
                 className={`${INPUT_CLS} cursor-pointer`}
               >
-                <option value="">— Pilih project manager —</option>
+                <option value="">-- Pilih project manager --</option>
                 {managers.map((m) => (
                   <option key={m.id} value={m.id}>
                     {m.name}
@@ -178,7 +178,7 @@ export default function EditProjectModal({ project, onClose, onSaved }: Props) {
 
           <div>
             <label className={LABEL_CLS}>
-              Nama PIC / Penanggung Jawab Klien
+              Nama Klien
             </label>
             <input
               type="text"

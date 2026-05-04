@@ -3,10 +3,39 @@ import Project from "@/models/Project";
 import { ProjectData } from "@/types/IProject";
 import { CreateProjectInput, UpdateProjectInput } from "@/validators/projectValidator";
 
-function generateTrackerCode(index: number): string {
-  const date   = new Date().toISOString().slice(0, 10).replace(/-/g, "");
-  const order  = String(index).padStart(4, "0");
-  const random = Math.random().toString(36).slice(2, 8).toUpperCase();
+const RANDOM_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+function generateRandomString(length: number): string {
+  return Array.from({ length }, () =>
+    RANDOM_CHARS[Math.floor(Math.random() * RANDOM_CHARS.length)]
+  ).join("");
+}
+
+function getDateStamp(): string {
+  const now = new Date();
+  const y = now.getFullYear();
+  const m = String(now.getMonth() + 1).padStart(2, "0");
+  const d = String(now.getDate()).padStart(2, "0");
+  return `${y}${m}${d}`;
+}
+
+async function generateTrackerCode(): Promise<string> {
+  const last = await Project.findOne({}, { trackerCode: 1 })
+    .sort({ trackerCode: -1 })
+    .lean();
+
+  let nextNumber = 1;
+
+  if (last?.trackerCode) {
+    const parts = (last.trackerCode as string).split("-");
+    const lastNum = parseInt(parts[0], 10);
+    if (!isNaN(lastNum)) nextNumber = lastNum + 1;
+  }
+
+  const order  = String(nextNumber).padStart(4, "0");
+  const date   = getDateStamp();
+  const random = generateRandomString(8);
+
   return `${order}-${date}-${random}`;
 }
 
@@ -18,6 +47,7 @@ function toProjectData(item: any): ProjectData {
     projectManagerId:   item.projectManagerId?._id?.toString() ?? "",
     projectManagerName: item.projectManagerId?.name ?? "",
     clientName:         item.clientName ?? "",
+    clientPhone:        item.clientPhone ?? "",
     clientBusiness:     item.clientBusiness ?? "",
     isArchived:         item.isArchived ?? false,
     createdAt:          item.createdAt?.toISOString() ?? "",
@@ -38,8 +68,7 @@ export async function dbCreateProject(
 ): Promise<{ ok: boolean; error?: string }> {
   try {
     await connectDB();
-    const count       = await Project.countDocuments();
-    const trackerCode = generateTrackerCode(count + 1);
+    const trackerCode = await generateTrackerCode();
     await Project.create({ ...payload, trackerCode });
     return { ok: true };
   } catch {

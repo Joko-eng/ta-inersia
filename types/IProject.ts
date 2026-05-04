@@ -5,6 +5,7 @@ export interface IProject extends Document {
   trackerCode:      string;
   projectManagerId: mongoose.Types.ObjectId;
   clientName:       string;
+  clientPhone:      string;
   clientBusiness:   string;
   isArchived:       boolean;
   createdAt:        Date;
@@ -18,6 +19,7 @@ export interface ProjectData {
   projectManagerId:   string;
   projectManagerName: string;
   clientName:         string;
+  clientPhone:        string;
   clientBusiness:     string;
   isArchived:         boolean;
   createdAt:          string;
