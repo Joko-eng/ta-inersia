@@ -1,7 +1,7 @@
 "use server";
 
 import { addTeamMember, deleteTeamMember } from "@/lib/services/teamServices";
-import { teamSchema } from "@/validations/teamValidator";
+import { teamSchema } from "@/validators/teamValidator";
 
 import { revalidatePath } from "next/cache";
 

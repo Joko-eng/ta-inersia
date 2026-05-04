@@ -1,7 +1,7 @@
 import { connectDB } from "@/lib/mongodb";
 import TeamMember from "@/models/TeamMember";
 import User from "@/models/User";
-import type { TeamMemberInput } from "@/validations/teamValidator";
+import type { TeamMemberInput } from "@/validators/teamValidator";
 
 export async function addTeamMember(data: TeamMemberInput) {
   const { name, email, username, division } = data;

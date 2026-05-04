@@ -6,7 +6,7 @@ import {
   ModalOverlay,
   INPUT_CLS,
   LABEL_CLS,
-} from "./components/props";
+} from "@/components/ui/props";
 
 type LogType = "info" | "success" | "error" | "loading";
 

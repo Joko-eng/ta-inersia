@@ -2,22 +2,26 @@
 
 import { useState } from "react";
 import { LeadData } from "@/types/ILead";
-import { deleteLead } from "./leadAction";
+import { deleteLead } from "../leadAction";
 import {
   BottomSheetHandle,
   ModalHeader,
   ModalOverlay,
-} from "./components/props";
+} from "@/components/ui/props";
 
 interface DeleteModalProps {
-  lead:      LeadData;
-  onClose:   () => void;
+  lead: LeadData;
+  onClose: () => void;
   onDeleted: () => void;
 }
 
-export default function DeleteModal({ lead, onClose, onDeleted }: DeleteModalProps) {
+export default function DeleteModal({
+  lead,
+  onClose,
+  onDeleted,
+}: DeleteModalProps) {
   const [deleting, setDeleting] = useState(false);
-  const [error, setError]       = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   const handleDelete = async () => {
     setDeleting(true);

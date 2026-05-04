@@ -1,4 +1,4 @@
-export type LeadData = {
+export interface LeadData {
   id:           string;
   nama:         string;
   rating:       number;
@@ -8,7 +8,7 @@ export type LeadData = {
   mapsUrl:      string;
   keterangan:   string;
   status:       string;
-};
+}
 
 export const LEAD_STATUSES = [
   "Belum Diproses",
@@ -17,4 +17,5 @@ export const LEAD_STATUSES = [
   "Tidak Prospek",
 ] as const;
 
-export type LeadStatus = (typeof LEAD_STATUSES)[number];
+export type LeadStatus   = (typeof LEAD_STATUSES)[number];
+export type StatusFilter = "Semua" | LeadStatus;

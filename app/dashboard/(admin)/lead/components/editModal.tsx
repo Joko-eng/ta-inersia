@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { ExternalLink } from "lucide-react";
 import { LeadData, LEAD_STATUSES } from "@/types/ILead";
-import { updateLead } from "./leadAction";
+import { updateLead } from "../leadAction";
 import {
   BottomSheetHandle,
   ConfirmDialog,
@@ -11,30 +11,34 @@ import {
   LABEL_CLS,
   ModalHeader,
   ModalOverlay,
-} from "./components/props";
+} from "@/components/ui/props";
 
 interface EditModalProps {
-  lead:    LeadData;
+  lead: LeadData;
   onClose: () => void;
   onSaved: () => void;
 }
 
 export default function EditModal({ lead, onClose, onSaved }: EditModalProps) {
-  const [form, setForm]               = useState<LeadData>({ ...lead });
-  const [saving, setSaving]           = useState(false);
-  const [error, setError]             = useState<string | null>(null);
+  const [form, setForm] = useState<LeadData>({ ...lead });
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [confirmOpen, setConfirmOpen] = useState(false);
 
   const set = (key: keyof Omit<LeadData, "id">, value: string | number) =>
     setForm((prev) => ({ ...prev, [key]: value }));
 
-  const isTidakProspek    = form.status === "Tidak Prospek";
-  const keteranganMissing = isTidakProspek && (form.keterangan ?? "").trim().length === 0;
-  const isDirty           = JSON.stringify(form) !== JSON.stringify(lead);
-  const canSave           = !keteranganMissing;
+  const isTidakProspek = form.status === "Tidak Prospek";
+  const keteranganMissing =
+    isTidakProspek && (form.keterangan ?? "").trim().length === 0;
+  const isDirty = JSON.stringify(form) !== JSON.stringify(lead);
+  const canSave = !keteranganMissing;
 
   const handleClose = () => {
-    if (isDirty) { setConfirmOpen(true); return; }
+    if (isDirty) {
+      setConfirmOpen(true);
+      return;
+    }
     onClose();
   };
 
@@ -64,7 +68,10 @@ export default function EditModal({ lead, onClose, onSaved }: EditModalProps) {
         title="Tutup tanpa menyimpan?"
         description="Perubahan yang belum disimpan akan hilang."
         confirmLabel="Lanjutkan"
-        onConfirm={() => { setConfirmOpen(false); onClose(); }}
+        onConfirm={() => {
+          setConfirmOpen(false);
+          onClose();
+        }}
         onCancel={() => setConfirmOpen(false)}
       />
 
@@ -112,7 +119,9 @@ export default function EditModal({ lead, onClose, onSaved }: EditModalProps) {
               <input
                 type="number"
                 value={form.jumlahUlasan}
-                onChange={(e) => set("jumlahUlasan", parseInt(e.target.value) || 0)}
+                onChange={(e) =>
+                  set("jumlahUlasan", parseInt(e.target.value) || 0)
+                }
                 className={INPUT_CLS}
                 min="0"
               />
@@ -171,7 +180,9 @@ export default function EditModal({ lead, onClose, onSaved }: EditModalProps) {
               className={`${INPUT_CLS} cursor-pointer`}
             >
               {LEAD_STATUSES.map((s) => (
-                <option key={s} value={s}>{s}</option>
+                <option key={s} value={s}>
+                  {s}
+                </option>
               ))}
             </select>
           </div>
