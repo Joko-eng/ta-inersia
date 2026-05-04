@@ -1,89 +1,124 @@
-import { Browser } from "playwright";
-import { connectDB } from "@/lib/mongodb";
+import { NextRequest } from "next/server";
 
-import { SCRAPING_CONFIG }       from "@/lib/scraping/configScrap";
-import { DatabaseCounter, SendFn } from "@/lib/scraping/interfaceScrap";
-import { pickRandom }            from "@/lib/scraping/utilityScrap";
-import { launchBrowser }         from "@/lib/scraping/browserScrap";
-import { navigateToSearch, scrollResultsPanel } from "@/lib/scraping/navigationScrap";
-import { collectAllBusinesses }  from "@/lib/scraping/collectorScrap";
-import { saveBusinessToDatabase } from "@/lib/scraping/databaseScrap";
+const FASTAPI_BASE = process.env.FASTAPI_URL ?? "http://localhost:8000";
 
 const encoder = new TextEncoder();
 
-function buildSSELine(type: string, message?: string, data?: unknown): Uint8Array {
-  const payload = message !== undefined ? { type, message } : { type, data };
-  return encoder.encode(`data: ${JSON.stringify(payload)}\n\n`);
+function toSSE(type: string, message: string): Uint8Array {
+  return encoder.encode(`data: ${JSON.stringify({ type, message })}\n\n`);
 }
 
-export async function POST(req: Request): Promise<Response> {
-  const { lokasi, kategori, jumlahData } = await req.json();
+async function startScrapeJob(
+  keyword:  string,
+  location: string,
+  target:   number | null,
+): Promise<string> {
+  const res = await fetch(`${FASTAPI_BASE}/scrape`, {
+    method:  "POST",
+    headers: { "Content-Type": "application/json" },
+    body:    JSON.stringify({ keyword, location, target }),
+  });
 
-  const parsed      = parseInt(jumlahData);
-  const target      = (!jumlahData || isNaN(parsed) || parsed <= 0)
-    ? Infinity
-    : parsed;
-  const searchQuery = `${kategori} di ${lokasi}`;
-  const userAgent   = pickRandom(SCRAPING_CONFIG.USER_AGENTS);
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}));
+    throw new Error(body?.detail ?? `FastAPI error ${res.status}`);
+  }
 
-  const stream = new ReadableStream({
+  const data = await res.json() as { job_id: string };
+  return data.job_id;
+}
+
+function createErrorStream(message: string): ReadableStream {
+  return new ReadableStream({
+    start(ctrl) {
+      ctrl.enqueue(toSSE("error", message));
+      ctrl.close();
+    },
+  });
+}
+
+function createProxyStream(jobId: string): ReadableStream {
+  return new ReadableStream({
     async start(controller) {
-      const send: SendFn = (type, message) => {
-        controller.enqueue(buildSSELine(type, message));
-      };
-
-      let browser: Browser | null = null;
+      const send = (type: string, message: string) =>
+        controller.enqueue(toSSE(type, message));
 
       try {
-        await connectDB();
-        send("info", "Koneksi database berhasil.");
-        send("info", "Sesi scraping dimulai.");
-        send("info", `Keyword  : ${kategori}`);
-        send("info", `Lokasi   : ${lokasi}`);
-        send("info", `Target   : ${target === Infinity ? "Tidak terbatas" : target + " data"}`);
+        const res = await fetch(`${FASTAPI_BASE}/scrape/${jobId}/stream`);
 
-        send("info", "Menjalankan browser...");
-        const { browser: b, page } = await launchBrowser(userAgent);
-        browser = b;
+        if (!res.ok || !res.body) {
+          send("error", `Stream tidak tersedia (${res.status})`);
+          controller.close();
+          return;
+        }
 
-        send("info", `Membuka Google Maps: ${searchQuery}`);
-        await navigateToSearch(page, searchQuery);
+        const reader  = res.body.getReader();
+        const decoder = new TextDecoder();
+        let buffer    = "";
 
-        send("loading", "Memuat hasil pencarian...");
-        await scrollResultsPanel(page, SCRAPING_CONFIG.MAX_SCROLL_ATTEMPTS, target, send);
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
 
-        send("info", "Memulai ekstraksi data bisnis...");
+          buffer += decoder.decode(value, { stream: true });
 
-        const counter: DatabaseCounter = { saved: 0, skipped: 0 };
+          let idx: number;
+          while ((idx = buffer.indexOf("\n")) !== -1) {
+            const line = buffer.slice(0, idx).trim();
+            buffer     = buffer.slice(idx + 1);
 
-        const results = await collectAllBusinesses(
-          page,
-          target,
-          send,
-          (item) => saveBusinessToDatabase(item, lokasi, kategori, send, counter)
-        );
+            if (!line.startsWith("data: ")) continue;
 
-        send("info",    "Sesi scraping selesai.");
-        send("success", `Total terkumpul  : ${results.length} data`);
-        send("success", `Tersimpan ke DB  : ${counter.saved} data`);
-        send("info",    `Duplikat dilewati: ${counter.skipped} data`);
-        send("info",    "Semua data disimpan dengan status: Belum Diproses");
+            try {
+              const json = JSON.parse(line.slice(6)) as { type: string; message?: string };
 
-        controller.enqueue(buildSSELine("done", undefined, results));
-      } catch (err) {
-        send("error", `Terjadi kesalahan fatal: ${String(err)}`);
+              if (json.type === "closed") {
+                send("done", "Scraping selesai.");
+                controller.close();
+                return;
+              }
+
+              if (json.type !== "connected" && json.type !== "ping") {
+                send(json.type, json.message ?? "");
+              }
+            } catch { }
+          }
+        }
+      } catch (e) {
+        controller.enqueue(toSSE("error", `Stream terputus: ${String(e)}`));
       } finally {
-        if (browser) await browser.close().catch(() => {});
         controller.close();
       }
     },
   });
+}
 
-  return new Response(stream, {
+export async function POST(req: NextRequest) {
+  const { lokasi, kategori, jumlahData } = await req.json();
+
+  if (!lokasi?.trim() || !kategori?.trim()) {
+    return new Response(createErrorStream("Lokasi dan kategori wajib diisi."), {
+      status:  400,
+      headers: { "Content-Type": "text/event-stream" },
+    });
+  }
+
+  let jobId: string;
+  try {
+    jobId = await startScrapeJob(kategori.trim(), lokasi.trim(), jumlahData ?? null);
+  } catch (e) {
+    return new Response(createErrorStream(`Gagal memulai job: ${String(e)}`), {
+      headers: { "Content-Type": "text/event-stream" },
+    });
+  }
+
+  return new Response(createProxyStream(jobId), {
     headers: {
-      "Content-Type":  "text/event-stream",
-      "Cache-Control": "no-cache",
-      "Connection":    "keep-alive",
+      "Content-Type":              "text/event-stream",
+      "Cache-Control":             "no-cache",
+      "X-Accel-Buffering":         "no",
+      Connection:                  "keep-alive",
+      "Access-Control-Allow-Origin": "*",
     },
   });
 }

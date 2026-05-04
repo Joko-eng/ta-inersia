@@ -1,53 +1,42 @@
-import { NextResponse }   from "next/server";
-import { connectDB }       from "@/lib/mongodb";
-import Lead                from "@/models/Lead";
-import { runPrediction }   from "@/lib/ml/predictorML";
-import { PredictionInput } from "@/lib/ml/interfaceML";
+import { NextRequest, NextResponse } from "next/server";
 
-export async function POST(): Promise<NextResponse> {
+const FASTAPI_BASE = process.env.FASTAPI_URL ?? "http://localhost:8000";
+
+function parseClassificationCounts(logs: string[]): { prospek: number; belum_prospek: number } {
+  let prospek       = 0;
+  let belum_prospek = 0;
+
+  for (const entry of logs) {
+    const match = entry.match(/Prospek:\s*(\d+),\s*Belum Prospek:\s*(\d+)/i);
+    if (match) {
+      prospek       += parseInt(match[1]);
+      belum_prospek += parseInt(match[2]);
+    }
+  }
+
+  return { prospek, belum_prospek };
+}
+
+export async function POST(_req: NextRequest) {
   try {
-    await connectDB();
+    const res = await fetch(`${FASTAPI_BASE}/classify`, { method: "POST" });
 
-    const leads = await Lead.find({ status: "Belum Diproses" }).lean();
-
-    if (leads.length === 0) {
-      return NextResponse.json({
-        pesan:    "Tidak ada data dengan status Belum Diproses.",
-        diproses: 0,
-      });
+    if (!res.ok) {
+      const body = await res.json().catch(() => ({}));
+      return NextResponse.json(
+        { error: body?.detail ?? `FastAPI error ${res.status}` },
+        { status: res.status },
+      );
     }
 
-    const inputs: PredictionInput[] = leads.map((lead: any) => ({
-      rating:        lead.rating       ?? 0,
-      jumlah_ulasan: lead.jumlahUlasan ?? 0,
-      website:       lead.website ? 1 : 0,
-    }));
+    const data = await res.json() as { log: string[] };
+    const { prospek, belum_prospek } = parseClassificationCounts(data.log ?? []);
 
-    const predictions = await runPrediction(inputs);
-
-    let prospek      = 0;
-    let belumProspek = 0;
-
-    await Promise.all(
-      leads.map(async (lead: any, i: number) => {
-        const status = predictions[i].status;
-        if (status === "Prospek") prospek++;
-        else belumProspek++;
-        await Lead.findByIdAndUpdate(lead._id, { $set: { status } });
-      })
-    );
-
-    return NextResponse.json({
-      pesan:         "Klasifikasi selesai.",
-      diproses:      leads.length,
-      prospek,
-      belum_prospek: belumProspek,
-    });
-
-  } catch (err) {
+    return NextResponse.json({ prospek, belum_prospek, log: data.log });
+  } catch (e) {
     return NextResponse.json(
-      { error: `Terjadi kesalahan: ${String(err)}` },
-      { status: 500 }
+      { error: `Tidak bisa terhubung ke ML server: ${String(e)}` },
+      { status: 502 },
     );
   }
 }

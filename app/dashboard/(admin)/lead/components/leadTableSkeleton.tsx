@@ -1,7 +1,6 @@
 export default function LeadTableSkeleton() {
   return (
     <div className="flex flex-col h-full min-h-0 gap-4">
-      {/* Toolbar skeleton */}
       <div className="flex items-center justify-between gap-3 shrink-0">
         <div className="flex items-center gap-3">
           <div className="h-9 w-36 bg-zinc-200 dark:bg-zinc-800 rounded-lg animate-pulse" />
@@ -13,7 +12,6 @@ export default function LeadTableSkeleton() {
         </div>
       </div>
 
-      {/* Mobile skeleton */}
       <div className="lg:hidden flex-1 min-h-0 rounded-xl border border-zinc-200 dark:border-zinc-800 overflow-hidden flex flex-col">
         <div className="flex-1 p-3 sm:p-4 flex flex-col gap-3 bg-[#F5F5F3] dark:bg-[#111111] overflow-hidden">
           {Array.from({ length: 4 }).map((_, i) => (
@@ -54,7 +52,6 @@ export default function LeadTableSkeleton() {
         </div>
       </div>
 
-      {/* Desktop skeleton */}
       <div className="hidden lg:flex flex-1 min-h-0 flex-col rounded-xl border border-zinc-200 dark:border-zinc-800 overflow-hidden bg-white dark:bg-zinc-900">
         <div className="flex-1 overflow-hidden">
           <table className="w-full">

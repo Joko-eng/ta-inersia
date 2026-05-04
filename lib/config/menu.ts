@@ -83,7 +83,7 @@ export function getSidebarMenu(role: Role): MenuItem[] {
       return [
         { label: "Dashboard", href: "/dashboard", icon: House },
         { label: "Lead Generation", href: "/dashboard/lead", icon: Briefcase },
-        { label: "Project", href: "/dashboard/admin/project", icon: UserCheck },
+        { label: "Project", href: "/dashboard/project", icon: UserCheck },
         {
           label: "Project Manager",
           href: "/dashboard/project-manager",

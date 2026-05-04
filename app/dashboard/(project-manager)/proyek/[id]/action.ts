@@ -6,7 +6,7 @@ import {
   updateMilestoneById,
   validateDueDate,
 } from "@/lib/services/milestoneService";
-import { milestoneSchema } from "@/validations/milestoneValidator";
+import { milestoneSchema } from "@/validators/milestoneValidator";
 import { revalidatePath } from "next/cache";
 
 export async function createMilestone(formData: FormData) {

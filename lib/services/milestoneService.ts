@@ -1,7 +1,7 @@
 import { connectDB } from "@/lib/mongodb";
 import Milestone from "@/models/Milestone";
 import Task from "@/models/Task";
-import type { MilestoneInput } from "@/validations/milestoneValidator";
+import type { MilestoneInput } from "@/validators/milestoneValidator";
 
 export function validateDueDate(date: string) {
   const today = new Date();
