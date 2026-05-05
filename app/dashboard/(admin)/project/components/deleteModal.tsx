@@ -1,13 +1,13 @@
 "use client";
 
-import { useState } from "react";
-import { deleteProject } from "../projectAction";
-import { ProjectData } from "@/types/IProject";
 import {
   BottomSheetHandle,
   ModalHeader,
   ModalOverlay,
 } from "@/components/ui/props";
+import { ProjectData } from "@/types/IProject";
+import { useState } from "react";
+import { deleteProject } from "../projectAction";
 
 interface Props {
   project: ProjectData;
@@ -15,9 +15,13 @@ interface Props {
   onSaved: () => void;
 }
 
-export default function DeleteProjectModal({ project, onClose, onSaved }: Props) {
+export default function DeleteProjectModal({
+  project,
+  onClose,
+  onSaved,
+}: Props) {
   const [deleting, setDeleting] = useState(false);
-  const [error,    setError]    = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   async function handleDelete() {
     if (deleting) return;
@@ -41,7 +45,11 @@ export default function DeleteProjectModal({ project, onClose, onSaved }: Props)
 
       <div className="relative w-full sm:max-w-sm bg-white dark:bg-zinc-900 sm:rounded-2xl rounded-t-2xl border border-zinc-200 dark:border-zinc-800 shadow-2xl flex flex-col overflow-hidden">
         <BottomSheetHandle />
-        <ModalHeader title="Hapus Project" subtitle={project.trackerCode} onClose={onClose} />
+        <ModalHeader
+          title="Hapus Project"
+          subtitle={project.trackerCode}
+          onClose={onClose}
+        />
 
         <div className="px-6 py-5 flex flex-col gap-3">
           {error && (
@@ -50,15 +58,20 @@ export default function DeleteProjectModal({ project, onClose, onSaved }: Props)
             </p>
           )}
 
-          <p className="text-[13px] text-zinc-600 dark:text-zinc-400">
-            Yakin ingin menghapus project ini? Tindakan ini tidak dapat dibatalkan.
-          </p>
-
           <div className="p-3 rounded-lg bg-zinc-50 dark:bg-zinc-800 border border-zinc-100 dark:border-zinc-700 flex flex-col gap-1">
-            <p className="text-[13px] font-medium text-zinc-800 dark:text-zinc-100">{project.name}</p>
-            <p className="text-[11px] font-mono text-zinc-400 dark:text-zinc-500">{project.trackerCode}</p>
-            <p className="text-[11px] text-zinc-400 dark:text-zinc-500">{project.clientBusiness} · {project.clientName}</p>
+            <p className="text-sm font-medium text-zinc-800 dark:text-zinc-100">
+              {project.name}
+            </p>
+            <p className="text-sm text-zinc-400 dark:text-zinc-500">
+              {project.trackerCode}
+            </p>
+            <p className="text-sm text-zinc-400 dark:text-zinc-500">
+              {project.clientBusiness} · {project.clientName}
+            </p>
           </div>
+          <p className="text-sm text-zinc-600 dark:text-zinc-400">
+            Yakin ingin menghapus project ini?
+          </p>
         </div>
 
         <div className="px-6 py-4 border-t border-zinc-100 dark:border-zinc-800 flex justify-end gap-2 shrink-0">

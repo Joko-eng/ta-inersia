@@ -11,7 +11,7 @@ async function ProjectManagerTableServer() {
 export default function ProjectManagerPage() {
   return (
     <div className="flex flex-col h-full min-h-0 overflow-hidden">
-      <div className="shrink-0 flex items-end justify-between px-5 sm:px-8 lg:px-10 pt-6 pb-5 border-zinc-200 dark:border-zinc-800">
+      <div className="shrink-0 flex items-end justify-between px-5 sm:px-8 lg:px-10 pt-5 border-zinc-200 dark:border-zinc-800">
         <div>
           <p className="text-xs font-medium uppercase text-zinc-400 dark:text-zinc-500 mb-1">
             Manajemen Data
@@ -22,7 +22,7 @@ export default function ProjectManagerPage() {
         </div>
       </div>
 
-      <div className="flex-1 min-h-0 flex flex-col overflow-hidden px-5 sm:px-8 lg:px-10 py-5">
+      <div className="flex-1 min-h-0 flex flex-col overflow-hidden px-5 sm:px-8 lg:px-10">
         <Suspense fallback={<ProjectManagerTableSkeleton />}>
           <ProjectManagerTableServer />
         </Suspense>

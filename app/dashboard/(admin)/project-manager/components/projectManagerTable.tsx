@@ -1,7 +1,7 @@
 "use client";
 
 import { ProjectManagerData } from "@/types/IProjectManager";
-import { PencilLine, Trash } from "lucide-react";
+import { PencilLine, Plus, Trash } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useCallback, useState, useTransition } from "react";
 import CreateProjectManagerModal from "./createModal";
@@ -44,7 +44,7 @@ function ActionButtons({
       </button>
       <button
         onClick={onDelete}
-        className={`${compact ? "h-8 px-4" : "flex-1 h-9"} flex items-center justify-center gap-1.5 text-sm font-medium rounded-lg bg-red-500 hover:bg-rose-600 text-white transition-colors`}
+        className={`${compact ? "h-8 px-4" : "flex-1 h-9"} flex items-center justify-center gap-1.5 text-sm font-medium rounded-lg bg-red-500 hover:bg-red-600 text-white transition-colors`}
       >
         <Trash size={13} /> Hapus
       </button>
@@ -173,9 +173,10 @@ export default function ProjectManagerTable({
         </span>
         <button
           onClick={() => setShowCreate(true)}
-          className="h-9 px-5 text-sm font-semibold rounded-lg bg-primary hover:bg-blue-700 text-white dark:bg-white dark:text-black dark:hover:bg-zinc-200 transition-colors"
+          className="flex items-center justify-center gap-2 h-9 px-5 text-sm font-semibold rounded-lg bg-primary hover:bg-blue-700 text-white dark:bg-white dark:text-black dark:hover:bg-zinc-200 transition-colors"
         >
-          Tambah Project Manager
+          <Plus size={16} />
+          <span>Project Manager</span>
         </button>
       </div>
 
