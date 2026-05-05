@@ -72,7 +72,7 @@ function MobileCard({
         <p className="text-sm font-semibold text-zinc-800 dark:text-zinc-100 truncate">
           {item.name}
         </p>
-        <p className="text-sm font-mono text-zinc-500 dark:text-zinc-400">
+        <p className="text-sm text-zinc-500 dark:text-zinc-400">
           @{item.username}
         </p>
       </div>

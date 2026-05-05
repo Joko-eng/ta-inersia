@@ -1,7 +1,5 @@
 "use client";
 
-import { useCallback, useRef, useState, useTransition } from "react";
-import { useRouter } from "next/navigation";
 import {
   ChevronDown,
   ChevronLeft,
@@ -10,10 +8,11 @@ import {
   SlidersHorizontal,
   Trash2,
 } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useCallback, useRef, useState, useTransition } from "react";
 
+import { EmptyCell, useClickOutside } from "@/components/ui/props";
 import { LeadData, StatusFilter } from "@/types/ILead";
-import { useClickOutside } from "@/components/ui/props";
-import { EmptyCell } from "@/components/ui/props";
 import DeleteModal from "./deleteModal";
 import EditModal from "./editModal";
 import ScrapingModal from "./scrapModal";
@@ -162,7 +161,7 @@ function MobileLeadCard({
         {item.noTelp && (
           <div className="col-span-2">
             <CardField label="Telepon">
-              <p className="text-[13px] font-mono text-zinc-600 dark:text-zinc-400">
+              <p className="text-[13px]  text-zinc-600 dark:text-zinc-400">
                 {item.noTelp}
               </p>
             </CardField>

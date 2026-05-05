@@ -9,8 +9,8 @@ import DeleteProjectModal from "./deleteModal";
 import EditProjectModal from "./editModal";
 
 const TABLE_COLUMNS = [
-  { label: "No", align: "text-center", w: "w-12" },
-  { label: "Nama Project", align: "text-left", w: "w-auto" },
+  { label: "No", align: "text-center", w: "w-10" },
+  { label: "Nama Project", align: "text-left", w: "w-50" },
   { label: "Tracker Code", align: "text-left", w: "w-44" },
   { label: "Project Manager", align: "text-left", w: "w-56" },
   { label: "Klien", align: "text-left", w: "w-52" },
