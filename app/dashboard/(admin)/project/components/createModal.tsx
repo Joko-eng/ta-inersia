@@ -214,7 +214,6 @@ export default function CreateProjectModal({ onClose, onCreated }: Props) {
       <div className="relative w-full sm:max-w-md bg-white dark:bg-zinc-900 sm:rounded-2xl rounded-t-2xl border border-zinc-200 dark:border-zinc-800 shadow-2xl flex flex-col max-h-[92vh] overflow-hidden">
         <BottomSheetHandle />
 
-        {/* Header */}
         <div className="px-6 pt-6 pb-2">
           <h2 className="text-lg font-semibold text-zinc-900 dark:text-white">
             Buat Project
@@ -412,7 +411,7 @@ export default function CreateProjectModal({ onClose, onCreated }: Props) {
           <button
             onClick={handleSave}
             disabled={saving || !canSave}
-            className="h-9 px-5 text-sm font-semibold rounded-lg bg-blue-600 hover:bg-blue-700 text-white disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            className="h-9 px-5 text-sm font-semibold rounded-lg bg-primary hover:bg-blue-700 dark:bg-white dark:text-black disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
           >
             {saving ? "Membuat..." : "Buat Project"}
           </button>

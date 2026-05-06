@@ -1,77 +1,87 @@
 "use client";
 
-import { useState, useRef, useCallback } from "react";
-import {
-  ModalHeader,
-  ModalOverlay,
-  INPUT_CLS,
-  LABEL_CLS,
-} from "@/components/ui/props";
+import { ModalOverlay } from "@/components/ui/props";
+import { useCallback, useRef, useState } from "react";
 
 type LogType = "info" | "success" | "error" | "loading";
 
 interface LogEntry {
-  id:      number;
-  type:    LogType;
-  time:    string;
+  id: number;
+  type: LogType;
+  time: string;
   message: string;
 }
 
 interface ScrapingModalProps {
-  onClose:         () => void;
+  onClose: () => void;
   onScrapingDone?: () => void;
 }
 
 const LOG_DOT: Record<LogType, string> = {
   success: "bg-emerald-400",
-  error:   "bg-rose-400",
+  error: "bg-rose-400",
   loading: "bg-blue-400 animate-pulse",
-  info:    "bg-zinc-500 dark:bg-zinc-600",
+  info: "bg-zinc-500 dark:bg-zinc-600",
 };
 
 const LOG_TEXT: Record<LogType, string> = {
   success: "text-emerald-400",
-  error:   "text-rose-400",
+  error: "text-rose-400",
   loading: "text-blue-400",
-  info:    "text-zinc-400",
+  info: "text-zinc-400",
 };
+
+const INPUT_CLS =
+  "w-full h-10 px-3 text-sm rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 dark:placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition";
+
+const LABEL_CLS =
+  "block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1.5";
 
 let _logId = 0;
 
 function makeEntry(type: LogType, message: string): LogEntry {
   return {
-    id:   ++_logId,
+    id: ++_logId,
     type,
     time: new Date().toLocaleTimeString("id-ID", {
-      hour: "2-digit", minute: "2-digit", second: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
     }),
     message,
   };
 }
 
-export default function ScrapingModal({ onClose, onScrapingDone }: ScrapingModalProps) {
-  const [location,  setLocation]  = useState("");
-  const [category,  setCategory]  = useState("");
+export default function ScrapingModal({
+  onClose,
+  onScrapingDone,
+}: ScrapingModalProps) {
+  const [location, setLocation] = useState("");
+  const [category, setCategory] = useState("");
   const [dataCount, setDataCount] = useState("");
   const [isRunning, setIsRunning] = useState(false);
-  const [isDone,    setIsDone]    = useState(false);
-  const [logs,      setLogs]      = useState<LogEntry[]>([]);
+  const [isDone, setIsDone] = useState(false);
+  const [logs, setLogs] = useState<LogEntry[]>([]);
 
   const logContainerRef = useRef<HTMLDivElement>(null);
-  const abortRef        = useRef<AbortController | null>(null);
+  const abortRef = useRef<AbortController | null>(null);
 
   const scrollToBottom = useCallback(() => {
     requestAnimationFrame(() => {
       if (logContainerRef.current) {
-        logContainerRef.current.scrollTop = logContainerRef.current.scrollHeight;
+        logContainerRef.current.scrollTop =
+          logContainerRef.current.scrollHeight;
       }
     });
   }, []);
 
-  const appendLog = useCallback((type: LogType, message: string) => {
-    setLogs((prev) => [...prev, makeEntry(type, message)]);
-    scrollToBottom();
-  }, [scrollToBottom]);
+  const appendLog = useCallback(
+    (type: LogType, message: string) => {
+      setLogs((prev) => [...prev, makeEntry(type, message)]);
+      scrollToBottom();
+    },
+    [scrollToBottom],
+  );
 
   const runMLClassification = useCallback(async () => {
     appendLog("info", "Memulai klasifikasi Machine Learning...");
@@ -109,16 +119,16 @@ export default function ScrapingModal({ onClose, onScrapingDone }: ScrapingModal
     setIsDone(false);
     setLogs([]);
 
-    const controller  = new AbortController();
-    abortRef.current  = controller;
+    const controller = new AbortController();
+    abortRef.current = controller;
 
     try {
       const response = await fetch("/api/scraping", {
-        method:  "POST",
+        method: "POST",
         headers: { "Content-Type": "application/json" },
-        body:    JSON.stringify({
-          lokasi:     trimmedLocation,
-          kategori:   trimmedCategory,
+        body: JSON.stringify({
+          lokasi: trimmedLocation,
+          kategori: trimmedCategory,
           jumlahData: parsedCount,
         }),
         signal: controller.signal,
@@ -130,9 +140,9 @@ export default function ScrapingModal({ onClose, onScrapingDone }: ScrapingModal
         return;
       }
 
-      const reader  = response.body.getReader();
+      const reader = response.body.getReader();
       const decoder = new TextDecoder();
-      let buffer    = "";
+      let buffer = "";
 
       outer: while (true) {
         const { done, value } = await reader.read();
@@ -143,22 +153,23 @@ export default function ScrapingModal({ onClose, onScrapingDone }: ScrapingModal
         let newlineIndex: number;
         while ((newlineIndex = buffer.indexOf("\n")) !== -1) {
           const line = buffer.slice(0, newlineIndex);
-          buffer     = buffer.slice(newlineIndex + 1);
+          buffer = buffer.slice(newlineIndex + 1);
 
           if (!line.startsWith("data: ")) continue;
 
           try {
-            const json = JSON.parse(line.slice(6)) as { type: string; message: string };
-
+            const json = JSON.parse(line.slice(6)) as {
+              type: string;
+              message: string;
+            };
             if (json.type === "done") {
               await runMLClassification();
               break outer;
             }
-
             if (json.type !== "connected" && json.type !== "ping") {
               appendLog(json.type as LogType, json.message);
             }
-          } catch {  }
+          } catch {}
         }
       }
     } catch (err) {
@@ -182,12 +193,31 @@ export default function ScrapingModal({ onClose, onScrapingDone }: ScrapingModal
       <ModalOverlay onClick={!isRunning ? handleClose : undefined} />
 
       <div className="relative w-full max-w-md bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-2xl flex flex-col overflow-hidden">
-        <ModalHeader
-          title="Scraping Data Baru"
-          subtitle="Scraping dan klasifikasi Random Forest secara otomatis"
-          onClose={handleClose}
-          closeDisabled={isRunning}
-        />
+        {/* Header */}
+        <div className="px-6 pt-6 pb-2 flex items-start justify-between gap-3">
+          <div>
+            <h2 className="text-lg font-semibold text-zinc-900 dark:text-white">
+              Scraping Data Baru
+            </h2>
+            <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-0.5">
+              Scraping dan klasifikasi Random Forest secara otomatis
+            </p>
+          </div>
+          <button
+            onClick={handleClose}
+            disabled={isRunning}
+            className="shrink-0 mt-0.5 h-8 w-8 flex items-center justify-center rounded-lg text-zinc-400 hover:text-zinc-600 hover:bg-zinc-100 dark:hover:bg-zinc-800 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+          >
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+              <path
+                d="M1 1l12 12M13 1L1 13"
+                stroke="currentColor"
+                strokeWidth="1.8"
+                strokeLinecap="round"
+              />
+            </svg>
+          </button>
+        </div>
 
         <div className="px-6 py-5 flex flex-col gap-4">
           <div>
@@ -217,7 +247,7 @@ export default function ScrapingModal({ onClose, onScrapingDone }: ScrapingModal
           <div>
             <label className={LABEL_CLS}>
               Jumlah Data
-              <span className="ml-1.5 font-normal normal-case tracking-normal text-zinc-300 dark:text-zinc-700">
+              <span className="ml-1.5 text-sm font-normal text-zinc-400 dark:text-zinc-600">
                 opsional
               </span>
             </label>
@@ -235,7 +265,7 @@ export default function ScrapingModal({ onClose, onScrapingDone }: ScrapingModal
           {isDone ? (
             <button
               onClick={handleClose}
-              className="w-full h-10 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-[13px] font-semibold transition-colors"
+              className="w-full h-10 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold transition-colors"
             >
               Selesai, Tutup
             </button>
@@ -243,15 +273,16 @@ export default function ScrapingModal({ onClose, onScrapingDone }: ScrapingModal
             <button
               onClick={handleScrape}
               disabled={isRunning || !location.trim() || !category.trim()}
-              className="w-full h-10 rounded-lg bg-zinc-900 dark:bg-white hover:bg-zinc-700 dark:hover:bg-zinc-100 disabled:opacity-40 disabled:cursor-not-allowed text-white dark:text-zinc-900 text-[13px] font-semibold transition-colors"
+              className="w-full h-10 rounded-lg bg-primary hover:bg-blue-700 dark:bg-white dark:text-black disabled:opacity-40 disabled:cursor-not-allowed text-white text-sm font-semibold transition-colors"
             >
               {isRunning ? "Memproses..." : "Mulai Scraping"}
             </button>
           )}
         </div>
 
-        <div className="px-6 pb-5 flex flex-col gap-2">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.15em] text-zinc-400 dark:text-zinc-600">
+        {/* Log section */}
+        <div className="px-6 pb-6 flex flex-col gap-2">
+          <p className="text-xs font-semibold text-zinc-500 dark:text-zinc-400">
             Log Aktivitas
           </p>
 
@@ -260,17 +291,21 @@ export default function ScrapingModal({ onClose, onScrapingDone }: ScrapingModal
             className="h-36 bg-zinc-950 dark:bg-black rounded-xl p-3 overflow-y-auto flex flex-col gap-0.5 border border-zinc-800"
           >
             {logs.length === 0 ? (
-              <p className="text-[11px] text-zinc-600 font-light">
+              <p className="text-xs text-zinc-600">
                 Menunggu scraping dimulai...
               </p>
             ) : (
               logs.map((entry) => (
                 <div key={entry.id} className="flex items-start gap-2">
-                  <div className={`mt-1.5 shrink-0 w-1.5 h-1.5 rounded-full ${LOG_DOT[entry.type]}`} />
+                  <div
+                    className={`mt-1.5 shrink-0 w-1.5 h-1.5 rounded-full ${LOG_DOT[entry.type]}`}
+                  />
                   <span className="text-[10px] text-zinc-600 shrink-0 tabular-nums font-mono w-16">
                     {entry.time}
                   </span>
-                  <span className={`text-[11px] leading-relaxed ${LOG_TEXT[entry.type]}`}>
+                  <span
+                    className={`text-xs leading-relaxed ${LOG_TEXT[entry.type]}`}
+                  >
                     {entry.message}
                   </span>
                 </div>

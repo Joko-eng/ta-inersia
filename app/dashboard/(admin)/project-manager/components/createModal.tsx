@@ -1,14 +1,11 @@
 "use client";
 
+import { BottomSheetHandle, ModalOverlay } from "@/components/ui/props";
 import { useState } from "react";
 import { createProjectManager } from "../projectManagerAction";
-import {
-  BottomSheetHandle,
-  ModalOverlay,
-} from "@/components/ui/props";
 
 interface Props {
-  onClose:   () => void;
+  onClose: () => void;
   onCreated: () => void;
 }
 
@@ -18,17 +15,20 @@ const INPUT_CLS =
 const LABEL_CLS =
   "block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1.5";
 
-export default function CreateProjectManagerModal({ onClose, onCreated }: Props) {
-  const [name,     setName]     = useState("");
-  const [email,    setEmail]    = useState("");
+export default function CreateProjectManagerModal({
+  onClose,
+  onCreated,
+}: Props) {
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [saving,   setSaving]   = useState(false);
-  const [error,    setError]    = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const canSave =
-    name.trim().length > 0     &&
-    email.trim().length > 0    &&
+    name.trim().length > 0 &&
+    email.trim().length > 0 &&
     username.trim().length > 0 &&
     password.length >= 8;
 
@@ -38,8 +38,8 @@ export default function CreateProjectManagerModal({ onClose, onCreated }: Props)
     setError(null);
 
     const result = await createProjectManager({
-      name:     name.trim(),
-      email:    email.trim(),
+      name: name.trim(),
+      email: email.trim(),
       username: username.trim(),
       password,
     });
@@ -133,7 +133,7 @@ export default function CreateProjectManagerModal({ onClose, onCreated }: Props)
           <button
             onClick={handleSave}
             disabled={saving || !canSave}
-            className="h-9 px-5 text-sm font-semibold rounded-lg bg-blue-600 hover:bg-blue-700 text-white disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            className="h-9 px-5 text-sm font-semibold rounded-lg bg-primary hover:bg-blue-700 dark:bg-white dark:text-black disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
           >
             {saving ? "Menyimpan..." : "Simpan"}
           </button>

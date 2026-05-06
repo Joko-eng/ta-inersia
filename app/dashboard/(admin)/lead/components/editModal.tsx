@@ -1,23 +1,26 @@
 "use client";
 
-import { useState } from "react";
-import { ExternalLink } from "lucide-react";
-import { LeadData, LEAD_STATUSES } from "@/types/ILead";
-import { updateLead } from "../leadAction";
 import {
   BottomSheetHandle,
   ConfirmDialog,
-  INPUT_CLS,
-  LABEL_CLS,
-  ModalHeader,
   ModalOverlay,
 } from "@/components/ui/props";
+import { LEAD_STATUSES, LeadData } from "@/types/ILead";
+import { ExternalLink } from "lucide-react";
+import { useState } from "react";
+import { updateLead } from "../leadAction";
 
 interface EditModalProps {
   lead: LeadData;
   onClose: () => void;
   onSaved: () => void;
 }
+
+const INPUT_CLS =
+  "w-full h-10 px-3 text-sm rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 dark:placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition";
+
+const LABEL_CLS =
+  "block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1.5";
 
 export default function EditModal({ lead, onClose, onSaved }: EditModalProps) {
   const [form, setForm] = useState<LeadData>({ ...lead });
@@ -78,15 +81,19 @@ export default function EditModal({ lead, onClose, onSaved }: EditModalProps) {
       <div className="relative w-full sm:max-w-sm bg-white dark:bg-zinc-900 sm:rounded-2xl rounded-t-2xl border border-zinc-200 dark:border-zinc-800 shadow-2xl flex flex-col max-h-[92vh] overflow-hidden">
         <BottomSheetHandle />
 
-        <ModalHeader
-          title="Edit Lead"
-          subtitle={lead.nama}
-          onClose={handleClose}
-        />
+        {/* Header */}
+        <div className="px-6 pt-6 pb-2">
+          <h2 className="text-lg font-semibold text-zinc-900 dark:text-white">
+            Edit Lead
+          </h2>
+          <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-0.5 truncate">
+            {lead.nama}
+          </p>
+        </div>
 
         <div className="px-6 py-5 flex flex-col gap-4 overflow-y-auto">
           {error && (
-            <p className="text-[12px] text-rose-500 bg-rose-50 dark:bg-rose-950/30 px-3 py-2 rounded-lg">
+            <p className="text-sm text-rose-500 bg-rose-50 dark:bg-rose-950/30 px-3 py-2 rounded-lg">
               {error}
             </p>
           )}
@@ -163,9 +170,9 @@ export default function EditModal({ lead, onClose, onSaved }: EditModalProps) {
                   href={form.mapsUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="shrink-0 h-9 px-3 flex items-center gap-1.5 text-[12px] font-medium rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors"
+                  className="shrink-0 h-10 px-3 flex items-center gap-1.5 text-sm font-medium rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors"
                 >
-                  <ExternalLink size={12} />
+                  <ExternalLink size={13} />
                   Buka
                 </a>
               )}
@@ -191,12 +198,12 @@ export default function EditModal({ lead, onClose, onSaved }: EditModalProps) {
             <label className={LABEL_CLS}>
               Keterangan
               {!isTidakProspek && (
-                <span className="ml-1.5 font-normal normal-case tracking-normal text-zinc-300 dark:text-zinc-700">
+                <span className="ml-1.5 text-sm font-normal text-zinc-400 dark:text-zinc-600">
                   opsional
                 </span>
               )}
               {isTidakProspek && (
-                <span className="ml-1 font-normal normal-case tracking-normal text-rose-400">
+                <span className="ml-1.5 text-sm font-normal text-rose-400">
                   wajib diisi
                 </span>
               )}
@@ -210,14 +217,14 @@ export default function EditModal({ lead, onClose, onSaved }: EditModalProps) {
                   ? "Jelaskan alasan tidak prospek..."
                   : "Catatan tambahan..."
               }
-              className={`w-full px-3 py-2.5 text-[13px] rounded-lg border bg-white dark:bg-zinc-800 text-zinc-800 dark:text-zinc-100 placeholder-zinc-300 dark:placeholder-zinc-600 focus:outline-none transition-colors resize-none ${
+              className={`w-full px-3 py-2.5 text-sm rounded-lg border bg-white dark:bg-zinc-800 text-zinc-800 dark:text-zinc-100 placeholder:text-zinc-400 dark:placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors resize-none ${
                 keteranganMissing
-                  ? "border-rose-300 dark:border-rose-800 focus:border-rose-400"
-                  : "border-zinc-200 dark:border-zinc-700 focus:border-zinc-400 dark:focus:border-zinc-500"
+                  ? "border-rose-300 dark:border-rose-800"
+                  : "border-zinc-300 dark:border-zinc-700"
               }`}
             />
             {keteranganMissing && (
-              <p className="text-[11px] text-rose-500 mt-1.5">
+              <p className="text-xs text-rose-500 mt-1.5">
                 Keterangan wajib diisi untuk status Tidak Prospek.
               </p>
             )}
@@ -227,14 +234,14 @@ export default function EditModal({ lead, onClose, onSaved }: EditModalProps) {
         <div className="px-6 py-4 border-t border-zinc-100 dark:border-zinc-800 flex justify-end gap-2 shrink-0">
           <button
             onClick={handleClose}
-            className="h-9 px-5 text-[13px] font-medium rounded-lg border border-zinc-200 dark:border-zinc-700 text-zinc-500 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors"
+            className="h-9 px-5 text-sm font-medium rounded-lg border border-zinc-300 dark:border-zinc-700 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors"
           >
             Batal
           </button>
           <button
             onClick={handleSave}
             disabled={saving || !canSave}
-            className="h-9 px-5 text-[13px] font-semibold rounded-lg bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 hover:bg-zinc-700 dark:hover:bg-zinc-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            className="h-9 px-5 text-sm font-semibold rounded-lg bg-blue-600 hover:bg-blue-700 text-white disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
           >
             {saving ? "Menyimpan..." : "Simpan"}
           </button>
