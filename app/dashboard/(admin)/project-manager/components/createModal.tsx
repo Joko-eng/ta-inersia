@@ -133,7 +133,7 @@ export default function CreateProjectManagerModal({
           <button
             onClick={handleSave}
             disabled={saving || !canSave}
-            className="h-9 px-5 text-sm font-semibold rounded-lg bg-primary hover:bg-blue-700 dark:bg-white dark:text-black disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            className="h-9 px-5 text-sm font-semibold rounded-lg bg-primary text-white hover:bg-blue-700 dark:bg-white dark:text-black disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
           >
             {saving ? "Menyimpan..." : "Simpan"}
           </button>

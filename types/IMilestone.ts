@@ -23,3 +23,8 @@ export const formatTanggalID = (date?: string) => {
     year: "numeric",
   });
 };
+
+export interface MilestoneTim {
+  id: string;
+  title: string;
+}

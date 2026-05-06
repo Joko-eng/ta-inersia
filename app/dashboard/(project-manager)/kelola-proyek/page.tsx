@@ -1,17 +1,16 @@
-import { connectDB } from "@/lib/mongodb";
-import Project from "@/models/Project";
+import { getSession } from "@/lib/auth";
+import { dbGetProjectsByManager } from "@/lib/services/projectAdminService";
+import { redirect } from "next/navigation";
 import ProjectList from "./components/ProjectList";
 
 export default async function Page() {
-  await connectDB();
+  const session = await getSession();
 
-  const raw = await Project.find({ isArchived: false }).lean();
+  if (!session?.user) {
+    redirect("/login");
+  }
 
-  const projects = raw.map((p: any) => ({
-    _id: p._id.toString(),
-    name: p.name,
-    createdAt: p.createdAt.toISOString(),
-  }));
+  const projects = await dbGetProjectsByManager((session.user as any).id);
 
   return <ProjectList projects={projects} />;
 }

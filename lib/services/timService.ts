@@ -1,9 +1,9 @@
 import { connectDB } from "@/lib/mongodb";
 import Milestone from "@/models/Milestone";
 import Project from "@/models/Project";
-import Task from "@/models/Task";
+import TaskModel from "@/models/Task";
 import "@/models/TeamMember";
-import { Milestone as MilestoneDTO } from "@/types/IMilestone";
+import { MilestoneTim } from "@/types/IMilestone";
 import { Task as TaskDTO } from "@/types/ITask";
 
 export async function getSharePageData(id: string) {
@@ -15,7 +15,7 @@ export async function getSharePageData(id: string) {
   const milestones = await Milestone.find({ projectId: id }).lean();
   const milestoneIds = milestones.map((m: any) => m._id);
 
-  const tasks = await Task.find({ milestoneId: { $in: milestoneIds } })
+  const tasks = await TaskModel.find({ milestoneId: { $in: milestoneIds } })
     .populate({
       path: "assignee",
       populate: { path: "userId", select: "name" },
@@ -36,7 +36,7 @@ export async function getSharePageData(id: string) {
       : undefined,
   }));
 
-  const mappedMilestones: MilestoneDTO[] = milestones.map((m: any) => ({
+  const mappedMilestones: MilestoneTim[] = milestones.map((m: any) => ({
     id: m._id.toString(),
     title: m.name,
   }));

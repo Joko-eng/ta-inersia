@@ -7,7 +7,7 @@ import { toast } from "sonner";
 import { archiveProject } from "../actions";
 
 type Project = {
-  _id: string;
+  id: string;
   name: string;
   createdAt: string;
 };
@@ -37,7 +37,7 @@ export default function ProjectList({ projects }: { projects: Project[] }) {
 
         {projects.map((p) => (
           <div
-            key={p._id}
+            key={p.id}
             className="grid grid-cols-12 items-center px-8 py-5 text-sm border-b last:border-b-0 hover:bg-zinc-50 dark:hover:bg-zinc-800/40 transition"
           >
             <div className="col-span-5 font-medium text-zinc-800 dark:text-zinc-100">
@@ -52,13 +52,13 @@ export default function ProjectList({ projects }: { projects: Project[] }) {
             </div>
             <div className="col-span-4 flex justify-end gap-3">
               <Link
-                href={`proyek/${p._id}`}
+                href={`proyek/${p.id}`}
                 className="px-4 py-1.5 text-xs font-semibold rounded-md bg-primary dark:bg-white text-primary-foreground hover:opacity-90 transition"
               >
                 Detail
               </Link>
               <button
-                onClick={() => setArchiveTarget(p._id)}
+                onClick={() => setArchiveTarget(p.id)}
                 className="px-4 py-1.5 text-xs font-semibold rounded-md border border-zinc-300 text-zinc-600 hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800 transition"
               >
                 Arsipkan

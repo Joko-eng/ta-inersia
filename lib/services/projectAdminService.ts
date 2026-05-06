@@ -1,13 +1,18 @@
 import { connectDB } from "@/lib/mongodb";
 import Project from "@/models/Project";
 import { ProjectData } from "@/types/IProject";
-import { CreateProjectInput, UpdateProjectInput } from "@/validators/projectValidator";
+import {
+  CreateProjectInput,
+  UpdateProjectInput,
+} from "@/validators/projectValidator";
 
-const RANDOM_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+const RANDOM_CHARS =
+  "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 
 function generateRandomString(length: number): string {
-  return Array.from({ length }, () =>
-    RANDOM_CHARS[Math.floor(Math.random() * RANDOM_CHARS.length)]
+  return Array.from(
+    { length },
+    () => RANDOM_CHARS[Math.floor(Math.random() * RANDOM_CHARS.length)],
   ).join("");
 }
 
@@ -32,8 +37,8 @@ async function generateTrackerCode(): Promise<string> {
     if (!isNaN(lastNum)) nextNumber = lastNum + 1;
   }
 
-  const order  = String(nextNumber).padStart(4, "0");
-  const date   = getDateStamp();
+  const order = String(nextNumber).padStart(4, "0");
+  const date = getDateStamp();
   const random = generateRandomString(8);
 
   return `${order}-${date}-${random}`;
@@ -41,16 +46,16 @@ async function generateTrackerCode(): Promise<string> {
 
 function toProjectData(item: any): ProjectData {
   return {
-    id:                 item._id.toString(),
-    name:               item.name ?? "",
-    trackerCode:        item.trackerCode ?? "",
-    projectManagerId:   item.projectManagerId?._id?.toString() ?? "",
+    id: item._id.toString(),
+    name: item.name ?? "",
+    trackerCode: item.trackerCode ?? "",
+    projectManagerId: item.projectManagerId?._id?.toString() ?? "",
     projectManagerName: item.projectManagerId?.name ?? "",
-    clientName:         item.clientName ?? "",
-    clientPhone:        item.clientPhone ?? "",
-    clientBusiness:     item.clientBusiness ?? "",
-    isArchived:         item.isArchived ?? false,
-    createdAt:          item.createdAt?.toISOString() ?? "",
+    clientName: item.clientName ?? "",
+    clientPhone: item.clientPhone ?? "",
+    clientBusiness: item.clientBusiness ?? "",
+    isArchived: item.isArchived ?? false,
+    createdAt: item.createdAt?.toISOString() ?? "",
   };
 }
 
@@ -77,12 +82,16 @@ export async function dbCreateProject(
 }
 
 export async function dbUpdateProject(
-  id:      string,
+  id: string,
   payload: UpdateProjectInput,
 ): Promise<{ ok: boolean; error?: string }> {
   try {
     await connectDB();
-    const result = await Project.findByIdAndUpdate(id, { $set: payload }, { new: true });
+    const result = await Project.findByIdAndUpdate(
+      id,
+      { $set: payload },
+      { new: true },
+    );
     if (!result) return { ok: false, error: "Project tidak ditemukan." };
     return { ok: true };
   } catch {
@@ -101,4 +110,18 @@ export async function dbDeleteProject(
   } catch {
     return { ok: false, error: "Gagal menghapus project." };
   }
+}
+
+export async function dbGetProjectsByManager(
+  managerId: string,
+): Promise<ProjectData[]> {
+  await connectDB();
+  const projects = await Project.find({
+    isArchived: false,
+    projectManagerId: managerId, 
+  })
+    .sort({ createdAt: -1 })
+    .populate("projectManagerId", "name")
+    .lean();
+  return projects.map(toProjectData);
 }

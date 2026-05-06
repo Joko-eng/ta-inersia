@@ -4,7 +4,7 @@ export interface Task {
   description?: string;
   milestoneId: string;
   assigneeName: string | null;
-  assignee: {
+  assignee?: {
     id: string;
     name: string;
     division: string;

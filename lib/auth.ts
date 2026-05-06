@@ -1,4 +1,3 @@
-// lib/auth.ts
 import { connectDB } from "@/lib/mongodb";
 import User from "@/models/User";
 import { AuthOptions, getServerSession } from "next-auth";
