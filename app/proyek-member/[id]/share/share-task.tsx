@@ -1,7 +1,7 @@
 "use client";
 
 import ProjectSidebar from "@/components/layout/sidebar-member";
-import { Milestone } from "@/types/IMilestone";
+import { MilestoneTim } from "@/types/IMilestone";
 import { Task } from "@/types/ITask";
 import { KanbanSquare } from "lucide-react";
 
@@ -37,7 +37,7 @@ export default function ShareTaskView({
 }: {
   projectName: string;
   tasks: Task[];
-  milestones: Milestone[];
+  milestones: MilestoneTim[];
 }) {
   return (
     <div className="flex h-screen bg-background">
