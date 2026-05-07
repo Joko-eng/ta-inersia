@@ -22,7 +22,7 @@ export default function ProjectPage() {
         </div>
       </div>
 
-      <div className="flex-1 min-h-0 flex flex-col overflow-hidden px-5 sm:px-8 lg:px-10 pt-5">
+      <div className="flex-1 min-h-0 flex flex-col overflow-hidden px-5 sm:px-8 lg:px-10 py-5">
         <Suspense fallback={<ProjectTableSkeleton />}>
           <ProjectTableServer />
         </Suspense>
