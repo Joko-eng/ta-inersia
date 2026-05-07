@@ -1,9 +1,8 @@
 import { connectDB } from "../lib/mongodb";
 import User from "../models/User";
-import bcrypt from "bcryptjs";
 
-const email    = process.env.SEED_ADMIN_EMAIL    ?? "admin@inersia.com";
-const username = process.env.SEED_ADMIN_USERNAME ?? "admin";
+const email    = process.env.SEED_ADMIN_EMAIL;
+const username = process.env.SEED_ADMIN_USERNAME;
 const password = process.env.SEED_ADMIN_PASSWORD;
 
 async function seed() {
@@ -19,19 +18,17 @@ async function seed() {
     process.exit(0);
   }
 
-  const hashed = await bcrypt.hash(password, 12);
-
   await User.create({
     name:     "Admin",
     email,
     username,
-    password: hashed,
+    password,
     role:     "admin",
   });
 
   process.exit(0);
 }
 
-seed().catch((err) => {
+seed().catch(() => {
   process.exit(1);
 });
