@@ -1,11 +1,9 @@
 import NavbarMonitoring from "@/components/Navbar-Monitoring";
 import TrackingForm from "./TrackingForm";
-
 export default function Page() {
   return (
     <>
       <NavbarMonitoring />
-
       <div className="min-h-screen bg-white dark:bg-neutral-950 relative overflow-hidden">
         <div className="absolute top-0 left-0 right-0 h-1" />
 
@@ -28,7 +26,7 @@ export default function Page() {
         />
 
         <div className="relative z-10 max-w-4xl mx-auto px-6 py-20">
-          <div className="text-center mb-10">
+          <div className="text-center mb-10 pt-8">
             <div className="inline-flex items-center gap-2 bg-primary/10 dark:bg-primary/20 border border-primary/20 dark:border-white/30 rounded-full px-4 py-1.5 mb-6">
               <span className="w-1.5 h-1.5 rounded-full bg-primary dark:bg-white" />
               <span className="text-primary dark:text-white text-xs font-semibold tracking-wide">

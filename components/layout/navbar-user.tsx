@@ -1,5 +1,4 @@
 "use client";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -8,7 +7,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { LogOut, User } from "lucide-react";
+import { CircleUser, LogOut, User } from "lucide-react";
 import { signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
 
@@ -22,11 +21,10 @@ export function NavbarUserMenu({ name, role }: NavbarUserMenuProps) {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger className="flex items-center gap-3 outline-none cursor-pointer">
-        <Avatar>
-          <AvatarImage src="/avatar.png" />
-          <AvatarFallback>{name.charAt(0)}</AvatarFallback>
-        </Avatar>
+      <DropdownMenuTrigger className="flex items-center gap-5 outline-none cursor-pointer">
+        <div className="flex items-center justify-center rounded-full bg-muted p-1">
+          <CircleUser className="h-6 w-6 text-muted-foreground" />
+        </div>
         <div className="leading-tight text-sm">
           <p className="font-medium">{name}</p>
           <p className="text-muted-foreground capitalize">

@@ -10,7 +10,7 @@ async function LeadTableServer() {
 
 export default function LeadGenerationPage() {
   return (
-    <div className="flex flex-col h-full min-h-0 overflow-hidden bg-white dark:bg-zinc-900">
+    <div className="flex flex-col h-full min-h-0 overflow-hidden bg-white dark:bg-black">
       <div className="shrink-0 flex items-end justify-between px-5 sm:px-8 lg:px-10 pt-5 border-zinc-200 dark:border-zinc-800">
         <div>
           <p className="text-xs font-medium uppercase text-zinc-400 dark:text-zinc-500 mb-1">

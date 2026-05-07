@@ -1,12 +1,22 @@
 "use client";
 
+import { useClickOutside } from "@/components/ui/props";
 import { ProjectManagerData } from "@/types/IProjectManager";
-import { PencilLine, Plus, Trash } from "lucide-react";
+import {
+  ChevronDown,
+  ChevronLeft,
+  ChevronRight,
+  PencilLine,
+  Plus,
+  Trash,
+} from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useCallback, useState, useTransition } from "react";
+import { useCallback, useRef, useState, useTransition } from "react";
 import CreateProjectManagerModal from "./createModal";
 import DeleteProjectManagerModal from "./deleteModal";
 import EditProjectManagerModal from "./editModal";
+
+const PER_PAGE_OPTIONS = [5, 8, 10, 15];
 
 const TABLE_COLUMNS = [
   { label: "No", align: "text-center", w: "w-12" },
@@ -110,6 +120,120 @@ function EmptyState({ colSpan }: { colSpan?: number }) {
   return <div className="flex-1 flex items-center justify-center">{text}</div>;
 }
 
+function PerPageDropdown({
+  value,
+  onChange,
+}: {
+  value: number;
+  onChange: (v: number) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+  useClickOutside(ref, () => setOpen(false));
+
+  return (
+    <div ref={ref} className="relative">
+      <button
+        onClick={() => setOpen((o) => !o)}
+        className="h-9 px-3.5 flex items-center gap-2 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-sm text-zinc-600 dark:text-zinc-300 hover:border-zinc-400 dark:hover:border-zinc-600 transition-colors"
+      >
+        <span className="text-xs font-medium text-zinc-500 dark:text-zinc-500">
+          Tampilkan
+        </span>
+        <span className="font-semibold text-zinc-800 dark:text-zinc-100">
+          {value}
+        </span>
+        <ChevronDown
+          size={12}
+          className={`text-zinc-400 dark:text-zinc-600 transition-transform duration-150 ${open ? "rotate-180" : ""}`}
+        />
+      </button>
+
+      {open && (
+        <div className="absolute top-full left-0 mt-1 w-32 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 shadow-lg z-50 overflow-hidden py-1">
+          {PER_PAGE_OPTIONS.map((opt) => (
+            <button
+              key={opt}
+              onClick={() => {
+                onChange(opt);
+                setOpen(false);
+              }}
+              className={`w-full px-4 py-2 text-left text-sm transition-colors ${
+                opt === value
+                  ? "font-semibold text-zinc-900 dark:text-white bg-zinc-50 dark:bg-zinc-800"
+                  : "text-zinc-500 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-800/60"
+              }`}
+            >
+              {opt}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function PaginationBar({
+  currentPage,
+  totalPages,
+  pageNumbers,
+  filteredCount,
+  perPage,
+  goTo,
+}: {
+  currentPage: number;
+  totalPages: number;
+  pageNumbers: number[];
+  filteredCount: number;
+  perPage: number;
+  goTo: (p: number) => void;
+}) {
+  const rangeStart = (currentPage - 1) * perPage + 1;
+  const rangeEnd = Math.min(currentPage * perPage, filteredCount);
+
+  return (
+    <div className="shrink-0 border-t border-zinc-200 dark:border-zinc-800 px-4 sm:px-5 py-3 flex items-center justify-between gap-3 bg-white dark:bg-zinc-900">
+      <span className="text-sm text-zinc-500 dark:text-zinc-500 shrink-0">
+        {filteredCount === 0
+          ? "Tidak ada data"
+          : `${rangeStart}–${rangeEnd} dari ${filteredCount}`}
+      </span>
+
+      <div className="flex items-center gap-1 flex-wrap justify-end">
+        <button
+          onClick={() => goTo(currentPage - 1)}
+          disabled={currentPage === 1}
+          className="h-8 w-8 flex items-center justify-center rounded-lg border border-zinc-300 dark:border-zinc-700 text-zinc-500 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-800 disabled:opacity-25 disabled:cursor-not-allowed transition-colors"
+        >
+          <ChevronLeft size={14} />
+        </button>
+
+        {pageNumbers.map((page) => (
+          <button
+            key={page}
+            onClick={() => goTo(page)}
+            className={`h-8 min-w-[32px] px-2 rounded-lg text-sm font-medium transition-colors ${
+              page === currentPage
+                ? "bg-primary text-white dark:bg-white dark:text-black border-transparent"
+                : "border border-zinc-300 dark:border-zinc-700 text-zinc-500 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-800"
+            }`}
+          >
+            {page}
+          </button>
+        ))}
+
+        <button
+          onClick={() => goTo(currentPage + 1)}
+          disabled={currentPage === totalPages}
+          className="h-8 w-8 flex items-center justify-center rounded-lg border border-zinc-300 dark:border-zinc-700 text-zinc-500 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-800 disabled:opacity-25 disabled:cursor-not-allowed transition-colors"
+        >
+          <ChevronRight size={14} />
+        </button>
+      </div>
+    </div>
+  );
+}
+
 export default function ProjectManagerTable({
   initialManagers,
 }: {
@@ -117,6 +241,9 @@ export default function ProjectManagerTable({
 }) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const [perPage, setPerPage] = useState(5);
 
   const [showCreate, setShowCreate] = useState(false);
   const [editTarget, setEditTarget] = useState<ProjectManagerData | null>(null);
@@ -128,6 +255,51 @@ export default function ProjectManagerTable({
     () => startTransition(() => router.refresh()),
     [router],
   );
+
+  const totalPages = Math.max(1, Math.ceil(initialManagers.length / perPage));
+  const paginated = initialManagers.slice(
+    (currentPage - 1) * perPage,
+    currentPage * perPage,
+  );
+
+  const goTo = (p: number) => {
+    if (p >= 1 && p <= totalPages) setCurrentPage(p);
+  };
+
+  const handlePerPageChange = (val: number) => {
+    setPerPage(val);
+    setCurrentPage(1);
+  };
+
+  const pageNumbers = (() => {
+    if (totalPages <= 5)
+      return Array.from({ length: totalPages }, (_, i) => i + 1);
+    if (currentPage <= 3) return [1, 2, 3, 4, 5];
+    if (currentPage >= totalPages - 2)
+      return [
+        totalPages - 4,
+        totalPages - 3,
+        totalPages - 2,
+        totalPages - 1,
+        totalPages,
+      ];
+    return [
+      currentPage - 2,
+      currentPage - 1,
+      currentPage,
+      currentPage + 1,
+      currentPage + 2,
+    ];
+  })();
+
+  const paginationProps = {
+    currentPage,
+    totalPages,
+    pageNumbers,
+    filteredCount: initialManagers.length,
+    perPage,
+    goTo,
+  };
 
   return (
     <div
@@ -167,10 +339,14 @@ export default function ProjectManagerTable({
         />
       )}
 
+      {/* Toolbar */}
       <div className="flex items-center justify-between gap-3 shrink-0">
-        <span className="text-sm text-zinc-500  dark:text-zinc-400">
-          {initialManagers.length} Project Manager
-        </span>
+        <div className="flex items-center gap-3">
+          <PerPageDropdown value={perPage} onChange={handlePerPageChange} />
+          <span className="hidden sm:inline text-sm text-zinc-500 dark:text-zinc-400">
+            {initialManagers.length} Project Manager
+          </span>
+        </div>
         <button
           onClick={() => setShowCreate(true)}
           className="flex items-center justify-center gap-2 h-9 px-5 text-sm font-semibold rounded-lg bg-primary hover:bg-blue-700 text-white dark:bg-white dark:text-black dark:hover:bg-zinc-200 transition-colors"
@@ -183,22 +359,24 @@ export default function ProjectManagerTable({
       {/* Mobile cards */}
       <div className="lg:hidden flex-1 min-h-0 flex flex-col overflow-hidden rounded-xl border border-zinc-200 dark:border-zinc-800">
         <div className="flex-1 min-h-0 overflow-y-auto p-3 sm:p-4 flex flex-col gap-3 bg-zinc-50 dark:bg-zinc-950">
-          {initialManagers.length === 0 ? (
+          {paginated.length === 0 ? (
             <EmptyState />
           ) : (
-            initialManagers.map((item, idx) => (
+            paginated.map((item, idx) => (
               <MobileCard
                 key={item.id}
                 item={item}
-                index={idx + 1}
+                index={(currentPage - 1) * perPage + idx + 1}
                 onEdit={() => setEditTarget(item)}
                 onDelete={() => setDeleteTarget(item)}
               />
             ))
           )}
         </div>
+        <PaginationBar {...paginationProps} />
       </div>
 
+      {/* Desktop table */}
       <div className="hidden lg:flex flex-1 min-h-0 flex-col rounded-xl border border-zinc-200 dark:border-zinc-800 overflow-hidden bg-white dark:bg-zinc-900">
         <div className="flex-1 min-h-0 overflow-auto">
           <table
@@ -219,16 +397,16 @@ export default function ProjectManagerTable({
             </thead>
 
             <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800">
-              {initialManagers.length === 0 ? (
+              {paginated.length === 0 ? (
                 <EmptyState colSpan={TABLE_COLUMNS.length} />
               ) : (
-                initialManagers.map((item, idx) => (
+                paginated.map((item, idx) => (
                   <tr
                     key={item.id}
                     className="hover:bg-zinc-50 dark:hover:bg-zinc-800/40 transition-colors duration-75"
                   >
                     <td className="py-4 px-5 text-center text-sm text-zinc-500 dark:text-zinc-500 tabular-nums">
-                      {idx + 1}
+                      {(currentPage - 1) * perPage + idx + 1}
                     </td>
 
                     <td className="py-4 px-5 text-sm font-semibold text-zinc-800 dark:text-zinc-100">
@@ -260,6 +438,7 @@ export default function ProjectManagerTable({
             </tbody>
           </table>
         </div>
+        <PaginationBar {...paginationProps} />
       </div>
     </div>
   );

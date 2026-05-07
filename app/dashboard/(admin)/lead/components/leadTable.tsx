@@ -515,14 +515,13 @@ export default function LeadTable({
           <FilterDropdown value={statusFilter} onChange={handleFilterChange} />
           <button
             onClick={() => setShowScrapModal(true)}
-            className="h-9 px-5 text-sm font-semibold rounded-lg bg-primary text-white hover:bg-blue-700 dark:bg-white dark:text-black transition-colors"
+            className="h-9 px-3 sm:px-5 text-xs sm:text-sm font-semibold rounded-lg bg-primary text-white hover:bg-blue-700 dark:bg-white dark:text-black transition-colors whitespace-nowrap"
           >
             Tambah Data
           </button>
         </div>
       </div>
 
-      {/* Mobile cards */}
       <div className="lg:hidden flex-1 min-h-0 flex flex-col overflow-hidden rounded-xl border border-zinc-200 dark:border-zinc-800">
         <div className="flex-1 min-h-0 overflow-y-auto p-3 sm:p-4 flex flex-col gap-3 bg-zinc-50 dark:bg-zinc-950">
           {paginated.length === 0 ? (
@@ -542,7 +541,6 @@ export default function LeadTable({
         <PaginationBar {...paginationProps} />
       </div>
 
-      {/* Desktop table */}
       <div className="hidden lg:flex flex-1 min-h-0 flex-col rounded-xl border border-zinc-200 dark:border-zinc-800 overflow-hidden bg-white dark:bg-zinc-900">
         <div className="flex-1 min-h-0 overflow-auto">
           <table
