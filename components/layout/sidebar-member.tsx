@@ -1,5 +1,6 @@
 "use client";
 
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { KanbanSquare } from "lucide-react";
 import Image from "next/image";
 
@@ -20,7 +21,7 @@ export default function ProjectSidebar({
         />
         <div>
           <p className="text-sm font-semibold leading-none">
-            Inersia Development Indonesia{" "}
+            Inersia Development Indonesia
           </p>
         </div>
       </div>
@@ -41,6 +42,11 @@ export default function ProjectSidebar({
       </div>
 
       <div className="flex-1" />
+
+      {/* tambahkan ini */}
+      <div className="flex justify-center px-4 pb-2">
+        <ThemeToggle />
+      </div>
 
       <div className="p-4 text-xs text-zinc-400 border-t">
         © {new Date().getFullYear()} InersiaDev
