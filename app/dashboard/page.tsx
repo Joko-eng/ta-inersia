@@ -19,10 +19,10 @@ const stats = [
     ),
     label: "Total Proyek",
     value: "22",
-    color: "amber",
-    gradient: "from-amber-500/10 to-amber-500/0",
-    iconBg: "bg-amber-100",
-    iconText: "text-amber-600",
+    gradient:
+      "from-amber-500/10 to-amber-500/0 dark:from-amber-500/15 dark:to-amber-500/0",
+    iconBg: "bg-amber-100 dark:bg-amber-500/20",
+    iconText: "text-amber-600 dark:text-amber-400",
   },
   {
     icon: (
@@ -40,10 +40,10 @@ const stats = [
     ),
     label: "Total Klien",
     value: "13",
-    color: "pink",
-    gradient: "from-pink-500/10 to-pink-500/0",
-    iconBg: "bg-pink-100",
-    iconText: "text-pink-500",
+    gradient:
+      "from-pink-500/10 to-pink-500/0 dark:from-pink-500/15 dark:to-pink-500/0",
+    iconBg: "bg-pink-100 dark:bg-pink-500/20",
+    iconText: "text-pink-500 dark:text-pink-400",
   },
   {
     icon: (
@@ -63,10 +63,10 @@ const stats = [
     ),
     label: "Total Tim Pengembang",
     value: "5",
-    color: "purple",
-    gradient: "from-purple-500/10 to-purple-500/0",
-    iconBg: "bg-purple-100",
-    iconText: "text-purple-600",
+    gradient:
+      "from-purple-500/10 to-purple-500/0 dark:from-purple-500/15 dark:to-purple-500/0",
+    iconBg: "bg-purple-100 dark:bg-purple-500/20",
+    iconText: "text-purple-600 dark:text-purple-400",
   },
 ];
 
@@ -81,73 +81,96 @@ export default function Page() {
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
 
-    const dpr = window.devicePixelRatio || 1;
-    const rect = canvas.getBoundingClientRect();
-    canvas.width = rect.width * dpr;
-    canvas.height = rect.height * dpr;
-    ctx.scale(dpr, dpr);
+    const draw = () => {
+      const ctx = canvas.getContext("2d");
+      if (!ctx) return;
 
-    const w = rect.width;
-    const h = rect.height;
-    const data = visitorData;
-    const max = Math.max(...data);
-    const min = Math.min(...data);
-    const padX = 16;
-    const padY = 20;
-    const stepX = (w - padX * 2) / (data.length - 1);
+      const dpr = window.devicePixelRatio || 1;
+      const rect = canvas.getBoundingClientRect();
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+      ctx.scale(dpr, dpr);
 
-    const getY = (v: number) =>
-      padY + ((max - v) / (max - min)) * (h - padY * 2);
+      const w = rect.width;
+      const h = rect.height;
+      const data = visitorData;
+      const max = Math.max(...data);
+      const min = Math.min(...data);
+      const padX = 16;
+      const padY = 20;
+      const stepX = (w - padX * 2) / (data.length - 1);
 
-    ctx.beginPath();
-    ctx.strokeStyle = "#d1d5db";
-    ctx.lineWidth = 1.5;
-    data.forEach((v, i) => {
-      const x = padX + i * stepX;
-      const y = getY(v) + 10;
-      i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+      const getY = (v: number) =>
+        padY + ((max - v) / (max - min)) * (h - padY * 2);
+
+      // Detect dark mode
+      const isDark = document.documentElement.classList.contains("dark");
+      const prevLineColor = isDark ? "#3f3f46" : "#d1d5db";
+      const fillStart = isDark
+        ? "rgba(20,184,166,0.2)"
+        : "rgba(20,184,166,0.15)";
+
+      // Draw previous line
+      ctx.beginPath();
+      ctx.strokeStyle = prevLineColor;
+      ctx.lineWidth = 1.5;
+      data.forEach((v, i) => {
+        const x = padX + i * stepX;
+        const y = getY(v) + 10;
+        i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+      });
+      ctx.stroke();
+
+      // Draw current line (teal)
+      ctx.beginPath();
+      ctx.strokeStyle = "#14b8a6";
+      ctx.lineWidth = 2;
+      data.forEach((v, i) => {
+        const x = padX + i * stepX;
+        const y = getY(v);
+        i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+      });
+      ctx.stroke();
+
+      ctx.lineTo(padX + (data.length - 1) * stepX, h - padY);
+      ctx.lineTo(padX, h - padY);
+      ctx.closePath();
+      const gradient = ctx.createLinearGradient(0, padY, 0, h);
+      gradient.addColorStop(0, fillStart);
+      gradient.addColorStop(1, "rgba(20,184,166,0)");
+      ctx.fillStyle = gradient;
+      ctx.fill();
+    };
+
+    draw();
+
+    // Redraw when dark mode changes
+    const observer = new MutationObserver(draw);
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class"],
     });
-    ctx.stroke();
 
-    // Draw current line (teal)
-    ctx.beginPath();
-    ctx.strokeStyle = "#14b8a6";
-    ctx.lineWidth = 2;
-    data.forEach((v, i) => {
-      const x = padX + i * stepX;
-      const y = getY(v);
-      i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
-    });
-    ctx.stroke();
-
-    ctx.lineTo(padX + (data.length - 1) * stepX, h - padY);
-    ctx.lineTo(padX, h - padY);
-    ctx.closePath();
-    const gradient = ctx.createLinearGradient(0, padY, 0, h);
-    gradient.addColorStop(0, "rgba(20,184,166,0.15)");
-    gradient.addColorStop(1, "rgba(20,184,166,0)");
-    ctx.fillStyle = gradient;
-    ctx.fill();
+    return () => observer.disconnect();
   }, []);
 
   // Donut chart via SVG
-  const donutRadius = 54;
-  const circumference = 2 * Math.PI * donutRadius;
-  const percentage = 60;
-  const strokeDashoffset = circumference - (percentage / 100) * circumference;
+  const circumference = 2 * Math.PI * 54;
 
   const months = ["Des", "Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul"];
 
   return (
-    <div className="flex-1 p-6 bg-gray-50 min-h-screen dark:bg-black">
+    <div className="flex-1 p-6 bg-gray-50 dark:bg-black min-h-screen">
       <div className="max-w-6xl mx-auto space-y-6">
         {/* Page Header */}
         <div>
-          <h1 className="text-xl font-semibold text-gray-800">Dashboard</h1>
-          <p className="text-sm text-gray-500">Selamat datang kembali, </p>
+          <h1 className="text-xl font-semibold text-gray-800 dark:text-zinc-100">
+            Dashboard
+          </h1>
+          <p className="text-sm text-gray-500 dark:text-zinc-500">
+            Selamat datang kembali,{" "}
+          </p>
         </div>
 
         {/* Stat Cards */}
@@ -155,18 +178,19 @@ export default function Page() {
           {stats.map((s, i) => (
             <div
               key={i}
-              className={`relative rounded-2xl p-5 bg-gradient-to-br ${s.gradient} backdrop-blur-sm border border-white/40 shadow-sm hover:shadow-md transition`}
+              className={`relative rounded-2xl p-5 bg-gradient-to-br ${s.gradient} backdrop-blur-sm border border-white/40 dark:border-zinc-700/60 shadow-sm hover:shadow-md dark:hover:shadow-zinc-800/60 transition bg-white dark:bg-zinc-900`}
             >
               <div className="flex items-center gap-4">
                 <div className={`p-3 rounded-xl ${s.iconBg} ${s.iconText}`}>
                   {s.icon}
                 </div>
-
                 <div>
                   <p className={`text-3xl font-semibold ${s.iconText}`}>
                     {s.value}
                   </p>
-                  <p className="text-xs text-gray-500 mt-1">{s.label}</p>
+                  <p className="text-xs text-gray-500 dark:text-zinc-500 mt-1">
+                    {s.label}
+                  </p>
                 </div>
               </div>
             </div>
@@ -176,28 +200,34 @@ export default function Page() {
         {/* Main Content: Chart + Donut */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
           {/* Visitor Statistics */}
-          <div className="lg:col-span-2 bg-white rounded-2xl p-5 shadow-sm">
+          <div className="lg:col-span-2 bg-white dark:bg-zinc-900 rounded-2xl p-5 shadow-sm dark:shadow-zinc-800/40 border border-transparent dark:border-zinc-800">
             <div className="flex items-center justify-between mb-4">
               <div>
-                <p className="text-sm font-semibold text-gray-800">
+                <p className="text-sm font-semibold text-gray-800 dark:text-zinc-100">
                   Visitor statistics
                 </p>
-                <p className="text-xs text-gray-400">Nov – Jul</p>
+                <p className="text-xs text-gray-400 dark:text-zinc-500">
+                  Nov – Jul
+                </p>
               </div>
               <div className="flex gap-6 text-right">
                 <div>
-                  <div className="flex items-center gap-1.5 text-xs text-gray-400">
+                  <div className="flex items-center gap-1.5 text-xs text-gray-400 dark:text-zinc-500">
                     <span className="inline-block w-2 h-2 rounded-full bg-teal-400" />
                     Last 6 months
                   </div>
-                  <p className="text-sm font-semibold text-gray-800">475.273</p>
+                  <p className="text-sm font-semibold text-gray-800 dark:text-zinc-100">
+                    475.273
+                  </p>
                 </div>
                 <div>
-                  <div className="flex items-center gap-1.5 text-xs text-gray-400">
-                    <span className="inline-block w-2 h-2 rounded-full bg-gray-300" />
+                  <div className="flex items-center gap-1.5 text-xs text-gray-400 dark:text-zinc-500">
+                    <span className="inline-block w-2 h-2 rounded-full bg-gray-300 dark:bg-zinc-600" />
                     Previously
                   </div>
-                  <p className="text-sm font-semibold text-gray-800">782.396</p>
+                  <p className="text-sm font-semibold text-gray-800 dark:text-zinc-100">
+                    782.396
+                  </p>
                 </div>
               </div>
             </div>
@@ -207,7 +237,10 @@ export default function Page() {
             {/* X axis labels */}
             <div className="flex justify-between mt-1 px-1">
               {months.map((m) => (
-                <span key={m} className="text-xs text-gray-400">
+                <span
+                  key={m}
+                  className="text-xs text-gray-400 dark:text-zinc-600"
+                >
                   {m}
                 </span>
               ))}
@@ -215,10 +248,12 @@ export default function Page() {
           </div>
 
           {/* Proyek Donut */}
-          <div className="bg-white rounded-2xl p-5 shadow-sm">
+          <div className="bg-white dark:bg-zinc-900 rounded-2xl p-5 shadow-sm dark:shadow-zinc-800/40 border border-transparent dark:border-zinc-800">
             <div className="flex items-center justify-between mb-4">
-              <p className="text-sm font-semibold text-gray-800">Proyek</p>
-              <button className="text-xs text-blue-500 hover:underline">
+              <p className="text-sm font-semibold text-gray-800 dark:text-zinc-100">
+                Proyek
+              </p>
+              <button className="text-xs text-blue-500 dark:text-blue-400 hover:underline">
                 Januari
               </button>
             </div>
@@ -230,16 +265,17 @@ export default function Page() {
                 <circle
                   cx="70"
                   cy="70"
-                  r={donutRadius}
+                  r={54}
                   fill="none"
                   stroke="#f3f4f6"
+                  className="dark:[stroke:#27272a]"
                   strokeWidth="14"
                 />
                 {/* Green arc */}
                 <circle
                   cx="70"
                   cy="70"
-                  r={donutRadius}
+                  r={54}
                   fill="none"
                   stroke="#22c55e"
                   strokeWidth="14"
@@ -255,7 +291,7 @@ export default function Page() {
                 <circle
                   cx="70"
                   cy="70"
-                  r={donutRadius}
+                  r={54}
                   fill="none"
                   stroke="#f59e0b"
                   strokeWidth="14"
@@ -271,7 +307,7 @@ export default function Page() {
                 <circle
                   cx="70"
                   cy="70"
-                  r={donutRadius}
+                  r={54}
                   fill="none"
                   stroke="#ef4444"
                   strokeWidth="14"
@@ -305,7 +341,7 @@ export default function Page() {
               ].map((item) => (
                 <div
                   key={item.label}
-                  className="flex items-center gap-2 text-xs text-gray-600"
+                  className="flex items-center gap-2 text-xs text-gray-600 dark:text-zinc-400"
                 >
                   <span className={`w-2.5 h-2.5 rounded-full ${item.color}`} />
                   {item.label}

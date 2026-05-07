@@ -1,8 +1,10 @@
 "use client";
 
+import { useClickOutside } from "@/components/ui/props";
+import { ChevronDown, ChevronLeft, ChevronRight } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { toast } from "sonner";
 import { restoreProject } from "../actions";
 
@@ -12,20 +14,190 @@ type Project = {
   createdAt: string;
 };
 
+const PER_PAGE_OPTIONS = [5, 8, 10, 15];
+
+function PerPageDropdown({
+  value,
+  onChange,
+}: {
+  value: number;
+  onChange: (v: number) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+  useClickOutside(ref, () => setOpen(false));
+
+  return (
+    <div ref={ref} className="relative">
+      <button
+        onClick={() => setOpen((o) => !o)}
+        className="h-9 px-3.5 flex items-center gap-2 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-sm text-zinc-600 dark:text-zinc-300 hover:border-zinc-400 dark:hover:border-zinc-600 transition-colors"
+      >
+        <span className="text-xs font-medium text-zinc-500 dark:text-zinc-500">
+          Tampilkan
+        </span>
+        <span className="font-semibold text-zinc-800 dark:text-zinc-100">
+          {value}
+        </span>
+        <ChevronDown
+          size={12}
+          className={`text-zinc-400 dark:text-zinc-600 transition-transform duration-150 ${open ? "rotate-180" : ""}`}
+        />
+      </button>
+
+      {open && (
+        <div className="absolute top-full left-0 mt-1 w-32 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 shadow-lg z-50 overflow-hidden py-1">
+          {PER_PAGE_OPTIONS.map((opt) => (
+            <button
+              key={opt}
+              onClick={() => {
+                onChange(opt);
+                setOpen(false);
+              }}
+              className={`w-full px-4 py-2 text-left text-sm transition-colors ${
+                opt === value
+                  ? "font-semibold text-zinc-900 dark:text-white bg-zinc-50 dark:bg-zinc-800"
+                  : "text-zinc-500 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-800/60"
+              }`}
+            >
+              {opt}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function PaginationBar({
+  currentPage,
+  totalPages,
+  pageNumbers,
+  filteredCount,
+  perPage,
+  goTo,
+}: {
+  currentPage: number;
+  totalPages: number;
+  pageNumbers: number[];
+  filteredCount: number;
+  perPage: number;
+  goTo: (p: number) => void;
+}) {
+  const rangeStart = (currentPage - 1) * perPage + 1;
+  const rangeEnd = Math.min(currentPage * perPage, filteredCount);
+
+  return (
+    <div className="border-t border-zinc-200 dark:border-zinc-800 px-4 sm:px-5 py-3 flex items-center justify-between gap-3 bg-white dark:bg-zinc-900">
+      <span className="text-sm text-zinc-500 dark:text-zinc-500 shrink-0">
+        {filteredCount === 0
+          ? "Tidak ada data"
+          : `${rangeStart}-${rangeEnd} dari ${filteredCount}`}
+      </span>
+
+      <div className="flex items-center gap-1 flex-wrap justify-end">
+        <button
+          onClick={() => goTo(currentPage - 1)}
+          disabled={currentPage === 1}
+          className="h-8 w-8 flex items-center justify-center rounded-lg border border-zinc-300 dark:border-zinc-700 text-zinc-500 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-800 disabled:opacity-25 disabled:cursor-not-allowed transition-colors"
+        >
+          <ChevronLeft size={14} />
+        </button>
+
+        {pageNumbers.map((page) => (
+          <button
+            key={page}
+            onClick={() => goTo(page)}
+            className={`h-8 min-w-[32px] px-2 rounded-lg text-sm font-medium transition-colors ${
+              page === currentPage
+                ? "bg-primary text-white dark:bg-white dark:text-black border-transparent"
+                : "border border-zinc-300 dark:border-zinc-700 text-zinc-500 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-800"
+            }`}
+          >
+            {page}
+          </button>
+        ))}
+
+        <button
+          onClick={() => goTo(currentPage + 1)}
+          disabled={currentPage === totalPages}
+          className="h-8 w-8 flex items-center justify-center rounded-lg border border-zinc-300 dark:border-zinc-700 text-zinc-500 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-800 disabled:opacity-25 disabled:cursor-not-allowed transition-colors"
+        >
+          <ChevronRight size={14} />
+        </button>
+      </div>
+    </div>
+  );
+}
+
 export default function ArsipList({ projects }: { projects: Project[] }) {
   const router = useRouter();
   const [restoreTarget, setRestoreTarget] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [perPage, setPerPage] = useState(5);
+
+  const totalPages = Math.max(1, Math.ceil(projects.length / perPage));
+  const paginated = projects.slice(
+    (currentPage - 1) * perPage,
+    currentPage * perPage,
+  );
+
+  const goTo = (p: number) => {
+    if (p >= 1 && p <= totalPages) setCurrentPage(p);
+  };
+
+  const handlePerPageChange = (val: number) => {
+    setPerPage(val);
+    setCurrentPage(1);
+  };
+
+  const pageNumbers = (() => {
+    if (totalPages <= 5)
+      return Array.from({ length: totalPages }, (_, i) => i + 1);
+    if (currentPage <= 3) return [1, 2, 3, 4, 5];
+    if (currentPage >= totalPages - 2)
+      return [
+        totalPages - 4,
+        totalPages - 3,
+        totalPages - 2,
+        totalPages - 1,
+        totalPages,
+      ];
+    return [
+      currentPage - 2,
+      currentPage - 1,
+      currentPage,
+      currentPage + 1,
+      currentPage + 2,
+    ];
+  })();
+
+  const paginationProps = {
+    currentPage,
+    totalPages,
+    pageNumbers,
+    filteredCount: projects.length,
+    perPage,
+    goTo,
+  };
 
   return (
     <div className="flex-1 p-8 space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-semibold">Proyek Diarsipkan</h1>
         <Link
-          href="dashboard/kelola-proyek"
+          href="/dashboard/kelola-proyek"
           className="px-4 py-2 text-xs font-semibold rounded-md bg-primary text-primary-foreground shadow-sm hover:shadow hover:opacity-90 transition"
         >
           Kembali ke Daftar Proyek
         </Link>
+      </div>
+
+      <div className="flex items-center gap-3">
+        <PerPageDropdown value={perPage} onChange={handlePerPageChange} />
+        <span className="text-sm text-zinc-500 dark:text-zinc-400">
+          {projects.length} Total Proyek Diarsipkan
+        </span>
       </div>
 
       <div className="overflow-hidden rounded-2xl border bg-white dark:bg-zinc-900 shadow-sm">
@@ -35,37 +207,39 @@ export default function ArsipList({ projects }: { projects: Project[] }) {
           <div className="col-span-4 text-right pr-2">Aksi</div>
         </div>
 
-        {projects.map((p) => (
-          <div
-            key={p._id}
-            className="grid grid-cols-12 items-center px-8 py-5 text-sm border-b last:border-b-0 hover:bg-zinc-50 dark:hover:bg-zinc-800/40 transition"
-          >
-            <div className="col-span-5 font-medium text-zinc-800 dark:text-zinc-100">
-              {p.name}
-            </div>
-            <div className="col-span-3 text-zinc-500 dark:text-zinc-400">
-              {new Date(p.createdAt).toLocaleDateString("id-ID", {
-                day: "2-digit",
-                month: "long",
-                year: "numeric",
-              })}
-            </div>
-            <div className="col-span-4 flex justify-end gap-3">
-              <button
-                onClick={() => setRestoreTarget(p._id)}
-                className="px-4 py-1.5 text-xs font-semibold rounded-md border border-blue-300 text-blue-600 hover:bg-blue-50 dark:border-blue-700 dark:text-blue-400 dark:hover:bg-blue-900/30 transition"
-              >
-                Pulihkan
-              </button>
-            </div>
-          </div>
-        ))}
-
-        {projects.length === 0 && (
+        {paginated.length === 0 ? (
           <div className="px-8 py-10 text-center text-sm text-zinc-500">
             Tidak ada proyek yang diarsipkan.
           </div>
+        ) : (
+          paginated.map((p) => (
+            <div
+              key={p._id}
+              className="grid grid-cols-12 items-center px-8 py-5 text-sm border-b last:border-b-0 hover:bg-zinc-50 dark:hover:bg-zinc-800/40 transition"
+            >
+              <div className="col-span-5 font-medium text-zinc-800 dark:text-zinc-100">
+                {p.name}
+              </div>
+              <div className="col-span-3 text-zinc-500 dark:text-zinc-400">
+                {new Date(p.createdAt).toLocaleDateString("id-ID", {
+                  day: "2-digit",
+                  month: "long",
+                  year: "numeric",
+                })}
+              </div>
+              <div className="col-span-4 flex justify-end gap-3">
+                <button
+                  onClick={() => setRestoreTarget(p._id)}
+                  className="px-4 py-1.5 text-xs font-semibold rounded-md border border-blue-300 text-blue-600 hover:bg-blue-50 dark:border-blue-700 dark:text-blue-400 dark:hover:bg-blue-900/30 transition"
+                >
+                  Pulihkan
+                </button>
+              </div>
+            </div>
+          ))
         )}
+
+        <PaginationBar {...paginationProps} />
       </div>
 
       {restoreTarget && (
@@ -88,10 +262,8 @@ export default function ArsipList({ projects }: { projects: Project[] }) {
                 onClick={async () => {
                   try {
                     await restoreProject(restoreTarget);
-
                     setRestoreTarget(null);
                     toast.success("Proyek berhasil dipulihkan");
-
                     router.refresh();
                   } catch {
                     toast.error("Gagal memulihkan proyek");
