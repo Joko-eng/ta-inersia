@@ -22,6 +22,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "iconsax-react": "^0.0.8",
+    "ioredis": "^5.10.1",
     "lucide-react": "^0.562.0",
     "mongoose": "^9.1.5",
     "motion": "^12.35.2",
