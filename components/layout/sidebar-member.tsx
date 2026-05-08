@@ -21,7 +21,7 @@ export default function ProjectSidebar({
         />
         <div>
           <p className="text-sm font-semibold leading-none">
-            Inersia Development Indonesia
+            Inersia Dev <br /> Indonesia
           </p>
         </div>
       </div>
