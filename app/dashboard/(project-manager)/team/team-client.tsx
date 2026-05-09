@@ -191,7 +191,7 @@ export default function TeamClient({ initialMembers }: any) {
 
           <button
             onClick={() => setOpen(true)}
-            className="flex items-center gap-2 bg-primary text-white px-4 py-2 rounded-lg text-sm"
+            className="flex items-center gap-2 bg-primary text-white dark:bg-white dark:text-black px-4 py-2 rounded-lg text-sm"
           >
             <Plus size={16} />
             Tim Pengembang

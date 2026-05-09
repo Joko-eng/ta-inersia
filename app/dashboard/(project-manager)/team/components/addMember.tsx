@@ -1,5 +1,12 @@
 "use client";
 
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { X } from "lucide-react";
 
 interface AddMemberModalProps {
@@ -87,25 +94,32 @@ export default function AddMemberModal({
           </div>
 
           <div>
-            <select
+            <Select
               value={form.division}
-              className="w-full border rounded px-3 py-2"
-              onChange={(e) =>
+              onValueChange={(value) =>
                 setForm({
                   ...form,
-                  division: e.target.value,
+                  division: value,
                 })
               }
             >
-              <option value="">Pilih Role</option>
-              <option>Front End</option>
-              <option>Back End</option>
-              <option>QA</option>
-              <option>UI/UX</option>
-            </select>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Pilih Role" />
+              </SelectTrigger>
+
+              <SelectContent>
+                <SelectItem value="Front End">Front End</SelectItem>
+
+                <SelectItem value="Back End">Back End</SelectItem>
+
+                <SelectItem value="QA">QA</SelectItem>
+
+                <SelectItem value="UI/UX">UI/UX</SelectItem>
+              </SelectContent>
+            </Select>
 
             {errors?.division && (
-              <p className="text-xs text-red-500">{errors.division[0]}</p>
+              <p className="text-xs text-red-500 mt-1">{errors.division[0]}</p>
             )}
           </div>
         </div>
