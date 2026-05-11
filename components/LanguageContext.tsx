@@ -162,6 +162,145 @@ const translations: Record<string, Record<Lang, string>> = {
   "footer.privacy": { en: "Privacy Policy", id: "Kebijakan Privasi" },
   "footer.terms": { en: "Terms of Service", id: "Syarat Layanan" },
   "footer.cookie": { en: "Cookie Settings", id: "Pengaturan Cookie" },
+
+  "pricing.section.label": { en: "Service Packages", id: "Paket Layanan" },
+  "pricing.section.title": {
+    en: "Plans that grow with you",
+    id: "Paket yang tumbuh bersama Anda",
+  },
+
+  // Badge
+  "pricing.badge.popular": { en: "Most Popular", id: "Paling Populer" },
+
+  // Period labels
+  "pricing.period.from": { en: "starting from", id: "estimasi mulai dari" },
+  "pricing.period.contact": {
+    en: "contact us for estimate",
+    id: "hubungi kami untuk estimasi",
+  },
+
+  // Starter
+  "pricing.starter.name": { en: "Starter Website", id: "Starter Website" },
+  "pricing.starter.tagline": {
+    en: "For new businesses going digital",
+    id: "Untuk usaha & UMKM yang baru go digital",
+  },
+  "pricing.starter.f1": {
+    en: "Website 3 pages",
+    id: "Website 3 halaman",
+  },
+  "pricing.starter.f2": {
+    en: "1 simple API integration",
+    id: "1 integrasi API sederhana",
+  },
+  "pricing.starter.f3": { en: "3-month hosting", id: "Hosting 3 Bulan" },
+  "pricing.starter.f4": {
+    en: "Basic maintenance 3 months",
+    id: "Pemeliharaan Dasar 3 bulan",
+  },
+  "pricing.starter.f5": {
+    en: "Media Social integration",
+    id: "Integrasi Media Sosial",
+  },
+  "pricing.starter.f6": {
+    en: "Free Revision 2 times",
+    id: "Bebas Revisi 2 kali",
+  },
+  "pricing.starter.cta": { en: "Get Started", id: "Mulai Sekarang" },
+
+  // Growth
+  "pricing.growth.name": { en: "Growth Website", id: "Growth Website" },
+  "pricing.growth.tagline": {
+    en: "For startups ready to scale",
+    id: "Untuk startup & bisnis yang siap berkembang",
+  },
+  "pricing.growth.f1": {
+    en: "Website  5 page",
+    id: "Website  5 halaman",
+  },
+
+  "pricing.growth.f2": {
+    en: "Integration & Dokumentation API",
+    id: "Integrasi & Dokumentasi API",
+  },
+  "pricing.growth.f3": {
+    en: "Hosting 3 months",
+    id: "Hosting 3 bulan",
+  },
+  "pricing.growth.f4": {
+    en: "Basic maintenance 3 months",
+    id: "Pemeliharaan Dasar 3 bulan",
+  },
+  "pricing.growth.f6": {
+    en: "Brief documentation",
+    id: "Dokumentasi ringkas",
+  },
+  "pricing.growth.f8": {
+    en: "Free Revision 3 times",
+    id: "Bebas Revisi 3 kali",
+  },
+  "pricing.growth.f7": {
+    en: "Basic Security",
+    id: "Keamanan Dasar",
+  },
+  "pricing.growth.f5": {
+    en: "Media Social integration",
+    id: "Integrasi Media Sosial",
+  },
+  "pricing.growth.cta": { en: "Choose Growth", id: "Pilih Growth" },
+
+  // Enterprise
+  "pricing.enterprise.name": { en: "Customization", id: "Kustomisasi" },
+  "pricing.enterprise.tagline": {
+    en: "For companies with complex needs",
+    id: "Untuk perusahaan dengan kebutuhan kompleks",
+  },
+  "pricing.enterprise.f1": { en: "Full-stack Web", id: "Full-stack Web" },
+  "pricing.enterprise.f2": { en: "Mobile App", id: "Aplikasi Mobile" },
+  "pricing.enterprise.f3": { en: "Machine Learning", id: "Machine Learning" },
+  "pricing.enterprise.f4": { en: "Jokey Services", id: "Jasa Joki" },
+  "pricing.enterprise.f5": {
+    en: "Full infrastructure & Deployment",
+    id: "Infrastruktur & Pengembangan ",
+  },
+  "pricing.enterprise.f6": {
+    en: "Pro Maintenance",
+    id: "Pemeliharaan Lanjutan ",
+  },
+  "pricing.enterprise.f7": {
+    en: "API docs & user manual",
+    id: "Dokumentasi API & buku panduan",
+  },
+  "pricing.enterprise.price": {
+    en: "Price on request",
+    id: "Harga sesuai kebutuhan",
+  },
+  "pricing.enterprise.f8": {
+    en: "Full technical documentation",
+    id: "Dokumentasi Teknis lengkap",
+  },
+
+  "pricing.enterprise.cta": { en: "Contact Us", id: "Hubungi Kami" },
+
+  // Bottom CTA
+  "pricing.cta.title": {
+    en: "Not sure which plan fits?",
+    id: "Belum yakin mana yang tepat?",
+  },
+  "pricing.cta.desc": {
+    en: "Tell us about your project — we'll give you a free estimate.",
+    id: "Konsultasikan kebutuhan proyek Anda — kami bantu estimasi biaya secara gratis.",
+  },
+  "pricing.cta.contact": { en: "Contact Us", id: "Hubungi Kami" },
+  "pricing.cta.portfolio": { en: "View Portfolio", id: "Lihat Portfolio" },
+  "pricing.cta.contact.aria": {
+    en: "Contact us for consultation",
+    id: "Hubungi kami untuk konsultasi",
+  },
+  "pricing.cta.portfolio.aria": {
+    en: "View our portfolio",
+    id: "Lihat portfolio kami",
+  },
 };
 
 const LanguageContext = createContext<LanguageContextType>({

@@ -1,3 +1,6 @@
+"use client";
+
+import { useLang } from "@/components/LanguageContext";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -9,80 +12,170 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { Check, Infinity } from "lucide-react";
+import { Check } from "lucide-react";
 
 const packages = [
   {
-    name: "Starter",
-    tagline: "Untuk usaha & UMKM yang baru go digital",
-    price: "3.500k",
-    period: "estimasi mulai dari",
+    nameKey: "pricing.starter.name",
+    taglineKey: "pricing.starter.tagline",
+    price: "999.000",
+    originalPrice: "1.199.000",
+    priceLabel: null,
+    periodKey: "pricing.period.from",
     highlight: false,
     badge: null,
     features: [
-      "Website company profile (3–5 halaman)",
-      "1 integrasi API sederhana",
-      "Hosting 1 tahun",
-      "Maintenance Basic 3 bulan",
-      "Dokumentasi ringkas",
+      "pricing.starter.f1",
+      // "pricing.starter.f2",
+      "pricing.starter.f3",
+      "pricing.starter.f4",
+      "pricing.starter.f5",
+      "pricing.starter.f6",
     ],
-    cta: "Mulai Sekarang",
+    ctaKey: "pricing.starter.cta",
   },
   {
-    name: "Growth",
-    tagline: "Untuk startup & bisnis yang siap berkembang",
-    price: "12.000k",
-    period: "estimasi mulai dari",
+    nameKey: "pricing.growth.name",
+    taglineKey: "pricing.growth.tagline",
+    price: "1.299.000",
+    originalPrice: "1.599.000",
+    priceLabel: null,
+    periodKey: "pricing.period.from",
     highlight: true,
-    badge: "Paling Populer",
+    badge: "pricing.badge.popular",
     features: [
-      "Website / Mobile App (medium complexity)",
-      "Hingga 5 fitur custom",
-      "Integrasi API & keamanan dasar",
-      "Hosting + Maintenance Pro 6 bulan",
-      "Dokumentasi Teknis lengkap",
-      "Konsultasi teknis bulanan",
+      "pricing.growth.f1",
+      "pricing.growth.f2",
+      "pricing.growth.f3",
+      "pricing.growth.f4",
+      "pricing.growth.f5",
+      "pricing.growth.f6",
+      "pricing.growth.f7",
+      "pricing.growth.f8",
     ],
-    cta: "Pilih Growth",
+    ctaKey: "pricing.growth.cta",
   },
   {
-    name: "Enterprise",
-    tagline: "Untuk perusahaan dengan kebutuhan kompleks",
-    price: "Custom",
-    period: "hubungi kami untuk estimasi",
+    nameKey: "pricing.enterprise.name",
+    taglineKey: "pricing.enterprise.tagline",
+    price: null,
+    originalPrice: null,
+    priceLabel: "pricing.enterprise.price",
+    periodKey: "pricing.period.contact",
     highlight: false,
     badge: null,
     features: [
-      "Full-stack Web + Mobile App",
-      "Machine Learning / IoT integration",
-      "Infrastruktur & deployment penuh",
-      "Maintenance Pro ongoing",
-      "Dokumentasi API & buku panduan",
-      "Dedicated support & SLA",
+      "pricing.enterprise.f1",
+      "pricing.enterprise.f2",
+      "pricing.enterprise.f3",
+      "pricing.enterprise.f4",
+      "pricing.enterprise.f5",
+      "pricing.enterprise.f6",
+      "pricing.enterprise.f7",
+      "pricing.enterprise.f8",
     ],
-    cta: "Hubungi Kami",
+    ctaKey: "pricing.enterprise.cta",
   },
 ];
 
-const infraServices = [
-  {
-    name: "Inersia Hosting",
-    price: "150k/bulan",
-    desc: "Hosting stabil dan cepat",
-  },
-  {
-    name: "Maintenance Basic",
-    price: "75k/bulan",
-    desc: "Bug fix & uptime monitoring",
-  },
-  {
-    name: "Maintenance Pro",
-    price: "150k/bulan",
-    desc: "Update konten, bug fix, konsultasi bulanan",
-  },
-];
+function PriceText({
+  value,
+  sizeRem = 1.6,
+}: {
+  value: string;
+  sizeRem?: number;
+}) {
+  const lastDot = value.lastIndexOf(".");
+  const mainPart = lastDot !== -1 ? value.slice(0, lastDot) : value;
+  const trailingZeros = lastDot !== -1 ? value.slice(lastDot) : "";
+
+  return (
+    <span
+      style={{
+        fontSize: `${sizeRem}rem`,
+        fontWeight: 800,
+        letterSpacing: "-0.01em",
+      }}
+    >
+      <sup
+        style={{
+          fontSize: "0.6em",
+          fontWeight: 700,
+          verticalAlign: "0.35em",
+          letterSpacing: "0.02em",
+          marginRight: "0.2em",
+        }}
+      >
+        Rp
+      </sup>
+      {mainPart}
+      {trailingZeros && (
+        <span style={{ fontSize: "0.65em", verticalAlign: "0.05em" }}>
+          {trailingZeros}
+        </span>
+      )}
+    </span>
+  );
+}
+
+/**
+ * If `label` is provided → render plain text (Enterprise).
+ * Otherwise → render strikethrough originalPrice + discounted price.
+ */
+function RupiahPrice({
+  value,
+  originalPrice,
+  highlight,
+  label,
+}: {
+  value?: string | null;
+  originalPrice?: string | null;
+  highlight: boolean;
+  label?: string | null;
+}) {
+  const priceClass = highlight
+    ? "text-white dark:text-primary"
+    : "text-gray-900 dark:text-white";
+
+  if (label) {
+    return (
+      <p
+        className={`text-2xl font-extrabold tracking-tight ${priceClass}`}
+        style={{ marginTop: "4px" }}
+      >
+        {label}
+      </p>
+    );
+  }
+
+  if (!value) return null;
+
+  return (
+    <div className="flex flex-col gap-0.5" style={{ marginTop: "4px" }}>
+      {originalPrice && (
+        <p
+          className="leading-none text-yellow-400 dark:text-red-400"
+          style={{
+            fontSize: "0.8rem",
+            fontWeight: 500,
+            textDecoration: "line-through",
+            textDecorationThickness: "1.5px",
+            textDecorationColor: "currentColor",
+          }}
+        >
+          <PriceText value={originalPrice} sizeRem={0.8} />
+        </p>
+      )}
+      <p className={`leading-none ${priceClass}`}>
+        <PriceText value={value} sizeRem={1.6} />
+      </p>
+    </div>
+  );
+}
 
 export default function Pricing() {
+  const { t } = useLang();
+
   return (
     <section
       id="pricing"
@@ -91,17 +184,17 @@ export default function Pricing() {
       <div className="w-full max-w-4xl flex flex-col items-center gap-10">
         <div className="text-center">
           <p className="text-xs font-semibold text-primary dark:text-blue-300 uppercase tracking-widest mb-2">
-            Paket Layanan
+            {t("pricing.section.label")}
           </p>
           <h2 className="text-4xl md:text-5xl font-bold text-primary dark:text-white tracking-tight mb-3">
-            Plans that grow with you
+            {t("pricing.section.title")}
           </h2>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5 w-full">
           {packages.map((pkg) => (
             <Card
-              key={pkg.name}
+              key={pkg.nameKey}
               className={`flex flex-col transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl relative ${
                 pkg.highlight
                   ? "bg-primary dark:bg-white text-primary-foreground border-primary shadow-xl shadow-primary/40"
@@ -111,7 +204,7 @@ export default function Pricing() {
               {pkg.badge && (
                 <div className="absolute -top-3 left-1/2 -translate-x-1/2">
                   <Badge className="bg-amber-400 text-amber-900 border-amber-300 font-semibold text-[11px] px-3 shadow-md">
-                    {pkg.badge}
+                    {t(pkg.badge)}
                   </Badge>
                 </div>
               )}
@@ -124,7 +217,7 @@ export default function Pricing() {
                       : "text-gray-900 dark:text-white"
                   }`}
                 >
-                  {pkg.name}
+                  {t(pkg.nameKey)}
                 </CardTitle>
                 <CardDescription
                   className={`text-xs leading-relaxed ${
@@ -133,7 +226,7 @@ export default function Pricing() {
                       : "text-gray-600 dark:text-gray-300"
                   }`}
                 >
-                  {pkg.tagline}
+                  {t(pkg.taglineKey)}
                 </CardDescription>
                 <div className="pt-2">
                   <p
@@ -143,17 +236,14 @@ export default function Pricing() {
                         : "text-gray-500 dark:text-gray-400"
                     }`}
                   >
-                    {pkg.period}
+                    {t(pkg.periodKey)}
                   </p>
-                  <p
-                    className={`text-2xl font-extrabold tracking-tight ${
-                      pkg.highlight
-                        ? "text-white dark:text-primary"
-                        : "text-gray-900 dark:text-white"
-                    }`}
-                  >
-                    {pkg.price === "Custom" ? "Custom" : `Rp ${pkg.price}`}
-                  </p>
+                  <RupiahPrice
+                    value={pkg.price}
+                    originalPrice={pkg.originalPrice}
+                    highlight={pkg.highlight}
+                    label={pkg.priceLabel ? String(t(pkg.priceLabel)) : null}
+                  />
                 </div>
               </CardHeader>
 
@@ -164,8 +254,8 @@ export default function Pricing() {
                   }
                 />
                 <ul className="flex flex-col gap-1.5">
-                  {pkg.features.map((f) => (
-                    <li key={f} className="flex items-start gap-2">
+                  {pkg.features.map((fKey) => (
+                    <li key={fKey} className="flex items-start gap-2">
                       <Check
                         size={12}
                         aria-hidden="true"
@@ -182,7 +272,7 @@ export default function Pricing() {
                             : "text-gray-600 dark:text-gray-300"
                         }`}
                       >
-                        {f}
+                        {t(fKey)}
                       </span>
                     </li>
                   ))}
@@ -197,62 +287,36 @@ export default function Pricing() {
                       : "bg-primary text-white hover:bg-primary/90 border-white/30 dark:bg-white dark:text-primary dark:border-zinc-700/30 dark:hover:bg-white/80"
                   }`}
                   variant={pkg.highlight ? "default" : "outline"}
-                  aria-label={`${pkg.cta} - Paket ${pkg.name}`}
+                  aria-label={`${String(t(pkg.ctaKey))} - Paket ${String(t(pkg.nameKey))}`}
                 >
-                  {pkg.cta}
+                  {t(pkg.ctaKey)}
                 </Button>
               </CardFooter>
             </Card>
           ))}
         </div>
-
-        <Card className="bg-gray-100 backdrop-blur-md border-white/60 w-full">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-bold text-primary flex items-center gap-2">
-              <Infinity aria-hidden="true" /> Infrastruktur & Maintenance
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="grid grid-cols-2 md:grid-cols-3 gap-4">
-            {infraServices.map((s) => (
-              <div
-                key={s.name}
-                className="flex flex-col gap-1 p-3 rounded-lg bg-primary border border-white/20"
-              >
-                <p className="text-xs font-semibold text-white">{s.name}</p>
-                <p className="text-base font-extrabold text-white">
-                  Rp {s.price}
-                </p>
-                <p className="text-[11px] text-blue-200 leading-relaxed">
-                  {s.desc}
-                </p>
-              </div>
-            ))}
-          </CardContent>
-        </Card>
-
         <Card className="w-full max-w-5xl bg-white/15 backdrop-blur-md border-white/30 text-center">
           <CardHeader>
             <CardTitle className="text-primary dark:text-white text-2xl font-bold tracking-tight">
-              Belum yakin mana yang tepat?
+              {t("pricing.cta.title")}
             </CardTitle>
             <CardDescription className="text-gray-600 dark:text-gray-300 max-w-sm mx-auto text-sm">
-              Konsultasikan kebutuhan proyek Anda — kami bantu estimasi biaya
-              secara gratis.
+              {t("pricing.cta.desc")}
             </CardDescription>
           </CardHeader>
           <CardContent className="flex gap-3 justify-center flex-wrap pt-0">
             <Button
               className="bg-primary text-white hover:bg-primary/90 font-semibold dark:bg-white dark:text-primary dark:hover:bg-white/90"
-              aria-label="Hubungi kami untuk konsultasi"
+              aria-label={String(t("pricing.cta.contact.aria"))}
             >
-              Hubungi Kami
+              {t("pricing.cta.contact")}
             </Button>
             <Button
-              variant="outline"
-              className="border-primary/40 text-primary dark:border-white/40 dark:text-white font-semibold"
-              aria-label="Lihat portfolio kami"
+              variant="ghost"
+              className="border border-primary/40 text-primary hover:bg-primary/5 hover:text-primary dark:border-white/40 dark:text-white dark:hover:bg-white/10 dark:hover:text-white font-semibold"
+              aria-label={String(t("pricing.cta.portfolio.aria"))}
             >
-              Lihat Portfolio
+              {t("pricing.cta.portfolio")}
             </Button>
           </CardContent>
         </Card>
