@@ -284,7 +284,7 @@ export default function Pricing() {
                   className={`w-full font-semibold ${
                     pkg.highlight
                       ? "bg-white text-primary dark:bg-primary dark:text-white hover:bg-white/90"
-                      : "bg-primary text-white hover:bg-primary/90 border-white/30 dark:bg-white dark:text-primary dark:border-zinc-700/30 dark:hover:bg-white/80"
+                      : "bg-primary text-white hover:bg-primary/90 hover:text-white border-white/30 dark:bg-white dark:text-primary dark:border-zinc-700/30 dark:hover:bg-white/80"
                   }`}
                   variant={pkg.highlight ? "default" : "outline"}
                   aria-label={`${String(t(pkg.ctaKey))} - Paket ${String(t(pkg.nameKey))}`}

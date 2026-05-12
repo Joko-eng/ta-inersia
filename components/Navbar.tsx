@@ -99,9 +99,7 @@ export default function Navbar() {
             ))}
           </div>
 
-          {/* Right Side Actions */}
           <div className="flex items-center gap-2">
-            {/* Theme Toggle */}
             <Button variant="ghost" size="icon" onClick={toggleTheme}>
               {!mounted ? (
                 <span className="h-5 w-5" />
@@ -112,7 +110,6 @@ export default function Navbar() {
               )}
             </Button>
 
-            {/* Language Toggle */}
             <button
               onClick={toggleLang}
               className="text-lg px-2 py-1 rounded-full hover:bg-gray-100 dark:hover:bg-white/10 transition-all"
@@ -121,7 +118,6 @@ export default function Navbar() {
               {lang === "en" ? FLAGS.id : FLAGS.en}
             </button>
 
-            {/* Desktop Contact Button */}
             <div className="hidden md:block ml-1">
               <a
                 href="#contact"
@@ -131,7 +127,6 @@ export default function Navbar() {
               </a>
             </div>
 
-            {/* Hamburger — kanan sendiri di mobile */}
             <button
               className="md:hidden p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-white/10 transition-colors ml-1"
               onClick={() => setMenuOpen(!menuOpen)}

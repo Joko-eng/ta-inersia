@@ -323,7 +323,7 @@ export default function Hero() {
           <div className="flex flex-wrap items-center gap-4">
             <a
               href="#contact"
-              className="inline-flex items-center gap-2 bg-primary dark:bg-white text-white dark:text-black font-semibold px-6 py-3 rounded-full hover:bg-blue-800 transition-all hover:shadow-lg hover:-translate-y-0.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+              className="inline-flex items-center gap-2 bg-primary dark:bg-white text-white dark:text-black font-semibold px-6 py-3 rounded-full hover:bg-blue-700 transition-all hover:shadow-lg hover:-translate-y-0.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
               aria-label={t("hero.cta1") as string}
             >
               {t("hero.cta1")}
