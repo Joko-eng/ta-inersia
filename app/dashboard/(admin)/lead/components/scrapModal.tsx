@@ -1,9 +1,10 @@
 "use client";
 
 import { ModalOverlay } from "@/components/ui/props";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 type LogType = "info" | "success" | "error" | "loading";
+type Phase = "idle" | "scraping" | "ml" | "done";
 
 interface LogEntry {
   id: number;
@@ -32,10 +33,22 @@ const LOG_TEXT: Record<LogType, string> = {
 };
 
 const INPUT_CLS =
-  "w-full h-10 px-3 text-sm rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 dark:placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition";
+  "w-full h-10 px-3 text-sm rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 dark:placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition disabled:opacity-40 disabled:cursor-not-allowed";
 
 const LABEL_CLS =
   "block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1.5";
+
+const SHIMMER_STYLE_BLUE: React.CSSProperties = {
+  animation: "shimmer 1.4s ease-in-out infinite",
+  background: "linear-gradient(90deg, #3b82f6 0%, #60a5fa 50%, #3b82f6 100%)",
+  backgroundSize: "200% 100%",
+};
+
+const SHIMMER_STYLE_PURPLE: React.CSSProperties = {
+  background: "linear-gradient(90deg, #a855f7 0%, #ec4899 50%, #a855f7 100%)",
+  backgroundSize: "200% 100%",
+  animation: "shimmer 1.6s ease-in-out infinite",
+};
 
 let _logId = 0;
 
@@ -52,6 +65,12 @@ function makeEntry(type: LogType, message: string): LogEntry {
   };
 }
 
+function formatElapsed(s: number): string {
+  const m = Math.floor(s / 60);
+  const sec = s % 60;
+  return m > 0 ? `${m}m ${sec}s` : `${sec}s`;
+}
+
 export default function ScrapingModal({
   onClose,
   onScrapingDone,
@@ -62,9 +81,23 @@ export default function ScrapingModal({
   const [isRunning, setIsRunning] = useState(false);
   const [isDone, setIsDone] = useState(false);
   const [logs, setLogs] = useState<LogEntry[]>([]);
+  const [phase, setPhase] = useState<Phase>("idle");
+  const [scrapedCount, setScrapedCount] = useState(0);
+  const [targetCount, setTargetCount] = useState<number | null>(null);
+  const [mlElapsed, setMlElapsed] = useState(0);
 
   const logContainerRef = useRef<HTMLDivElement>(null);
   const abortRef = useRef<AbortController | null>(null);
+  const mlTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const clearMlTimer = useCallback(() => {
+    if (mlTimerRef.current) {
+      clearInterval(mlTimerRef.current);
+      mlTimerRef.current = null;
+    }
+  }, []);
+
+  useEffect(() => clearMlTimer, [clearMlTimer]);
 
   const scrollToBottom = useCallback(() => {
     requestAnimationFrame(() => {
@@ -78,12 +111,16 @@ export default function ScrapingModal({
   const appendLog = useCallback(
     (type: LogType, message: string) => {
       setLogs((prev) => [...prev, makeEntry(type, message)]);
+      if (type === "success") setScrapedCount((n) => n + 1);
       scrollToBottom();
     },
     [scrollToBottom],
   );
 
   const runMLClassification = useCallback(async () => {
+    setPhase("ml");
+    setMlElapsed(0);
+    mlTimerRef.current = setInterval(() => setMlElapsed((s) => s + 1), 1000);
     appendLog("info", "Memulai klasifikasi Machine Learning...");
 
     try {
@@ -104,9 +141,11 @@ export default function ScrapingModal({
     } catch (err) {
       appendLog("error", `Gagal menghubungi API ML: ${String(err)}`);
     } finally {
+      clearMlTimer();
+      setPhase("done");
       setIsDone(true);
     }
-  }, [appendLog, onScrapingDone]);
+  }, [appendLog, onScrapingDone, clearMlTimer]);
 
   const handleScrape = useCallback(async () => {
     const trimmedLocation = location.trim();
@@ -118,6 +157,9 @@ export default function ScrapingModal({
     setIsRunning(true);
     setIsDone(false);
     setLogs([]);
+    setPhase("scraping");
+    setScrapedCount(0);
+    setTargetCount(parsedCount);
 
     const controller = new AbortController();
     abortRef.current = controller;
@@ -185,15 +227,29 @@ export default function ScrapingModal({
 
   const handleClose = useCallback(() => {
     abortRef.current?.abort();
+    clearMlTimer();
     onClose();
-  }, [onClose]);
+  }, [onClose, clearMlTimer]);
+
+  const scrapePercent = (() => {
+    if (phase === "done") return 100;
+    if (phase !== "scraping" || targetCount === null || targetCount === 0)
+      return null;
+    return Math.min(95, Math.round((scrapedCount / targetCount) * 100));
+  })();
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <style>{`
+        @keyframes shimmer {
+          0% { background-position: 200% center; }
+          100% { background-position: -200% center; }
+        }
+      `}</style>
+
       <ModalOverlay onClick={!isRunning ? handleClose : undefined} />
 
       <div className="relative w-full max-w-md bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-2xl flex flex-col overflow-hidden">
-        {/* Header */}
         <div className="px-6 pt-6 pb-2 flex items-start justify-between gap-3">
           <div>
             <h2 className="text-lg font-semibold text-zinc-900 dark:text-white">
@@ -228,7 +284,7 @@ export default function ScrapingModal({
               onChange={(e) => setLocation(e.target.value)}
               placeholder="contoh: Surabaya, Banyuwangi..."
               disabled={isRunning}
-              className={`${INPUT_CLS} disabled:opacity-40 disabled:cursor-not-allowed`}
+              className={INPUT_CLS}
             />
           </div>
 
@@ -240,7 +296,7 @@ export default function ScrapingModal({
               onChange={(e) => setCategory(e.target.value)}
               placeholder="contoh: Restoran, Bengkel, Apotek..."
               disabled={isRunning}
-              className={`${INPUT_CLS} disabled:opacity-40 disabled:cursor-not-allowed`}
+              className={INPUT_CLS}
             />
           </div>
 
@@ -258,7 +314,7 @@ export default function ScrapingModal({
               min={1}
               placeholder="Kosongkan untuk ambil semua data"
               disabled={isRunning}
-              className={`${INPUT_CLS} disabled:opacity-40 disabled:cursor-not-allowed`}
+              className={INPUT_CLS}
             />
           </div>
 
@@ -280,12 +336,80 @@ export default function ScrapingModal({
           )}
         </div>
 
-        {/* Log section */}
+        {phase !== "idle" && (
+          <div className="px-6 pb-2 flex flex-col gap-3">
+            <div className="flex flex-col gap-1.5">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wide">
+                  Scraping
+                </span>
+                <span className="text-xs font-mono text-zinc-500 dark:text-zinc-400">
+                  {targetCount !== null
+                    ? `${scrapedCount} / ${targetCount}`
+                    : `${scrapedCount} data`}
+                  {phase === "done" && (
+                    <span className="ml-1.5 text-emerald-500">✓</span>
+                  )}
+                </span>
+              </div>
+              <div className="h-1.5 w-full bg-zinc-100 dark:bg-zinc-800 rounded-full overflow-hidden">
+                {scrapePercent !== null ? (
+                  <div
+                    className="h-full bg-blue-500 rounded-full transition-all duration-500 ease-out"
+                    style={{
+                      width: `${phase === "done" ? 100 : scrapePercent}%`,
+                    }}
+                  />
+                ) : (
+                  <div
+                    className={`h-full rounded-full ${phase === "done" ? "bg-emerald-500 w-full" : "w-1/3"}`}
+                    style={
+                      phase === "scraping" ? SHIMMER_STYLE_BLUE : undefined
+                    }
+                  />
+                )}
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wide">
+                  Klasifikasi ML
+                </span>
+                <span className="text-xs font-mono text-zinc-500 dark:text-zinc-400">
+                  {phase === "ml" && (
+                    <span className="text-blue-400">
+                      {formatElapsed(mlElapsed)}
+                    </span>
+                  )}
+                  {phase === "done" && (
+                    <span className="text-emerald-500">✓ Selesai</span>
+                  )}
+                  {phase === "scraping" && (
+                    <span className="text-zinc-400">Menunggu...</span>
+                  )}
+                </span>
+              </div>
+              <div className="h-1.5 w-full bg-zinc-100 dark:bg-zinc-800 rounded-full overflow-hidden">
+                {phase === "scraping" ? (
+                  <div className="h-full w-0 bg-zinc-300 dark:bg-zinc-700 rounded-full" />
+                ) : phase === "ml" ? (
+                  <div
+                    className="h-full w-full rounded-full"
+                    style={SHIMMER_STYLE_PURPLE}
+                  />
+                ) : (
+                  <div className="h-full w-full bg-emerald-500 rounded-full transition-all duration-700" />
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
         <div className="px-6 pb-6 flex flex-col gap-2">
           <p className="text-xs font-semibold text-zinc-500 dark:text-zinc-400">
             Log Aktivitas
           </p>
-
           <div
             ref={logContainerRef}
             className="h-36 bg-zinc-950 dark:bg-black rounded-xl p-3 overflow-y-auto flex flex-col gap-0.5 border border-zinc-800"
