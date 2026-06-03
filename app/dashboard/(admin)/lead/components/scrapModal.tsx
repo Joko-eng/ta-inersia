@@ -53,78 +53,6 @@ function makeEntry(type: LogType, message: string): LogEntry {
   };
 }
 
-// SVG border progress — mengelilingi kotak log
-// rect: w=100%, h=144px (h-36), rx=12 (rounded-xl)
-// perimeter ≈ 2*(width+height), kita pakai nilai relatif via viewBox
-function LogBorderProgress({ percent }: { percent: number | null }) {
-  // Ukuran kotak log dalam px (sesuai className h-36 = 144px, lebar container dikurangi padding px-6*2 = 24*2)
-  // Gunakan SVG dengan preserveAspectRatio agar responsif
-  const W = 100; // viewBox units (%)
-  const H = 40;  // proporsi tinggi relatif terhadap lebar
-  const R = 3.2; // border-radius relatif
-  const stroke = 1.8;
-  const pad = stroke / 2;
-
-  const w = W - pad * 2;
-  const h = H - pad * 2;
-  const r = R;
-
-  // Perimeter kotak rounded-rect (approx, corner arc = 2πr/4 per sudut)
-  const perimeter = 2 * (w - 2 * r) + 2 * (h - 2 * r) + 2 * Math.PI * r;
-
-  const isDeterminate = percent !== null;
-  const filled = isDeterminate ? (percent / 100) * perimeter : 0;
-  const isDone = percent === 100;
-
-  const strokeColor = isDone
-    ? "#10b981" // emerald-500
-    : "#3b82f6"; // blue-500
-
-  return (
-    <svg
-      viewBox={`0 0 ${W} ${H}`}
-      className="absolute inset-0 w-full h-full pointer-events-none"
-      style={{ borderRadius: "0.75rem", overflow: "visible" }}
-    >
-      {/* Track */}
-      <rect
-        x={pad} y={pad} width={w} height={h} rx={r}
-        fill="none"
-        stroke="currentColor"
-        strokeWidth={stroke}
-        className="text-zinc-800"
-      />
-      {/* Progress */}
-      {isDeterminate ? (
-        <rect
-          x={pad} y={pad} width={w} height={h} rx={r}
-          fill="none"
-          stroke={strokeColor}
-          strokeWidth={stroke}
-          strokeDasharray={`${filled} ${perimeter}`}
-          strokeDashoffset={0}
-          strokeLinecap="round"
-          style={{
-            transformOrigin: "center",
-            transform: `rotate(-90deg) scaleX(-1)`,
-            transition: "stroke-dasharray 0.5s ease-out, stroke 0.4s ease",
-          }}
-        />
-      ) : (
-        // Indeterminate — segmen pendek berputar
-        <rect
-          x={pad} y={pad} width={w} height={h} rx={r}
-          fill="none"
-          stroke={strokeColor}
-          strokeWidth={stroke}
-          strokeDasharray={`${perimeter * 0.25} ${perimeter}`}
-          strokeLinecap="round"
-          style={{ animation: "borderSpin 1.6s linear infinite" }}
-        />
-      )}
-    </svg>
-  );
-}
 
 export default function ScrapingModal({ onClose, onScrapingDone }: ScrapingModalProps) {
   const [location, setLocation] = useState("");
@@ -288,32 +216,8 @@ export default function ScrapingModal({ onClose, onScrapingDone }: ScrapingModal
     return null;
   })();
 
-  const phaseLabel = (() => {
-    if (phase === "scraping") {
-      if (targetCount !== null) return `Scraping ${scrapedCount} / ${targetCount}`;
-      return `Scraping ${scrapedCount} data...`;
-    }
-    if (phase === "ml") return "Klasifikasi ML...";
-    if (phase === "done") return "Selesai";
-    return null;
-  })();
-
-  const percentDisplay = (() => {
-    if (phase === "done") return "100%";
-    if (globalPercent !== null) return `${globalPercent}%`;
-    if (phase === "scraping" || phase === "ml") return "—";
-    return null;
-  })();
-
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <style>{`
-        @keyframes borderSpin {
-          from { stroke-dashoffset: 0; }
-          to   { stroke-dashoffset: -1000; }
-        }
-      `}</style>
-
       <ModalOverlay onClick={!isRunning ? handleClose : undefined} />
 
       <div className="relative w-full max-w-md bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-2xl flex flex-col overflow-hidden">
@@ -329,16 +233,26 @@ export default function ScrapingModal({ onClose, onScrapingDone }: ScrapingModal
           <button
             onClick={handleClose}
             disabled={isRunning}
-            className="shrink-0 mt-0.5 h-8 w-8 flex items-center justify-center rounded-lg text-zinc-400 hover:text-zinc-600 hover:bg-zinc-100 dark:hover:bg-zinc-800 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+            className="shrink-0 mt-0.5 h-8 w-8 flex items-center justify-center rounded-lg text-zinc-400 hover:text-zinc-600 hover:bg-zinc-100 dark:hover:bg-zinc-800 disabled:cursor-not-allowed transition-colors"
           >
-            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-              <path
-                d="M1 1l12 12M13 1L1 13"
-                stroke="currentColor"
-                strokeWidth="1.8"
-                strokeLinecap="round"
-              />
-            </svg>
+            {isRunning ? (
+              <span
+                className={`text-[10px] font-mono font-bold tabular-nums leading-none ${
+                  phase === "ml" ? "text-purple-400" : "text-blue-400"
+                }`}
+              >
+                {globalPercent !== null ? `${globalPercent}%` : "…"}
+              </span>
+            ) : (
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                <path
+                  d="M1 1l12 12M13 1L1 13"
+                  stroke="currentColor"
+                  strokeWidth="1.8"
+                  strokeLinecap="round"
+                />
+              </svg>
+            )}
           </button>
         </div>
 
@@ -404,53 +318,28 @@ export default function ScrapingModal({ onClose, onScrapingDone }: ScrapingModal
         </div>
 
         <div className="px-6 pb-6 flex flex-col gap-2">
-          <div className="flex items-center justify-between">
-            <p className="text-xs font-semibold text-zinc-500 dark:text-zinc-400">
-              Log Aktivitas
-            </p>
-            {phase !== "idle" && (
-              <div className="flex items-center gap-2">
-                {phaseLabel && (
-                  <span className="text-[10px] text-zinc-500 dark:text-zinc-400">
-                    {phaseLabel}
-                  </span>
-                )}
-                {percentDisplay && (
-                  <span
-                    className={`text-xs font-mono font-semibold tabular-nums ${
-                      phase === "done" ? "text-emerald-500" : "text-blue-400"
-                    }`}
-                  >
-                    {percentDisplay}
-                  </span>
-                )}
-              </div>
-            )}
-          </div>
+          <p className="text-xs font-semibold text-zinc-500 dark:text-zinc-400">
+            Log Aktivitas
+          </p>
 
-          <div className="relative">
-            <div
-              ref={logContainerRef}
-              className="h-36 bg-zinc-950 dark:bg-black rounded-xl p-3 overflow-y-auto flex flex-col gap-0.5"
-            >
-              {logs.length === 0 ? (
-                <p className="text-xs text-zinc-600">Menunggu scraping dimulai...</p>
-              ) : (
-                logs.map((entry) => (
-                  <div key={entry.id} className="flex items-start gap-2">
-                    <div className={`mt-1.5 shrink-0 w-1.5 h-1.5 rounded-full ${LOG_DOT[entry.type]}`} />
-                    <span className="text-[10px] text-zinc-600 shrink-0 tabular-nums font-mono w-16">
-                      {entry.time}
-                    </span>
-                    <span className={`text-xs leading-relaxed ${LOG_TEXT[entry.type]}`}>
-                      {entry.message}
-                    </span>
-                  </div>
-                ))
-              )}
-            </div>
-            {phase !== "idle" && (
-              <LogBorderProgress percent={globalPercent ?? (phase === "done" ? 100 : null)} />
+          <div
+            ref={logContainerRef}
+            className="h-36 bg-zinc-950 dark:bg-black rounded-xl p-3 overflow-y-auto flex flex-col gap-0.5 border border-zinc-800"
+          >
+            {logs.length === 0 ? (
+              <p className="text-xs text-zinc-600">Menunggu scraping dimulai...</p>
+            ) : (
+              logs.map((entry) => (
+                <div key={entry.id} className="flex items-start gap-2">
+                  <div className={`mt-1.5 shrink-0 w-1.5 h-1.5 rounded-full ${LOG_DOT[entry.type]}`} />
+                  <span className="text-[10px] text-zinc-600 shrink-0 tabular-nums font-mono w-16">
+                    {entry.time}
+                  </span>
+                  <span className={`text-xs leading-relaxed ${LOG_TEXT[entry.type]}`}>
+                    {entry.message}
+                  </span>
+                </div>
+              ))
             )}
           </div>
         </div>
