@@ -237,7 +237,7 @@ export default function ScrapingModal({ onClose, onScrapingDone }: ScrapingModal
           >
             {isRunning ? (
               <span
-                className={`text-[10px] font-mono font-bold tabular-nums leading-none ${
+                className={`text-sm font-mono font-bold tabular-nums leading-none ${
                   phase === "ml" ? "text-purple-400" : "text-blue-400"
                 }`}
               >
