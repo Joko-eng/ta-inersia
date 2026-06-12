@@ -4,8 +4,9 @@ const FASTAPI_BASE = process.env.FASTAPI_URL ?? "http://localhost:8000";
 
 export async function POST(
   _req: NextRequest,
-  { params }: { params: { job_id: string } },
+  { params }: { params: Promise<{ job_id: string }> },
 ) {
+  const { job_id } = await params;
   const res = await fetch(`${FASTAPI_BASE}/scrape/${params.job_id}/cancel`, {
     method: "POST",
   });
