@@ -53,7 +53,6 @@ function makeEntry(type: LogType, message: string): LogEntry {
   };
 }
 
-
 export default function ScrapingModal({ onClose, onScrapingDone }: ScrapingModalProps) {
   const [location, setLocation] = useState("");
   const [category, setCategory] = useState("");
@@ -65,9 +64,23 @@ export default function ScrapingModal({ onClose, onScrapingDone }: ScrapingModal
   const [scrapedCount, setScrapedCount] = useState(0);
   const [targetCount, setTargetCount] = useState<number | null>(null);
 
+  const [mlPercent, setMlPercent] = useState(80);
+
   const logContainerRef = useRef<HTMLDivElement>(null);
   const abortRef = useRef<AbortController | null>(null);
   const mlTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const jobIdRef = useRef<string | null>(null);
+  const isRunningRef = useRef(false);
+
+  useEffect(() => {
+    const cancelJob = () => {
+      if (isRunningRef.current && jobIdRef.current) {
+        navigator.sendBeacon(`/api/scraping/${jobIdRef.current}/cancel`);
+      }
+    };
+    window.addEventListener("pagehide", cancelJob);
+    return () => window.removeEventListener("pagehide", cancelJob);
+  }, []);
 
   const clearMlTimer = useCallback(() => {
     if (mlTimerRef.current) {
@@ -97,6 +110,14 @@ export default function ScrapingModal({ onClose, onScrapingDone }: ScrapingModal
 
   const runMLClassification = useCallback(async () => {
     setPhase("ml");
+    setMlPercent(80);
+    mlTimerRef.current = setInterval(() => {
+      setMlPercent((p) => {
+        if (p >= 99) return 99;
+        const step = Math.max(1, Math.floor((99 - p) / 6));
+        return p + step;
+      });
+    }, 600);
     appendLog("info", "Memulai klasifikasi Machine Learning...");
 
     try {
@@ -131,10 +152,12 @@ export default function ScrapingModal({ onClose, onScrapingDone }: ScrapingModal
     const parsedCount = dataCount ? Math.max(1, parseInt(dataCount)) : null;
 
     setIsRunning(true);
+    isRunningRef.current = true;
     setIsDone(false);
     setLogs([]);
     setPhase("scraping");
     setScrapedCount(0);
+    setMlPercent(80);
     setTargetCount(parsedCount);
 
     const controller = new AbortController();
@@ -176,8 +199,13 @@ export default function ScrapingModal({ onClose, onScrapingDone }: ScrapingModal
           if (!line.startsWith("data: ")) continue;
 
           try {
-            const json = JSON.parse(line.slice(6)) as { type: string; message: string };
+            const json = JSON.parse(line.slice(6)) as { type: string; message: string; job_id?: string };
+            if (json.type === "connected" && json.job_id) {
+              jobIdRef.current = json.job_id;
+              continue;
+            }
             if (json.type === "done") {
+              jobIdRef.current = null;
               await runMLClassification();
               break outer;
             }
@@ -195,23 +223,29 @@ export default function ScrapingModal({ onClose, onScrapingDone }: ScrapingModal
     } finally {
       abortRef.current = null;
       setIsRunning(false);
+      isRunningRef.current = false;
     }
   }, [location, category, dataCount, appendLog, runMLClassification]);
 
   const handleClose = useCallback(() => {
+    if (jobIdRef.current) {
+      navigator.sendBeacon(`/api/scraping/${jobIdRef.current}/cancel`);
+      jobIdRef.current = null;
+    }
     abortRef.current?.abort();
     clearMlTimer();
     onClose();
   }, [onClose, clearMlTimer]);
 
-  // Progress global: scraping = 0–80%, ML = 80–100%, done = 100%
   const globalPercent = (() => {
     if (phase === "idle") return null;
     if (phase === "done") return 100;
-    if (phase === "ml") return null; // indeterminate selama ML
+    if (phase === "ml") return mlPercent;
     if (phase === "scraping") {
-      if (targetCount === null || targetCount === 0) return null;
-      return Math.min(78, Math.round((scrapedCount / targetCount) * 80));
+      if (targetCount !== null && targetCount > 0) {
+        return Math.min(78, Math.round((scrapedCount / targetCount) * 78));
+      }
+      return Math.min(78, Math.round(scrapedCount / 2));
     }
     return null;
   })();
