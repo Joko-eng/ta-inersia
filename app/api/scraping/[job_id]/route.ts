@@ -7,7 +7,7 @@ export async function POST(
   { params }: { params: Promise<{ job_id: string }> },
 ) {
   const { job_id } = await params;
-  const res = await fetch(`${FASTAPI_BASE}/scrape/${params.job_id}/cancel`, {
+  const res = await fetch(`${FASTAPI_BASE}/scrape/${job_id}/cancel`, {
     method: "POST",
   });
 
