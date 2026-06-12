@@ -113,10 +113,10 @@ export default function TrackingResult({ result }: { result: TrackResult }) {
               key={label}
               className="bg-white dark:bg-neutral-800 rounded-xl px-4 py-3 border border-gray-100 dark:border-neutral-700"
             >
-              <p className="text-[10px] text-gray-400 dark:text-gray-500 mb-1 uppercase tracking-wide">
+              <p className="text-[8px] text-gray-400 dark:text-gray-500 mb-1 uppercase tracking-wide">
                 {label}
               </p>
-              <p className="text-xs font-semibold text-gray-800 dark:text-gray-200 leading-snug">
+              <p className="text-[10px] font-semibold text-gray-800 dark:text-gray-200 leading-snug">
                 {value}
               </p>
             </div>
