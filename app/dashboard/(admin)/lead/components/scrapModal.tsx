@@ -153,7 +153,6 @@ export default function ScrapingModal({ onClose, onScrapingDone }: ScrapingModal
 
     setIsRunning(true);
     isRunningRef.current = true;
-    setIsDone(false);
     setLogs([]);
     setPhase("scraping");
     setScrapedCount(0);
