@@ -9,6 +9,8 @@ interface TaskModalProps {
   teamMembers: TeamMember[];
   defaultStatus: "todo" | "inprogress" | "done";
   showStatusSelect: boolean;
+  currentTaskCount: number;
+  maxTasks?: number;
   onClose: () => void;
   onSuccess: () => void;
   onError: (msg: string) => void;
@@ -19,6 +21,8 @@ export default function TaskModal({
   teamMembers,
   defaultStatus,
   showStatusSelect,
+  currentTaskCount,
+  maxTasks = 12,
   onClose,
   onSuccess,
   onError,
@@ -44,6 +48,12 @@ export default function TaskModal({
 
   const handleSubmit = async () => {
     setErrors({});
+
+    if (currentTaskCount >= maxTasks) {
+      onError(`Proyek ini sudah mencapai batas maksimal ${maxTasks} task.`);
+      return;
+    }
+
     const clientError = validate();
     if (clientError) {
       setErrors(clientError);
@@ -88,6 +98,13 @@ export default function TaskModal({
           Form tambah task project
         </p>
 
+        {currentTaskCount >= maxTasks && (
+          <p className="text-xs text-red-500 bg-red-50 dark:bg-red-900/20 rounded px-3 py-2">
+            Proyek ini sudah mencapai batas maksimal {maxTasks} task. Hapus task
+            lain terlebih dahulu sebelum menambah yang baru.
+          </p>
+        )}
+
         <input
           value={newTask.title}
           placeholder="Judul"
@@ -115,15 +132,12 @@ export default function TaskModal({
             <select
               value={targetStatus}
               onChange={(e) =>
-                setTargetStatus(
-                  e.target.value as "todo" | "inprogress" | "done",
-                )
+                setTargetStatus(e.target.value as "todo" | "inprogress")
               }
               className="w-full border rounded px-3 py-2 dark:bg-zinc-950 dark:border-zinc-800 dark:text-zinc-100"
             >
               <option value="todo">Daftar Tugas</option>
               <option value="inprogress">Sedang Dikerjakan</option>
-              <option value="done">Selesai</option>
             </select>
           </div>
         )}
@@ -196,7 +210,8 @@ export default function TaskModal({
           </button>
           <button
             onClick={handleSubmit}
-            className="px-4 py-2 bg-primary dark:bg-white text-primary-foreground rounded"
+            disabled={currentTaskCount >= maxTasks}
+            className="px-4 py-2 bg-primary dark:bg-white text-primary-foreground rounded disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Simpan
           </button>

@@ -8,6 +8,7 @@ import {
   Droppable,
   DropResult,
 } from "@hello-pangea/dnd";
+import { toast } from "sonner";
 import TaskCard from "./TaskCard";
 
 interface KanbanBoardProps {
@@ -19,6 +20,20 @@ interface KanbanBoardProps {
   onEditTask: (task: Task) => void;
   onDeleteTask: (id: string) => void;
   onDragEnd: (result: DropResult) => void;
+  maxTasks?: number;
+}
+
+// Aturan transisi status yang TIDAK diperbolehkan.
+// harus melewati "inprogress" terlebih dahulu.
+const FORBIDDEN_TRANSITIONS: Record<string, string[]> = {
+  todo: ["done"],
+};
+
+function isTransitionAllowed(from: string, to: string) {
+  if (from === to) return true;
+  const blocked = FORBIDDEN_TRANSITIONS[from];
+  if (!blocked) return true;
+  return !blocked.includes(to);
 }
 
 export default function KanbanBoard({
@@ -30,9 +45,42 @@ export default function KanbanBoard({
   onEditTask,
   onDeleteTask,
   onDragEnd,
+  maxTasks = 12,
 }: KanbanBoardProps) {
+  const handleDragEnd = (result: DropResult) => {
+    const { source, destination } = result;
+
+    // Drop di luar area droppable, biarkan parent yang menangani (no-op).
+    if (!destination) {
+      onDragEnd(result);
+      return;
+    }
+
+    const from = source.droppableId;
+    const to = destination.droppableId;
+
+    if (!isTransitionAllowed(from, to)) {
+      // Tolak perpindahan: jangan teruskan ke parent, card akan kembali
+      // ke posisi semula karena state tidak berubah.
+      toast.error(
+        'Task harus melalui status "In Progress" sebelum bisa ditandai "Done".',
+      );
+      return;
+    }
+
+    onDragEnd(result);
+  };
+
+  const handleAddTask = (status: "todo" | "inprogress" | "done") => {
+    if (tasks.length >= maxTasks) {
+      toast.error(`Proyek ini sudah mencapai batas maksimal ${maxTasks} task.`);
+      return;
+    }
+    onAddTask(status);
+  };
+
   return (
-    <DragDropContext onDragEnd={onDragEnd}>
+    <DragDropContext onDragEnd={handleDragEnd}>
       <div className="flex gap-6 overflow-x-auto items-start pb-4">
         {COLUMNS.map((col) => (
           <Droppable key={col.id} droppableId={col.id}>
@@ -51,7 +99,7 @@ export default function KanbanBoard({
                   </span>
                   <button
                     onClick={() =>
-                      onAddTask(col.id as "todo" | "inprogress" | "done")
+                      handleAddTask(col.id as "todo" | "inprogress" | "done")
                     }
                   >
                     +

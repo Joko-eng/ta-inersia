@@ -18,6 +18,8 @@ import TaskModal from "../components/TaskCreate";
 import TaskDeleteModal from "../components/TaskDelete";
 import TaskEditModal from "../components/TaskEdit";
 
+const MAX_TASKS_PER_PROJECT = 13;
+
 export default function ProjectClient({
   projectId,
   initialMilestones,
@@ -180,6 +182,12 @@ export default function ProjectClient({
             <button
               onClick={() => {
                 if (activeTab === "tugas") {
+                  if (tasks.length >= MAX_TASKS_PER_PROJECT) {
+                    toast.error(
+                      `Proyek ini sudah mencapai batas maksimal ${MAX_TASKS_PER_PROJECT} task.`,
+                    );
+                    return;
+                  }
                   setTargetStatus("todo");
                   setShowStatusSelect(true);
                   setShowTaskModal(true);
@@ -225,6 +233,7 @@ export default function ProjectClient({
             milestones={milestones}
             openMenuId={openMenuId}
             onToggleMenu={setOpenMenuId}
+            maxTasks={MAX_TASKS_PER_PROJECT}
             onAddTask={(status) => {
               setTargetStatus(status);
               setShowTaskModal(true);
@@ -293,6 +302,8 @@ export default function ProjectClient({
             teamMembers={teamMembers}
             defaultStatus={targetStatus}
             showStatusSelect={showStatusSelect}
+            currentTaskCount={tasks.length}
+            maxTasks={MAX_TASKS_PER_PROJECT}
             onClose={() => setShowTaskModal(false)}
             onSuccess={() => {
               setShowTaskModal(false);
