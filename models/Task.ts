@@ -8,6 +8,11 @@ export interface ITask extends Document {
   priority: "rendah" | "sedang" | "tinggi";
   status: "todo" | "inprogress" | "done";
   statusUpdatedAt: Date;
+  // Bukti pengerjaan (gambar/dokumen) — disimpan di Cloudinary
+  attachmentUrl?: string;
+  attachmentPublicId?: string;
+  // Link referensi tambahan (deploy, Figma, repo, dsb)
+  link?: string;
   createdAt: Date;
 }
 
@@ -39,6 +44,18 @@ const TaskSchema = new Schema<ITask>(
     statusUpdatedAt: {
       type: Date,
       default: Date.now,
+    },
+    attachmentUrl: {
+      type: String,
+      default: null,
+    },
+    attachmentPublicId: {
+      type: String,
+      default: null,
+    },
+    link: {
+      type: String,
+      default: null,
     },
   },
   { timestamps: true },

@@ -139,6 +139,9 @@ export default function ProjectClient({
             ? editTask.assignee || null
             : editTask.assignee?.id || null,
         priority: editTask.priority,
+        link: editTask.link || null,
+        attachmentUrl: editTask.attachmentUrl || null,
+        attachmentPublicId: editTask.attachmentPublicId || null,
       }),
     });
     setShowTaskEdit(false);

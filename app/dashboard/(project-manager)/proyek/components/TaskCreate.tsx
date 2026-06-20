@@ -1,8 +1,13 @@
 "use client";
 
+import {
+  uploadAttachment,
+  validateAttachmentFile,
+} from "@/lib/uploadAttachment";
 import { Milestone } from "@/types/IMilestone";
 import { TeamMember } from "@/types/ITeamMember";
-import { useState } from "react";
+import { Paperclip, X } from "lucide-react";
+import { useRef, useState } from "react";
 
 interface TaskModalProps {
   milestones: Milestone[];
@@ -33,17 +38,51 @@ export default function TaskModal({
     milestoneId: "",
     assignee: "",
     priority: "sedang" as "rendah" | "sedang" | "tinggi",
+    link: "",
   });
   const [targetStatus, setTargetStatus] = useState<
     "todo" | "inprogress" | "done"
   >(defaultStatus);
   const [errors, setErrors] = useState<any>({});
 
+  const [file, setFile] = useState<File | null>(null);
+  const [filePreview, setFilePreview] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   const validate = () => {
     const errs: any = {};
     if (!newTask.title.trim()) errs.title = ["Judul task wajib diisi"];
     if (!newTask.milestoneId) errs.milestoneId = ["Milestone wajib dipilih"];
+    if (newTask.link && !/^https?:\/\/.+/i.test(newTask.link.trim())) {
+      errs.link = ["Link harus diawali dengan http:// atau https://"];
+    }
     return Object.keys(errs).length ? errs : null;
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selected = e.target.files?.[0];
+    if (!selected) return;
+
+    const validationError = validateAttachmentFile(selected);
+    if (validationError) {
+      onError(validationError);
+      e.target.value = "";
+      return;
+    }
+
+    setFile(selected);
+    if (selected.type.startsWith("image/")) {
+      setFilePreview(URL.createObjectURL(selected));
+    } else {
+      setFilePreview(null);
+    }
+  };
+
+  const handleRemoveFile = () => {
+    setFile(null);
+    setFilePreview(null);
+    if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
   const handleSubmit = async () => {
@@ -60,6 +99,27 @@ export default function TaskModal({
       return;
     }
 
+    let attachmentUrl: string | null = null;
+    let attachmentPublicId: string | null = null;
+
+    try {
+      setUploading(true);
+      if (file) {
+        const uploaded = await uploadAttachment(file);
+        attachmentUrl = uploaded.url;
+        attachmentPublicId = uploaded.publicId;
+      }
+    } catch (err: unknown) {
+      setUploading(false);
+      onError(
+        err instanceof Error
+          ? err.message
+          : "Gagal mengupload bukti pengerjaan",
+      );
+      return;
+    }
+    setUploading(false);
+
     const res = await fetch("/api/tasks", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -70,6 +130,9 @@ export default function TaskModal({
         assignee: newTask.assignee || null,
         priority: newTask.priority,
         status: targetStatus,
+        link: newTask.link.trim() || null,
+        attachmentUrl,
+        attachmentPublicId,
       }),
     });
 
@@ -84,13 +147,15 @@ export default function TaskModal({
       milestoneId: "",
       assignee: "",
       priority: "sedang",
+      link: "",
     });
+    handleRemoveFile();
     onSuccess();
   };
 
   return (
     <div className="fixed inset-0 bg-black/40 dark:bg-black/70 flex items-center justify-center z-50">
-      <div className="bg-white dark:bg-zinc-900 rounded-xl w-full max-w-md p-6 space-y-4 border dark:border-zinc-800">
+      <div className="bg-white dark:bg-zinc-900 rounded-xl w-full max-w-md p-6 space-y-4 border dark:border-zinc-800 max-h-[90vh] overflow-y-auto">
         <h3 className="font-semibold text-lg text-zinc-900 dark:text-zinc-100 mb-0">
           Tambah Task
         </h3>
@@ -197,6 +262,73 @@ export default function TaskModal({
           )}
         </div>
 
+        {/* Link referensi */}
+        <div className="space-y-1">
+          <p className="text-xs font-medium text-zinc-700 dark:text-zinc-300">
+            Link (opsional)
+          </p>
+          <input
+            value={newTask.link}
+            placeholder="https://..."
+            onChange={(e) => setNewTask({ ...newTask, link: e.target.value })}
+            className="w-full border rounded px-3 py-2 dark:bg-zinc-950 dark:border-zinc-800 dark:text-zinc-100"
+          />
+          {errors?.link && (
+            <p className="text-xs text-red-500 mt-1">{errors.link[0]}</p>
+          )}
+        </div>
+
+        {/* Bukti pengerjaan (gambar/dokumen) */}
+        <div className="space-y-1">
+          <p className="text-xs font-medium text-zinc-700 dark:text-zinc-300">
+            Bukti Pengerjaan (opsional)
+          </p>
+
+          {!file && (
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              className="w-full flex items-center justify-center gap-2 border border-dashed rounded px-3 py-3 text-sm text-zinc-500 dark:text-zinc-400 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800"
+            >
+              <Paperclip size={14} />
+              Pilih gambar atau dokumen (JPG, PNG, WEBP, PDF — maks 5MB)
+            </button>
+          )}
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/png,image/jpeg,image/webp,application/pdf"
+            onChange={handleFileChange}
+            className="hidden"
+          />
+
+          {file && (
+            <div className="flex items-center justify-between border rounded px-3 py-2 dark:border-zinc-700">
+              <div className="flex items-center gap-2 min-w-0">
+                {filePreview ? (
+                  <img
+                    src={filePreview}
+                    alt="preview"
+                    className="w-10 h-10 object-cover rounded"
+                  />
+                ) : (
+                  <Paperclip size={16} className="shrink-0" />
+                )}
+                <span className="text-xs text-zinc-700 dark:text-zinc-300 truncate">
+                  {file.name}
+                </span>
+              </div>
+              <button
+                type="button"
+                onClick={handleRemoveFile}
+                className="p-1 rounded hover:bg-zinc-100 dark:hover:bg-zinc-800 shrink-0"
+              >
+                <X size={14} />
+              </button>
+            </div>
+          )}
+        </div>
+
         <div className="flex justify-end gap-2 pt-2">
           <button
             type="button"
@@ -210,10 +342,10 @@ export default function TaskModal({
           </button>
           <button
             onClick={handleSubmit}
-            disabled={currentTaskCount >= maxTasks}
+            disabled={currentTaskCount >= maxTasks || uploading}
             className="px-4 py-2 bg-primary dark:bg-white text-primary-foreground rounded disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Simpan
+            {uploading ? "Mengupload..." : "Simpan"}
           </button>
         </div>
       </div>

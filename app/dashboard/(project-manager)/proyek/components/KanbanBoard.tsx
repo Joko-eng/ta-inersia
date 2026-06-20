@@ -88,7 +88,7 @@ export default function KanbanBoard({
               <div
                 ref={provided.innerRef}
                 {...provided.droppableProps}
-                className="min-w-[300px] max-h-[520px] overflow-y-auto bg-slate-100 dark:bg-zinc-900 rounded-2xl p-4 flex flex-col border border-transparent dark:border-zinc-800 scrollbar-hide"
+                className="min-w-[340px] max-h-[620px] overflow-y-auto bg-slate-100 dark:bg-zinc-900 rounded-2xl p-4 flex flex-col border border-transparent dark:border-zinc-800 scrollbar-hide"
               >
                 <div
                   className={`${col.color} dark:opacity-90 text-white rounded-full px-4 py-2 mb-4 flex justify-between items-center shrink-0 sticky top-0 z-10`}

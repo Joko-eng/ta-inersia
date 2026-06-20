@@ -1,3 +1,4 @@
+import cloudinary from "@/lib/cloudinary";
 import { connectDB } from "@/lib/mongodb";
 import { recomputeMilestone } from "@/lib/recomputeMilestone";
 import Milestone from "@/models/Milestone";
@@ -18,6 +19,9 @@ export async function POST(req: Request) {
     dueDate,
     priority,
     status,
+    link,
+    attachmentUrl,
+    attachmentPublicId,
   } = body;
 
   if (!title || !milestoneId)
@@ -34,6 +38,9 @@ export async function POST(req: Request) {
     dueDate: dueDate ? new Date(dueDate) : null,
     priority,
     status,
+    link: link || null,
+    attachmentUrl: attachmentUrl || null,
+    attachmentPublicId: attachmentPublicId || null,
   });
 
   await recomputeMilestone(milestoneId);
@@ -60,8 +67,17 @@ export async function PATCH(req: Request) {
 
 export async function PUT(req: Request) {
   await connectDB();
-  const { id, title, description, assignee, dueDate, priority } =
-    await req.json();
+  const {
+    id,
+    title,
+    description,
+    assignee,
+    dueDate,
+    priority,
+    link,
+    attachmentUrl,
+    attachmentPublicId,
+  } = await req.json();
 
   const task = await Task.findByIdAndUpdate(
     id,
@@ -71,6 +87,9 @@ export async function PUT(req: Request) {
       assignee: assignee || null,
       dueDate: dueDate ? new Date(dueDate) : null,
       priority,
+      link: link ?? null,
+      attachmentUrl: attachmentUrl ?? null,
+      attachmentPublicId: attachmentPublicId ?? null,
     },
     { new: true },
   );
@@ -88,6 +107,17 @@ export async function DELETE(req: Request) {
 
   const task = await Task.findById(id);
   if (!task) return NextResponse.json({ success: true });
+
+  // Bersihkan file bukti pengerjaan di Cloudinary jika ada
+  if (task.attachmentPublicId) {
+    try {
+      await cloudinary.uploader.destroy(task.attachmentPublicId, {
+        resource_type: "image",
+      });
+    } catch (err) {
+      console.error("Gagal menghapus attachment dari Cloudinary:", err);
+    }
+  }
 
   await Task.findByIdAndDelete(id);
   await recomputeMilestone(task.milestoneId.toString());
@@ -137,6 +167,9 @@ export async function GET(req: Request) {
       priority: t.priority,
       status: t.status,
       statusUpdatedAt: t.statusUpdatedAt,
+      link: t.link || null,
+      attachmentUrl: t.attachmentUrl || null,
+      attachmentPublicId: t.attachmentPublicId || null,
     })),
     team: team.map((m) => ({
       _id: m._id.toString(),
