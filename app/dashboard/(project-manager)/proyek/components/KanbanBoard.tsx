@@ -45,7 +45,7 @@ export default function KanbanBoard({
   onEditTask,
   onDeleteTask,
   onDragEnd,
-  maxTasks = 12,
+  maxTasks = 50,
 }: KanbanBoardProps) {
   const handleDragEnd = (result: DropResult) => {
     const { source, destination } = result;
@@ -63,7 +63,7 @@ export default function KanbanBoard({
       // Tolak perpindahan: jangan teruskan ke parent, card akan kembali
       // ke posisi semula karena state tidak berubah.
       toast.error(
-        'Task harus melalui status "In Progress" sebelum bisa ditandai "Done".',
+        'Task harus melalui status "Sedang dikerjakan" sebelum bisa ditandai "Selesai".',
       );
       return;
     }

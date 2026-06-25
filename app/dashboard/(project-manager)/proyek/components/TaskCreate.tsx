@@ -27,7 +27,7 @@ export default function TaskModal({
   defaultStatus,
   showStatusSelect,
   currentTaskCount,
-  maxTasks = 12,
+  maxTasks = 50,
   onClose,
   onSuccess,
   onError,
