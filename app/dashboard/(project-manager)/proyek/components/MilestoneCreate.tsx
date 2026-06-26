@@ -83,6 +83,7 @@ export default function MilestoneCreate({
               name="description"
               placeholder="Isi deskripsi milestone"
               value={newMilestone.description || ""}
+              maxLength={200}
               onChange={(e) => {
                 setNewMilestone({
                   ...newMilestone,
